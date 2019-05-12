@@ -1,10 +1,12 @@
 #include"Parser.h"
 #include"Utils.h"
 
-#include<string>
-#include<map>
-#include<vector>
+#include <string>
+#include <map>
+#include <vector>
+#include <stdio.h>
 
+#include<iostream>
 //struct keywordToken
 //{
 //	std::string	keyword;
@@ -39,9 +41,13 @@ static TokenType idOrKeyword(const char* start, uint32_t length) {
 	if (start == NULL) {
 		return TOKEN_UNKNOWN;
 	}
-	std::string token_start = start;
-	auto keywordsIter = keywordsToken.find(start);
-	if (keywordsIter->second.first == length && keywordsIter != keywordsToken.end()) {
+	char* token_c_str = (char*)malloc(length+1);
+	strncpy_s(token_c_str, length+1 , start, length);
+	std::string token_start = token_c_str + '\0';
+
+	auto keywordsIter = keywordsToken.find(token_start);
+	auto test = keywordsToken.find("super");
+	if (keywordsIter != keywordsToken.end() && keywordsIter->second.first == length ) {
 		return keywordsIter->second.second;
 	}
 	return TOKEN_IDENTIFIER;

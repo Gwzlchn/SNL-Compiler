@@ -3,7 +3,7 @@
 #define _PARSER_H
 
 enum TokenType {
-	TOKEN_UNKNOWN,
+	TOKEN_UNKNOWN = 0,
 	
 	//data type
 	TOKEN_NUM,    
