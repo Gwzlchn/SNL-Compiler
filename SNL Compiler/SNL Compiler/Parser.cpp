@@ -37,7 +37,7 @@ std::map<std::string, std::pair<int, TokenType>> keywordsToken{
 //判断当前单词是否为关键字，是返回相应token，否则是普通标识符
 static TokenType idOrKeyword(const char* start, uint32_t length) {
 	if (start == NULL) {
-		return TOKEN_UNKOWN;
+		return TOKEN_UNKNOWN;
 	}
 	std::string token_start = start;
 	auto keywordsIter = keywordsToken.find(start);
@@ -52,7 +52,7 @@ char lookAheadChar(Parser* parser) {
 	return *parser->nextCharPtr;
 }
 
-//指向下一个字符
+//指针移动，指向下一个字符
 static void getNextChar(Parser* parser) {
 	parser->curChar = *parser->nextCharPtr;
 	parser->nextCharPtr++;
@@ -86,7 +86,7 @@ static void parserId(Parser* parser, TokenType type) {
 	}
 	
 	uint32_t length = (uint32_t)(parser->nextCharPtr - parser->curToken.start - 1);
-	if (type != TOKEN_UNKOWN) {
+	if (type != TOKEN_UNKNOWN) {
 		parser->curToken.type = type;
 	}
 	else {
@@ -208,9 +208,197 @@ void getNextToken(Parser* parser) {
 				break;
 
 			case '[':
+				curTokenType = TOKEN_LEFT_BRACKET;
+				break;
+
+			case ']':
 				curTokenType = TOKEN_RIGHT_BRACKET;
+				break;
+
+			case '{':
+				curTokenType = TOKEN_LEFT_BRACE;
+				break;
+
+			case '}':
+				curTokenType = TOKEN_RIGHT_BRACE;
+				break;
+
+			case '.':
+				if (matchNextChar(parser, '.')) {
+					curTokenType = TOKEN_DOT_DOT;
+				}
+				else {
+					curTokenType = TOEKN_DOT;
+				}
+				break;
+
+			case '=':
+				if (matchNextChar(parser, '=')) {
+					curTokenType = TOKEN_EQUAL;
+				}
+				else {
+					curTokenType = TOKEN_ASSIGN;
+				}
+				break;
+
+			case '+':
+				curTokenType = TOKEN_ADD;
+				break;
+
+			case '-':
+				curTokenType = TOKEN_SUB;
+				break;
+
+			case '*':
+				curTokenType = TOKEN_MUL;
+				break;
+				
+			case '/': 
+				if (matchNextChar(parser, '/') || matchNextChar(parser, '*')) {
+					skipComment(parser);
+					parser->curToken.start = parser->nextCharPtr - 1;
+
+					continue;
+				}
+				else {
+					curTokenType = TOKEN_DIV;
+				}
+				break;			
+
+			case '%':
+				curTokenType = TOKEN_MOD;
+				break;
+				
+			case '&':
+				if (matchNextChar(parser, '&')) {
+					curTokenType = TOKEN_LOGIC_AND;
+				}
+				else {
+					curTokenType = TOKEN_BIT_AND;
+				}
+				break;
+
+			case '|':
+				if (matchNextChar(parser, '|')) {
+					curTokenType = TOKEN_LOGIC_OR;
+				}
+				else {
+					curTokenType = TOKEN_BIT_OR;
+				}
+				break;
+
+			case '~':
+				curTokenType = TOKEN_BIT_NOT;
+				break;
+
+			case '?':
+				curTokenType = TOKEN_QUESTION;
+				break;
+
+			case '>':
+				if (matchNextChar(parser, '>')) {
+					curTokenType = TOKEN_BIT_SHIFT_RIGHT;
+				}
+				else if (matchNextChar(parser, '=')) {
+					curTokenType = TOKEN_GREATER_EQUAL;
+				}
+				else {
+					curTokenType = TOKEN_GREATER;
+				}
+				break;
+
+			case '<':
+				if (matchNextChar(parser, '<')) {
+					curTokenType = TOKEN_BIT_SHIFT_RIGHT;
+				}
+				else if (matchNextChar(parser, '=')) {
+					curTokenType = TOKEN_LESS_EQUAL;
+				}
+				else {
+					curTokenType = TOKEN_LESS;
+				}
+				break;
+
+			case '!':
+				if (matchNextChar(parser, '=')) {
+					curTokenType = TOKEN_NOT_EQUAL;
+				}
+				else {
+					curTokenType = TOKEN_LOGIC_NOT;
+				}
+				break;
 			
+			case '"':
+				parseString(parser);
+				break;
+			
+			default:
+				//处理变量名和数字
+				if (isalpha(parser->curChar) || parser->curChar == '_') {
+					parserId(parser, TOKEN_UNKNOWN);
+				}
+				else {
+					LEX_ERROR(parser, "unsupport char: \'\c\', quit.", parser->curChar);
+				}
+				return;
 		}
+
+		// case break 后的出口
+		currentToken.length = (uint32_t)(parser->nextCharPtr - parser->curToken.start);
+		getNextChar(parser);
+		return;
+
 	}
 }
+
+//若当前token为expected则读入下一个token并返回true,
+//否则不读入token且返回false
+bool matchToken(Parser* parser, TokenType expected) {
+	if (parser->curToken.type == expected) {
+		getNextToken(parser);
+		return true;
+	}
+	return false;
+}
+
+//断言当前token为expected并读入下一token,否则报错errMsg
+void consumeCurToken(Parser* parser, TokenType expected, const char* errMsg) {
+	if (parser->curToken.type != expected) {
+		COMPILE_ERROR(parser, errMsg);
+	}
+	getNextToken(parser);
+}
+
+//断言下一个token为expected,否则报错errMsg
+void consumeNextToken(Parser* parser, TokenType expected, const char* errMsg) {
+	getNextToken(parser);
+	if (parser->curToken.type != expected) {
+		COMPILE_ERROR(parser, errMsg);
+	}
+}
+
+//由于sourceCode未必来自于文件file,有可能只是个字符串,
+//file仅用作跟踪待编译的代码的标识,方便报错
+void initParser(Parser* parser, const char* file, const char* sourceCode) {
+	parser->file = file;
+	parser->sourceCode = sourceCode;
+	parser->curChar = *parser->sourceCode;
+	parser->nextCharPtr = parser->sourceCode + 1;
+
+
+	parser->curToken.lineNo = 1;
+	parser->curToken.type = TOKEN_UNKNOWN;
+	parser->curToken.start = NULL;
+	parser->curToken.length = 0;
+
+	parser->preToken = parser->curToken;
+	parser->interpolation_ExpectRightParemNum = 0;
+}
+
+
+
+
+
+
+
 

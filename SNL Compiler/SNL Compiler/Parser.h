@@ -3,7 +3,7 @@
 #define _PARSER_H
 
 enum TokenType {
-	TOKEN_UNKOWN,
+	TOKEN_UNKNOWN,
 	
 	//data type
 	TOKEN_NUM,    
@@ -103,4 +103,37 @@ struct Parser
 	int interpolation_ExpectRightParemNum;
 };
 
+
+
+static TokenType idOrKeyword(const char* start, uint32_t length);
+
+char lookAheadChar(Parser* parser);
+
+static void getNextChar(Parser* parser);
+
+static bool matchNextChar(Parser* parser, char expectedChar);
+
+static void parserId(Parser* parser, TokenType type);
+
+static void parseString(Parser* parser);
+
+static void skipBlanks(Parser* parser);
+
+static void skipAline(Parser* parser);
+
+static void skipComment(Parser* parser);
+
+void getNextToken(Parser* parser);
+
+bool matchToken(Parser* parser, TokenType expected);
+
+void consumeCurToken(Parser* parser, TokenType expected, const char* errMsg);
+
+void consumeNextToken(Parser* parser, TokenType expected, const char* errMsg);
+
+void initParser(Parser* parser, const char* file, const char* sourceCode);
+
+
+
 #endif // !_PARSER_H
+
