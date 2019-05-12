@@ -7,9 +7,14 @@
 #include"token.list"
 
 char* readFile(const char* path) {
-	FILE* file = fopen(path, "r");
-	if (file == NULL) {
+	FILE* file;
+	errno_t err;
+	
+	if (err = fopen_s(&file, path, "r") != 0) {
 		IO_ERROR("Could`t open file \"%s\".\n", path);
+	}
+	else {
+		printf("The file  was opened\n");
 	}
 
 	struct stat fileStat;

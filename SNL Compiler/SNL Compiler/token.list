@@ -1,4 +1,4 @@
-char* tokenArray[] = {
+const char* tokenArray[] = {
    "UNKNOWN",
    "NUM",		   
    "STRING",     	   

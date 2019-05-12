@@ -338,7 +338,7 @@ void getNextToken(Parser* parser) {
 					parserId(parser, TOKEN_UNKNOWN);
 				}
 				else {
-					LEX_ERROR(parser, "unsupport char: \'\c\', quit.", parser->curChar);
+					LEX_ERROR(parser, "unsupport char: \'%c\', quit.", parser->curChar);
 				}
 				return;
 		}
