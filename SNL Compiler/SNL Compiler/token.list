@@ -2,7 +2,7 @@ const char* tokenArray[] = {
    "UNKNOWN",
    "NUM",		   
    "STRING",     	   
-   "IDENTIFIER",	     	   
+   "IDENYIFIER",	     	   
    "INTERPOLATION",
 
    "VAR",		   

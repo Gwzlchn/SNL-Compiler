@@ -4,7 +4,7 @@
 #include <iostream>
 #include "Parser.h"
 #include "Utils.h"
-#include "TokenName.h"
+#include"token.list"
 
 char* readFile(const char* path) {
 	FILE* file;
@@ -47,8 +47,8 @@ static void RunFile(const char* file_name) {
 	initParser(&parser, file_name, srcCode);
 	while (parser.curToken.type != TOKEN_EOF) {
 		getNextToken(&parser);
-		printf("%dLine:\t\t %s\t\t\t[", \
-			parser.curToken.lineNo, tokenArray[parser.curToken.type].c_str());
+		printf("%d Line: %s [ ", \
+			parser.curToken.lineNo, tokenArray[parser.curToken.type]);
 
 		uint32_t idx = 0;
 		while (idx < parser.curToken.length) {

@@ -1,5 +1,4 @@
-:(){}
-func
+import people for People 
 
 func fn() {
    var p = People.new("xiaoming", "male")
