@@ -2,19 +2,68 @@
 //
 
 #include <iostream>
+#include "Parser.h"
+#include "Utils.h"
+#include "TokenName.h"
+
+char* readFile(const char* path) {
+	FILE* file;
+	errno_t err;
+	
+	if (err = fopen_s(&file, path, "r") != 0) {
+		IO_ERROR("Could`t open file \"%s\".\n", path);
+	}
+	else {
+		printf("The file  was opened\n");
+	}
+
+	struct stat fileStat;
+	stat(path, &fileStat);
+	size_t fileSize = fileStat.st_size;
+	char* fileContent = (char*)malloc(fileSize + 1);
+	if (fileContent == NULL) {
+		MEM_ERROR("Could`t allocate memory for reading file \"%s\".\n", path);
+	
+	}
+
+	size_t numRead = fread(fileContent, sizeof(char), fileSize, file);
+	if (numRead < fileSize) {
+		IO_ERROR("Could`t read file \"%s\".\n", path);
+	}
+	fileContent[fileSize] = '\0';
+
+	fclose(file);
+	return fileContent;
+}
+
+
+
+
+static void RunFile(const char* file_name) {
+
+	const char* srcCode = readFile(file_name);
+
+	Parser parser;
+	initParser(&parser, file_name, srcCode);
+	while (parser.curToken.type != TOKEN_EOF) {
+		getNextToken(&parser);
+		printf("%dLine:\t\t %s\t\t\t[", \
+			parser.curToken.lineNo, tokenArray[parser.curToken.type].c_str());
+
+		uint32_t idx = 0;
+		while (idx < parser.curToken.length) {
+			printf("%c", *(parser.curToken.start + idx));
+			idx++;
+		}
+		printf("]\n");
+	}
+
+}
 
 int main()
 {
     std::cout << "Hello World!\n"; 
+	RunFile("./sample.snl");
+	return 0;
 }
 
-// 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
-// 调试程序: F5 或调试 >“开始调试”菜单
-
-// 入门提示: 
-//   1. 使用解决方案资源管理器窗口添加/管理文件
-//   2. 使用团队资源管理器窗口连接到源代码管理
-//   3. 使用输出窗口查看生成输出和其他消息
-//   4. 使用错误列表窗口查看错误
-//   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
-//   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件
