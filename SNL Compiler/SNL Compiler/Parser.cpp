@@ -95,6 +95,35 @@ static void parserId(Parser* parser, TokenType type) {
 	parser->curToken.length = length;
 }
 
+//解析字符串,暂不支持转义字符
+static void parseString(Parser* parser) {
+
+	while (true) {
+		getNextChar(parser);
+
+		if (parser->curChar == '\0') {
+			LEX_ERROR(parser, "unterminated string!");
+		}
+
+		if (parser->curChar == '"') {
+			parser->curToken.type = TOKEN_STRING;
+			break;
+		}
+
+		if (parser->curChar == '%') {
+			if (!matchNextChar(parser, '(')) {
+				LEX_ERROR(parser, "'%' should followed by '('!");
+			}
+			if (parser->interpolation_ExpectRightParemNum > 0) {
+				COMPILE_ERROR(parser, "sorry, I don`t support nest interpolate expression!");
+			}
+			parser->interpolation_ExpectRightParemNum = 1;
+			parser->curToken.type = TOKEN_INTERPOLATION;
+			break;
+		}
+	}
+}
+
 
 static void skipAline(Parser* parser) {
 	getNextChar(parser);
@@ -143,10 +172,45 @@ void getNextToken(Parser* parser) {
 	skipBlanks(parser);
 
 	//起始设置
-	parser->curToken.type = TOKEN_EOF;
-	parser->curToken.length = 0;
-	parser->curToken.start = parser->nextCharPtr - 1;
+	Token& currentToken = parser->curToken;
+	TokenType& curTokenType = currentToken.type;
+	curTokenType = TOKEN_EOF;
+	currentToken.length = 0;
+	currentToken.start = parser->nextCharPtr - 1;
 
+	while (parser->curChar!='\0')
+	{
+		switch (parser->curChar) {
+			case ',':
+				curTokenType = TOKEN_COMMA;
+				break;
 
+			case ':':
+				curTokenType = TOKEN_COLON;
+				break;
+
+			case '(':
+				if (parser->interpolation_ExpectRightParemNum > 0) {
+					parser->interpolation_ExpectRightParemNum++;
+				}
+				curTokenType = TOKEN_LEFT_PAREN;
+				break;
+
+			case ')':
+				if (parser->interpolation_ExpectRightParemNum > 0) {
+					parser->interpolation_ExpectRightParemNum--;
+					if (parser->interpolation_ExpectRightParemNum == 0) {
+						parseString(parser);
+						break;
+					}
+				}
+				curTokenType = TOKEN_RIGHT_PAREN;
+				break;
+
+			case '[':
+				curTokenType = TOKEN_RIGHT_BRACKET;
+			
+		}
+	}
 }
 
