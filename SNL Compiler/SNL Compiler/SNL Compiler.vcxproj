@@ -153,9 +153,11 @@
   <ItemGroup>
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="SNL Compiler.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parser.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,5 @@
 #include"Parser.h"
+#include"Utils.h"
 
 #include<string>
 #include<map>
@@ -34,7 +35,11 @@ std::map<std::string, std::pair<int, TokenType>> keywordsToken{
 };
 
 //判断当前单词是否为关键字，是返回相应token，否则是普通标识符
-static TokenType idOrKeyword(const std::string start, uint32_t length) {
+static TokenType idOrKeyword(const char* start, uint32_t length) {
+	if (start == NULL) {
+		return TOKEN_UNKOWN;
+	}
+	std::string token_start = start;
 	auto keywordsIter = keywordsToken.find(start);
 	if (keywordsIter->second.first == length && keywordsIter != keywordsToken.end()) {
 		return keywordsIter->second.second;
@@ -42,5 +47,106 @@ static TokenType idOrKeyword(const std::string start, uint32_t length) {
 	return TOKEN_IDENTIFIER;
 }
 
+//向前看一个字符
+char lookAheadChar(Parser* parser) {
+	return *parser->nextCharPtr;
+}
 
+//指向下一个字符
+static void getNextChar(Parser* parser) {
+	parser->curChar = *parser->nextCharPtr;
+	parser->nextCharPtr++;
+}
+
+//下一个字符是否与预期匹配
+static bool matchNextChar(Parser* parser, char expectedChar) {
+	if (lookAheadChar(parser) == expectedChar) {
+		getNextChar(parser);
+		return true;
+	}
+	return false;
+}
+
+//跳过连续空白
+static void skipBlanks(Parser* parser) {
+	while (isspace(parser->curChar)) {
+		if (parser->curChar == '\n') {
+			parser->curToken.lineNo++;
+		}
+		getNextChar(parser);
+	}
+}
+
+
+//解析标识符：变量名&函数名
+static void parserId(Parser* parser, TokenType type) {
+	
+	while (isalnum(parser->curChar) || parser->curChar == '_') {
+		getNextChar(parser);
+	}
+	
+	uint32_t length = (uint32_t)(parser->nextCharPtr - parser->curToken.start - 1);
+	if (type != TOKEN_UNKOWN) {
+		parser->curToken.type = type;
+	}
+	else {
+		parser->curToken.type = idOrKeyword(parser->curToken.start, length);
+	}
+	parser->curToken.length = length;
+}
+
+
+static void skipAline(Parser* parser) {
+	getNextChar(parser);
+	while (parser->curChar != '\0') {
+		if (parser->curChar == '\n') {
+			parser->curToken.lineNo++;
+			getNextChar(parser);
+			break;
+		}
+		getNextChar(parser);
+	}
+}
+
+//跳过注释：块注释&单行注释
+static void skipComment(Parser* parser) {
+	char nextChar = lookAheadChar(parser);
+	
+	// 单行注释,like //
+	if (parser->curChar == '/') {
+		skipAline(parser);
+	}
+	else {	//块注释,like /* ... */
+		while (nextChar != '*' && nextChar != '\0') {
+			getNextChar(parser);
+			if (parser->curChar == '\n') {
+				parser->curToken.lineNo++;
+			}
+			nextChar = lookAheadChar(parser);
+		}
+		if (matchNextChar(parser, '*')) {
+			if (!matchNextChar(parser, '/')) {
+				LEX_ERROR(parser, "expect '/' after '*' !");
+			}
+			getNextChar(parser);
+		}
+		else {
+			LEX_ERROR(parser, "except '*/' before file end!");
+		}
+	}
+	skipBlanks(parser);
+}
+
+//获得下一个token
+void getNextToken(Parser* parser) {
+	parser->preToken = parser->curToken;
+	skipBlanks(parser);
+
+	//起始设置
+	parser->curToken.type = TOKEN_EOF;
+	parser->curToken.length = 0;
+	parser->curToken.start = parser->nextCharPtr - 1;
+
+
+}
 
