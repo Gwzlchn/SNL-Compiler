@@ -34,7 +34,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="token.list">
+    <None Include="sample.snl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="TokenName.h">
       <Filter>头文件</Filter>
     </None>
   </ItemGroup>

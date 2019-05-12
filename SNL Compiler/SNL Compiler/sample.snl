@@ -1,5 +1,3 @@
-import people for People 
-
 func fn() {
    var p = People.new("xiaoming", "male")
    p.sayHi()
@@ -20,6 +18,4 @@ class Family < People {
 var f = Family.new("wbf", "ls", "shine")
 f.sayHi()
 
-fn() 
-
-
+fn()

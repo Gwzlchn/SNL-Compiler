@@ -4,7 +4,7 @@
 #include <iostream>
 #include "Parser.h"
 #include "Utils.h"
-#include"token.list"
+#include "TokenName.h"
 
 char* readFile(const char* path) {
 	FILE* file;
@@ -23,7 +23,6 @@ char* readFile(const char* path) {
 	char* fileContent = (char*)malloc(fileSize + 1);
 	if (fileContent == NULL) {
 		MEM_ERROR("Could`t allocate memory for reading file \"%s\".\n", path);
-	
 	}
 
 	size_t numRead = fread(fileContent, sizeof(char), fileSize, file);
@@ -47,8 +46,8 @@ static void RunFile(const char* file_name) {
 	initParser(&parser, file_name, srcCode);
 	while (parser.curToken.type != TOKEN_EOF) {
 		getNextToken(&parser);
-		printf("%d Line: %s [ ", \
-			parser.curToken.lineNo, tokenArray[parser.curToken.type]);
+		printf("%d Line: \t\t%s [", \
+			parser.curToken.lineNo, tokenArray[parser.curToken.type].c_str());
 
 		uint32_t idx = 0;
 		while (idx < parser.curToken.length) {

@@ -1,4 +1,7 @@
-const char* tokenArray[] = {
+#include<vector>
+#include<string>
+
+std::vector<std::string> tokenArray = {
    "UNKNOWN",
    "NUM",		   
    "STRING",     	   
@@ -14,7 +17,7 @@ const char* tokenArray[] = {
    "WHILE",	     	   
    "FOR",	     	   
    "BREAK",	     	   
-   "CONTINUE"
+   "CONTINUE",
    "RETURN",     	   
    "NULL",	     
    
