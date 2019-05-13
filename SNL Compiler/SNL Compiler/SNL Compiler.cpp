@@ -5,6 +5,7 @@
 #include "Parser.h"
 #include "Utils.h"
 #include "TokenName.h"
+#include "SLR1.h"
 
 char* readFile(const char* path) {
 	FILE* file;
@@ -62,7 +63,8 @@ static void RunFile(const char* file_name) {
 int main()
 {
     std::cout << "Hello World!\n"; 
-	RunFile("./sample.snl");
+	//RunFile("./sample.snl");
+	ProductionSet a = ProductionSet();
 	return 0;
 }
 
