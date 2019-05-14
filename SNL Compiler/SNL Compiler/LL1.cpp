@@ -1,7 +1,12 @@
-#include "SLR1.h"
+#include "LL1.h"
 #include <algorithm>
+#include <iterator>
 
-map<SLR1Token, pair<string, bool>> TokenNameMap{
+#define TERMIN true
+#define NOTTER false
+
+
+map<LL1Token, pair<string, bool>> TokenNameMap{
 	{Token_S,{"S",NOTTER}},
 	{Token_E,{"E",NOTTER}},
 	{Token_T,{"T",NOTTER}},
@@ -31,7 +36,7 @@ Production::Production() {
 	m_look_ahead_idx = -1;
 }
 
-Production::Production(SLR1Token left, vector<SLR1Token> right, int id, int idx)
+Production::Production(LL1Token left, vector<LL1Token> right, int id, int idx)
 {
 	//先验证产生式是否正确
 	if (TokenNameMap.find(left) == TokenNameMap.end()) {
@@ -59,20 +64,54 @@ inline bool Production::isLeftTerminal() {
 	return iter->second.second;
 }
 
-SLR1Token Production::getProducitonLeft()
+LL1Token Production::getProducitonLeft()
 {
 	return this->m_left;
 }
 
-vector<SLR1Token> Production::getProductionRight()
+vector<LL1Token> Production::getProductionRight()
 {
 	return this->m_right;
+}
+
+set<LL1Token> Production::getProdTer()
+{
+	set<LL1Token> ret;
+	if (this->isLeftTerminal()) {
+		ret.insert(this->m_left);
+	}
+	for (size_t i = 0; i < m_right.size(); i++) {
+		auto iter = TokenNameMap.find(m_right[i]);
+		if (iter->second.second) {
+			ret.insert(this->m_right[i]);
+		}
+	}
+	return ret;
+}
+
+set<LL1Token> Production::getProdNotTer()
+{
+	set<LL1Token> ret;
+	if (!this->isLeftTerminal()) {
+		ret.insert(this->m_left);
+	}
+	for (size_t i = 0; i < m_right.size(); i++) {
+		auto iter = TokenNameMap.find(m_right[i]);
+		if (!iter->second.second) {
+			ret.insert(this->m_right[i]);
+		}
+	}
+	return ret;
+
 }
 
 
 ProductionSet::ProductionSet() {
 	//按书中76页构造
 	Production prods[7];
+	m_terminal = set<LL1Token>();
+	m_notTerminal = set<LL1Token>();
+
 
 	int i = 0;
 	prods[0] = Production(Token_S, { Token_E,Token_eof },i++,0);
@@ -85,17 +124,18 @@ ProductionSet::ProductionSet() {
 
 	for (int i = 6; i >= 0; i--) {
 		m_productions.push_back(prods[i]);
+		auto temp_ter = prods[i].getProdTer();
+		auto temp_not = prods[i].getProdNotTer();
+		//对终极符集合求并，对非终极符集合求并
+		std::set_union(m_terminal.begin(), m_terminal.end(), temp_ter.begin(), temp_ter.end(), \
+			std::inserter(m_terminal,m_terminal.end()));
+		std::set_union(m_notTerminal.begin(), m_notTerminal.end(), temp_not.begin(), temp_not.end(), \
+			std::inserter(m_notTerminal, m_notTerminal.end()));
+
+
 	}
 	std::sort(m_productions.begin(), m_productions.end());
 
 }
 
 
-ProductionSet::ProductionSet(vector<Production> productions, bool is_init)
-{
-	m_productions = productions;
-	m_is_init = is_init;
-	if (is_init) {
-		
-	}
-}

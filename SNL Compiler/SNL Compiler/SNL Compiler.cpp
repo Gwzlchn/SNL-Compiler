@@ -5,7 +5,7 @@
 #include "Parser.h"
 #include "Utils.h"
 #include "TokenName.h"
-#include "SLR1.h"
+#include "LL1.h"
 
 char* readFile(const char* path) {
 	FILE* file;

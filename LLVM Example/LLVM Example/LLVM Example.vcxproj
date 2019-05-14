@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{CE241396-6688-4D5F-9392-3B4E78668CE7}</ProjectGuid>
+    <ProjectGuid>{D5C469EE-FDD6-4287-9F0D-CCCEC125389E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>SNLCompiler</RootNamespace>
+    <RootNamespace>LLVMExample</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -91,6 +91,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Program Files\LLVM\llvm-8.0.0.src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,6 +124,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Program Files\LLVM\llvm-8.0.0.src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,19 +153,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Parser.cpp" />
-    <ClCompile Include="LL1.cpp" />
-    <ClCompile Include="SNL Compiler.cpp" />
-    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="LLVM Example.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Parser.h" />
-    <ClInclude Include="LL1.h" />
-    <ClInclude Include="Utils.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="sample.snl" />
-    <None Include="TokenName.h" />
+    <ClInclude Include="include\KaleidoscopeJIT.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
