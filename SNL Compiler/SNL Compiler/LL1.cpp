@@ -11,6 +11,10 @@ map<LL1Token, pair<string, bool>> TokenNameMap{
 	{Token_E,{"E",NOTTER}},
 	{Token_T,{"T",NOTTER}},
 	{Token_P,{"P",NOTTER}},
+	{Token_E_Hat,{"E^",NOTTER}},
+	{Token_F,{"F",NOTTER}},
+	{Token_T_Hat,{"T^",NOTTER}},
+
 	{Token_id,{"id",TERMIN}},
 	{Token_left_paren,{"(",TERMIN}},
 	{Token_right_paren,{")",TERMIN}},
@@ -106,36 +110,219 @@ set<LL1Token> Production::getProdNotTer()
 }
 
 
+
+
+
 ProductionSet::ProductionSet() {
-	//按书中76页构造
-	Production prods[7];
+	
+
 	m_terminal = set<LL1Token>();
 	m_notTerminal = set<LL1Token>();
 
+	m_productions = makeProdsFromPage53();
 
-	int i = 0;
-	prods[0] = Production(Token_S, { Token_E,Token_eof },i++,0);
-	prods[1] = Production(Token_E, { Token_E,Token_add,Token_T }, i++, 0);
-	prods[2] = Production(Token_E, { Token_T }, i++, 0);
-	prods[3] = Production(Token_T, { Token_T,Token_mul,Token_P }, i++, 0);
-	prods[4] = Production(Token_T, { Token_P }, i++, 0);
-	prods[5] = Production(Token_P, { Token_id }, i++, 0);
-	prods[6] = Production(Token_P, { Token_left_paren,Token_E,Token_right_paren }, i++, 0);
+	for (auto prod_iter = m_productions.begin(); \
+		prod_iter != m_productions.end();prod_iter++) {
 
-	for (int i = 6; i >= 0; i--) {
-		m_productions.push_back(prods[i]);
-		auto temp_ter = prods[i].getProdTer();
-		auto temp_not = prods[i].getProdNotTer();
+		auto temp_ter = prod_iter->getProdTer();
+		auto temp_not = prod_iter->getProdNotTer();
 		//对终极符集合求并，对非终极符集合求并
-		std::set_union(m_terminal.begin(), m_terminal.end(), temp_ter.begin(), temp_ter.end(), \
-			std::inserter(m_terminal,m_terminal.end()));
-		std::set_union(m_notTerminal.begin(), m_notTerminal.end(), temp_not.begin(), temp_not.end(), \
-			std::inserter(m_notTerminal, m_notTerminal.end()));
+		setUnion(m_notTerminal, temp_not);
+		setUnion(m_terminal, temp_ter);
+	}
 
+	//std::sort(m_productions.begin(), m_productions.end());
+
+
+	this->getProdsFirstSet();
+
+}
+
+//按书中76页构造
+
+vector<Production> ProductionSet::makeProdsFromPage77()
+{
+	vector<Production> ret = vector<Production>();
+	int i = 0;
+	ret.push_back(Production(Token_S, { Token_E,Token_eof }, i++, 0));
+	ret.push_back(Production(Token_E, { Token_E,Token_add,Token_T }, i++, 0));
+	ret.push_back(Production(Token_E, { Token_T }, i++, 0));
+	ret.push_back(Production(Token_T, { Token_T,Token_mul,Token_P }, i++, 0));
+	ret.push_back(Production(Token_T, { Token_P }, i++, 0));
+	ret.push_back(Production(Token_P, { Token_id }, i++, 0));
+	ret.push_back(Production(Token_P, { Token_left_paren,Token_E,Token_right_paren }, i++, 0));
+	return ret;
+
+}
+
+vector<Production> ProductionSet::makeProdsFromPage53()
+{
+	auto ret = vector<Production>();
+	int i = 0;
+	ret.push_back(Production(Token_E, { Token_T,Token_E_Hat }, i++, 0));
+	ret.push_back(Production(Token_E_Hat, { Token_add,Token_T,Token_E_Hat }, i++, 0));
+	ret.push_back(Production(Token_E_Hat, { Token_Blank }, i++, 0));
+	ret.push_back(Production(Token_T, { Token_F,Token_T_Hat }, i++, 0));
+	ret.push_back(Production(Token_T_Hat, { Token_mul,Token_F,Token_T_Hat }, i++, 0));
+	ret.push_back(Production(Token_T_Hat, { Token_Blank }, i++, 0));
+	ret.push_back(Production(Token_F, { Token_id }, i++, 0));
+	ret.push_back(Production(Token_F, { Token_left_paren,Token_E,Token_right_paren }, i++, 0));
+
+	return ret;
+
+
+}
+
+
+
+
+void ProductionSet::getProdsFirstSet()
+{
+	//first集合初始化
+	for (auto ter_iter = m_terminal.begin(); \
+		ter_iter != m_terminal.end(); ter_iter++) {
+		set<LL1Token> temp = { *ter_iter };
+		m_first_sets[*ter_iter] = temp;
+	}
+	for (auto not_iter = m_notTerminal.begin(); \
+		not_iter != m_notTerminal.end(); not_iter++) {
+		set<LL1Token> temp = set<LL1Token>();
+		m_first_sets[*not_iter] = temp;
+	}
+	//进一步求非终极符的first集合
+
+	//仍在扩大，标志位
+	bool  expanded = true;
+	while (expanded) {
+		expanded = false;
+		
+		for (auto notTer_iter = m_notTerminal.begin();
+			notTer_iter != m_notTerminal.end();
+			notTer_iter++) {
+
+			//当前非终极符First集合
+			set<LL1Token>& cur_not_ter_first_set = m_first_sets.find(*notTer_iter)->second;
+			//对所有产生式遍历
+			for (auto prod_iter = m_productions.begin(); \
+				prod_iter !=  m_productions.end();prod_iter++) {
+				if (prod_iter->getProducitonLeft() == *notTer_iter) {
+
+					size_t before = m_first_sets[*notTer_iter].size();
+					vector<LL1Token> prod_right = prod_iter->getProductionRight();
+					size_t prod_r_len = prod_right.size();
+
+					
+					for (size_t i = 0; i < prod_r_len; i++) {
+						//如果第一个是终极符,直接退出
+						if (getTokenType(prod_right[i]) == 2) {
+							cur_not_ter_first_set.insert(prod_right[i]);
+							break;
+						}
+						//如果第一个是空白符,继续查下一个字符
+						else if (getTokenType(prod_right[i]) == 1) {
+							cur_not_ter_first_set.insert(prod_right[i]);
+							continue;
+						}
+						//如果第一个是非终极符,二者取交集
+						else if (getTokenType(prod_right[i]) == 3) {
+							set<LL1Token> r_first_set = m_first_sets.find(prod_right[i])->second;
+							setUnion(cur_not_ter_first_set, setRemoveBlank(r_first_set));
+
+							if (!isNotTerDeriBlank(prod_right[i])) {
+								break;
+							}
+							
+						}
+					}
+					//printSetMap(m_first_sets);
+					//只要有一个非终极符First集扩大,则继续循环
+					if (m_first_sets[*notTer_iter].size() != before) {
+						expanded = true;
+					}
+				}
+			}
+		}
+	}
+
+}
+
+
+
+
+
+inline void ProductionSet::setUnion(set<LL1Token>& dst, const set<LL1Token>& src)
+{
+	std::set_union(dst.begin(), dst.end(), src.begin(), src.end(), \
+		std::inserter(dst, dst.end()));
+	return;
+}
+
+template <typename T>
+string ProductionSet::get_token_str(const T& tok_vec) const
+{
+	string ret = "";
+	for (auto i = tok_vec.begin(); i != tok_vec.end(); i++) {
+		ret += TokenNameMap.find(*i)->second.first;
+		ret += " ";
+	}
+	return ret;
+}
+
+void ProductionSet::printSetMap(const map<LL1Token, set<LL1Token>>& sets) const
+{
+	std::cout << "----------------------" << std::endl;
+	for (auto iter = sets.begin(); iter != sets.end(); iter++) {
+		if (m_terminal.find(iter->first) == m_terminal.end()) {
+			std::cout << TokenNameMap.find(iter->first)->second.first << "\t";
+			std::cout << get_token_str<set<LL1Token>>(iter->second) << std::endl;
+		}
+		
 
 	}
-	std::sort(m_productions.begin(), m_productions.end());
+}
 
+set<LL1Token> ProductionSet::setRemoveBlank(const set<LL1Token>& src) const
+{
+	auto blk_iter = src.find(Token_Blank);
+	if (blk_iter == src.end()) {
+		return src;
+	}
+	else {
+		set<LL1Token> ret = src;
+		ret.erase(Token_Blank);
+		return ret;
+	}
+}
+
+//非终极符是否能推出空
+bool ProductionSet::isNotTerDeriBlank(LL1Token not_ter)
+{
+	auto iter = m_first_sets.find(not_ter);
+	if (iter == m_first_sets.end()) {
+		return false;
+	}
+
+	//集合里能找到,说明能推出空
+	return iter->second.find(Token_Blank) != iter->second.end();
+}
+
+
+
+int ProductionSet::getTokenType(LL1Token tok)
+{
+	if (tok == Token_Blank) {
+		return 1;
+	}
+	auto ter_iter = m_terminal.find(tok);
+	auto not_iter = m_notTerminal.find(tok);
+	if (ter_iter != m_terminal.end()) {
+		return 2; //是终极符
+	}
+	if (not_iter != m_notTerminal.end()) {
+		return 3;	//是非终极符
+	}
+
+	return 0;
 }
 
 

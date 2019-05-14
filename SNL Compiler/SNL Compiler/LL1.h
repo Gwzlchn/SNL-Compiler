@@ -20,6 +20,9 @@ enum LL1Token {
 	Token_E,
 	Token_T,
 	Token_P,
+	Token_E_Hat,
+	Token_T_Hat,
+	Token_F,
 	Token_id,
 	Token_left_paren,
 	Token_right_paren,
@@ -28,6 +31,8 @@ enum LL1Token {
 	Token_eof,
 	Token_start,
 	Token_Blank,
+	
+
 
 };
 
@@ -64,8 +69,8 @@ private:
 	//bool m_is_init;		//这个set可能有两个用处，一个是用来存全部文法，另一个是用来存放闭包；
 		
 	//每一个非终极符的Follow集
-	map<LL1Token, set<LL1Token>> FollowSets;
-	map<LL1Token, set<LL1Token>> FirstSets;
+	map<LL1Token, set<LL1Token>> m_follow_sets;
+	map<LL1Token, set<LL1Token>> m_first_sets;
 
 	set<LL1Token> m_terminal;
 	set<LL1Token> m_notTerminal;
@@ -73,10 +78,29 @@ private:
 public:
 		
 	ProductionSet();
+	vector<Production> makeProdsFromPage77();
+	vector<Production> makeProdsFromPage53();
 	//ProductionSet(vector<Production> productions, bool is_init);
 	//set<Production> getProductionClosure(Production one_prod);
 	void getProdsFirstSet();
+	void makeProdFirstSet(LL1Token not_ter, vector<LL1Token> r_token);
+	void setUnion(set<LL1Token>& dst, const set<LL1Token>& src);
+
+	template <typename T>
+	string get_token_str(const T& tok_vec)const  ;
+
+	
+	void printSetMap(const map<LL1Token, set<LL1Token>>& sets) const;
+
+	set<LL1Token> setRemoveBlank(const set<LL1Token>& src) const ;
+
+	bool isNotTerDeriBlank(LL1Token not_ter);
+
+	int getTokenType(LL1Token tok);
+
 	void getProdsFollowSet();
+
+
 
 };
 
