@@ -136,6 +136,7 @@ ProductionSet::ProductionSet() {
 
 	this->getProdsFirstSet();
 	this->getProdsFollowSet();
+	this->setPredictSet();
 
 }
 
@@ -277,10 +278,20 @@ void ProductionSet::printSetMap(const map<LL1Token, set<LL1Token>>& sets) const
 			std::cout << TokenNameMap.find(iter->first)->second.first << "\t";
 			std::cout << get_token_str<set<LL1Token>>(iter->second) << std::endl;
 		}
+	}
+}
+
+
+void ProductionSet::printPredictMap() const {
+	std::cout << "----------------------" << std::endl;
+	for (auto iter = m_predict_set.begin(); iter != m_predict_set.end(); iter++) {
 		
+			std::cout << iter->first << "\t";
+			std::cout << get_token_str<set<LL1Token>>(iter->second) << std::endl;
 
 	}
 }
+
 
 set<LL1Token> ProductionSet::setRemoveBlank(const set<LL1Token>& src) const
 {
@@ -409,6 +420,47 @@ bool ProductionSet::getAfterTokenInRightProd(const LL1Token& to_find, const Prod
 	}
 
 	return false;
+}
+
+void ProductionSet::setPredictSet()
+{
+	for (auto prod_iter = m_productions.begin(); \
+		prod_iter != m_productions.end(); prod_iter++) {
+		m_predict_set[prod_iter->get_id()] = getOneProdPredict(*prod_iter);
+	}
+	printPredictMap();
+	return;
+}
+
+set<LL1Token> ProductionSet::getTokenVecFirst(const vector<LL1Token>& tok_vec)  {
+	set<LL1Token> ret_set = set<LL1Token>();
+	for (auto iter = tok_vec.begin(); iter != tok_vec.end(); iter++) {
+		const set<LL1Token>& cur_first = m_first_sets.find(*iter)->second;
+		setUnion(ret_set, setRemoveBlank(cur_first));
+		
+		if (isBlankInTokenFirst(*iter)) {
+			if (iter == tok_vec.end() - 1) {
+				ret_set.insert(Token_Blank);
+			}
+			continue;
+		}
+		else {
+			break;
+		}
+	}
+	return ret_set;
+}
+
+set<LL1Token> ProductionSet::getOneProdPredict(const Production& prod)  {
+	set<LL1Token> right_first = getTokenVecFirst(prod.getProductionRight());
+	if (right_first.find(Token_Blank) == right_first.end()) {
+		return right_first;
+	}
+	else {
+		right_first.erase(Token_Blank);
+		setUnion(right_first, m_follow_sets[prod.getProducitonLeft()]);
+		return right_first;
+	}
 }
 
 

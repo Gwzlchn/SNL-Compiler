@@ -74,6 +74,8 @@ private:
 	map<LL1Token, set<LL1Token>> m_follow_sets;
 	map<LL1Token, set<LL1Token>> m_first_sets;
 
+	map<int, set<LL1Token>> m_predict_set;
+
 	set<LL1Token> m_terminal;
 	set<LL1Token> m_notTerminal;
 
@@ -94,6 +96,8 @@ public:
 	
 	void printSetMap(const map<LL1Token, set<LL1Token>>& sets) const;
 
+	void printPredictMap() const;
+
 	set<LL1Token> setRemoveBlank(const set<LL1Token>& src) const ;
 
 	bool isNotTerDeriBlank(LL1Token not_ter);
@@ -106,7 +110,9 @@ public:
 	//如果出现,同时返回紧接着字符的First集
 	bool getAfterTokenInRightProd(const LL1Token& to_find, const Production& prod, LL1Token& after_token);
 
-
+	void setPredictSet();
+	set<LL1Token> getTokenVecFirst(const vector<LL1Token>& tok_vec) ;
+	set<LL1Token> getOneProdPredict(const Production& prod) ;
 
 };
 
