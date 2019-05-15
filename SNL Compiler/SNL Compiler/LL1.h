@@ -84,13 +84,13 @@ private:
 	set<LL1Token> m_notTerminal;
 
 	//输入流
-	vector<LL1Token> m_input_stream;
+	stack<LL1Token, vector<LL1Token>> m_input_stream;
 	
 
 public:
 		
 	ProductionSet();
-	vector<LL1Token> makeInputStreamFromPage61();
+	stack<LL1Token, vector<LL1Token>> makeInputStreamFromPage61();
 	vector<Production> makeProdsFromPage77();
 	vector<Production> makeProdsFromPage53();
 	//ProductionSet(vector<Production> productions, bool is_init);
@@ -126,6 +126,8 @@ public:
 
 	//LL1 分析表
 	void setAnalyseMap();
+	bool LL1AnalyseProcess();
+	int getProdIdFromAnalyseMap(LL1Token ana_tok, LL1Token in_tok);
 };
 
 

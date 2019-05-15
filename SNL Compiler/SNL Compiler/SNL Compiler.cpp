@@ -64,7 +64,7 @@ static void RunFile(const char* file_name) {
 int main()
 {
     std::cout << "Hello World!\n"; 
-	//RunFile("./sample.snl");
+	RunFile("./sample.snl");
 	ProductionSet a = ProductionSet();
 	return 0;
 }

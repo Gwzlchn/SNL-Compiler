@@ -144,13 +144,14 @@ ProductionSet::ProductionSet() {
 
 	//构造输入流
 	this->m_input_stream = makeInputStreamFromPage61();
-
+	
+	this->LL1AnalyseProcess();
 
 }
 
 
 //构造输入流
-vector<LL1Token> ProductionSet::makeInputStreamFromPage61() {
+stack<LL1Token, vector<LL1Token>> ProductionSet::makeInputStreamFromPage61() {
 	vector<LL1Token> ret;
 	ret.push_back(Token_id);
 	ret.push_back(Token_add);
@@ -158,8 +159,9 @@ vector<LL1Token> ProductionSet::makeInputStreamFromPage61() {
 	ret.push_back(Token_mul);
 	ret.push_back(Token_id);
 	ret.push_back(Token_eof);
+	std::reverse(ret.begin(), ret.end());
 
-	return ret;
+	return stack<LL1Token,vector<LL1Token>>(ret);
 }
 
 
@@ -515,6 +517,44 @@ void ProductionSet::setAnalyseMap()
 			
 		}
 	}
+}
+
+
+bool ProductionSet::LL1AnalyseProcess() {
+	//初始化分析栈,对于输入流 front为栈底，end栈顶
+
+	LL1Token tok_start = m_productions[0].getProducitonLeft();
+	stack<LL1Token> LL1_analyse_stack;
+	LL1_analyse_stack.push(Token_eof);
+	LL1_analyse_stack.push(tok_start);
+
+	while (m_input_stream.size() != 0) {
+		LL1Token cur_input_tok = m_input_stream.top();
+		LL1Token cur_analyse_tok = LL1_analyse_stack.top();
+		if (cur_analyse_tok != cur_input_tok) {
+			int prod_id = getProdIdFromAnalyseMap(cur_analyse_tok, cur_input_tok);
+
+		}
+
+		//int i = 1;
+	}
+
+	return true;
+
+}
+
+
+int ProductionSet::getProdIdFromAnalyseMap(LL1Token ana_tok, LL1Token in_tok) {
+	auto iter = m_LL1_analyse_map.find(ana_tok);
+
+	for (vector<pair<LL1Token, Prod_Idx>>::iterator vec_iter = iter->second.begin();\
+		vec_iter != (iter->second).end(); vec_iter++) {
+
+		if (vec_iter->first == in_tok) {
+			return vec_iter->second;
+		}
+	}
+	return -1;
 }
 
 
