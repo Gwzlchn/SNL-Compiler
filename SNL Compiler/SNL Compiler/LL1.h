@@ -73,8 +73,11 @@ private:
 	//每一个非终极符的Follow集
 	map<LL1Token, set<LL1Token>> m_follow_sets;
 	map<LL1Token, set<LL1Token>> m_first_sets;
-
-	map<int, set<LL1Token>> m_predict_set;
+	typedef  int Prod_Idx;
+	//Predict 集合
+	map<Prod_Idx, set<LL1Token>> m_predict_set;
+	//LL1 分析表
+	map<LL1Token, vector<pair<LL1Token, Prod_Idx>>> m_LL1_analyse_map;
 
 	set<LL1Token> m_terminal;
 	set<LL1Token> m_notTerminal;
@@ -114,6 +117,9 @@ public:
 	set<LL1Token> getTokenVecFirst(const vector<LL1Token>& tok_vec) ;
 	set<LL1Token> getOneProdPredict(const Production& prod) ;
 
+
+	//LL1 分析表
+	void setAnalyseMap();
 };
 
 

@@ -121,6 +121,9 @@ ProductionSet::ProductionSet() {
 
 	m_productions = makeProdsFromPage53();
 
+	//m_productions = makeProdsFromPage77();
+
+
 	for (auto prod_iter = m_productions.begin(); \
 		prod_iter != m_productions.end();prod_iter++) {
 
@@ -137,6 +140,7 @@ ProductionSet::ProductionSet() {
 	this->getProdsFirstSet();
 	this->getProdsFollowSet();
 	this->setPredictSet();
+	this->setAnalyseMap();
 
 }
 
@@ -145,7 +149,7 @@ ProductionSet::ProductionSet() {
 vector<Production> ProductionSet::makeProdsFromPage77()
 {
 	vector<Production> ret = vector<Production>();
-	int i = 0;
+	int i = 1;
 	ret.push_back(Production(Token_S, { Token_E,Token_eof }, i++, 0));
 	ret.push_back(Production(Token_E, { Token_E,Token_add,Token_T }, i++, 0));
 	ret.push_back(Production(Token_E, { Token_T }, i++, 0));
@@ -160,7 +164,7 @@ vector<Production> ProductionSet::makeProdsFromPage77()
 vector<Production> ProductionSet::makeProdsFromPage53()
 {
 	auto ret = vector<Production>();
-	int i = 0;
+	int i = 1;
 	ret.push_back(Production(Token_E, { Token_T,Token_E_Hat }, i++, 0));
 	ret.push_back(Production(Token_E_Hat, { Token_add,Token_T,Token_E_Hat }, i++, 0));
 	ret.push_back(Production(Token_E_Hat, { Token_Blank }, i++, 0));
@@ -460,6 +464,29 @@ set<LL1Token> ProductionSet::getOneProdPredict(const Production& prod)  {
 		right_first.erase(Token_Blank);
 		setUnion(right_first, m_follow_sets[prod.getProducitonLeft()]);
 		return right_first;
+	}
+}
+
+void ProductionSet::setAnalyseMap()
+{
+	m_LL1_analyse_map = map<LL1Token, vector<pair<LL1Token, Prod_Idx>>>();
+	size_t ter_size = m_terminal.size();
+	for (auto not_ter_iter = m_notTerminal.begin(); \
+		not_ter_iter != m_notTerminal.end(); not_ter_iter++) {
+		//m_LL1_analyse_map[*not_ter_iter] = vector<pair<LL1Token, Prod_Idx>>(ter_size);
+	}
+
+	for (auto prod_iter = m_productions.begin(); \
+		prod_iter != m_productions.end(); prod_iter++) {
+		
+		//找到当前Predict集
+		set<LL1Token>& cur_predict = m_predict_set.find(prod_iter->get_id())->second;
+
+		for (auto ter_iter = cur_predict.begin(); \
+			ter_iter != cur_predict.end(); ter_iter++) {
+			m_LL1_analyse_map[prod_iter->getProducitonLeft()].push_back({ *ter_iter,prod_iter->get_id() });
+			
+		}
 	}
 }
 

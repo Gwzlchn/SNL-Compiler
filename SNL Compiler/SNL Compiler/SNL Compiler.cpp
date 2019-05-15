@@ -6,6 +6,7 @@
 #include "Utils.h"
 #include "TokenName.h"
 #include "LL1.h"
+#include <cstdio>
 
 char* readFile(const char* path) {
 	FILE* file;
