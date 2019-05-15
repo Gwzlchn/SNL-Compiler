@@ -397,11 +397,3 @@ void initParser(Parser* parser, const char* file, const char* sourceCode) {
 	parser->preToken = parser->curToken;
 	parser->interpolation_ExpectRightParemNum = 0;
 }
-
-
-
-
-
-
-
-
