@@ -121,6 +121,9 @@ ProductionSet::ProductionSet() {
 
 	m_productions = makeProdsFromPage53();
 
+	//m_productions = makeProdsFromPage77();
+
+
 	for (auto prod_iter = m_productions.begin(); \
 		prod_iter != m_productions.end();prod_iter++) {
 
