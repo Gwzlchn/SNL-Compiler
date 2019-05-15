@@ -68,12 +68,12 @@ inline bool Production::isLeftTerminal() {
 	return iter->second.second;
 }
 
-LL1Token Production::getProducitonLeft()
+LL1Token Production::getProducitonLeft() const
 {
 	return this->m_left;
 }
 
-vector<LL1Token> Production::getProductionRight()
+vector<LL1Token> Production::getProductionRight() const
 {
 	return this->m_right;
 }
@@ -135,6 +135,7 @@ ProductionSet::ProductionSet() {
 
 
 	this->getProdsFirstSet();
+	this->getProdsFollowSet();
 
 }
 
@@ -186,8 +187,8 @@ void ProductionSet::getProdsFirstSet()
 	}
 	for (auto not_iter = m_notTerminal.begin(); \
 		not_iter != m_notTerminal.end(); not_iter++) {
-		set<LL1Token> temp = set<LL1Token>();
-		m_first_sets[*not_iter] = temp;
+
+		m_first_sets[*not_iter] = set<LL1Token>();
 	}
 	//进一步求非终极符的first集合
 
@@ -294,6 +295,19 @@ set<LL1Token> ProductionSet::setRemoveBlank(const set<LL1Token>& src) const
 	}
 }
 
+//存在,返回true
+bool ProductionSet::isBlankInTokenFirst(const LL1Token& tok) const {
+	set<LL1Token> tok_first = m_first_sets.find(tok)->second;
+	if (tok_first.find(Token_Blank) != tok_first.end()) {
+		
+		return true;
+	}
+	else {
+		return false;
+	}
+
+}
+
 //非终极符是否能推出空
 bool ProductionSet::isNotTerDeriBlank(LL1Token not_ter)
 {
@@ -323,6 +337,78 @@ int ProductionSet::getTokenType(LL1Token tok)
 	}
 
 	return 0;
+}
+
+void ProductionSet::getProdsFollowSet()
+{
+	for (auto ter_iter = m_terminal.begin(); \
+		ter_iter != m_terminal.end(); ter_iter++) {
+		m_follow_sets[*ter_iter] = set<LL1Token>();
+	}
+	for (auto not_iter = m_notTerminal.begin(); \
+		not_iter != m_notTerminal.end(); not_iter++) {
+		m_follow_sets[*not_iter] = set<LL1Token>();
+	}
+
+	//找到开始符
+	LL1Token begin = m_productions[0].getProducitonLeft();
+	m_follow_sets[begin].insert(Token_eof);
+
+	bool expanded = true;
+	while (expanded) {
+		expanded = false;
+		for (auto not_iter = m_notTerminal.begin(); \
+			not_iter != m_notTerminal.end(); not_iter++) {
+
+			set<LL1Token>& cur_not_follow = m_follow_sets[*not_iter];
+			size_t before = cur_not_follow.size();
+			for (auto prod_iter = m_productions.begin(); \
+				prod_iter != m_productions.end(); prod_iter++) {
+				LL1Token after;
+				if (getAfterTokenInRightProd(*not_iter, *prod_iter, after)) {
+					set<LL1Token> after_fisrt_set = m_first_sets.find(after)->second;
+					set<LL1Token> remove_blank = setRemoveBlank(after_fisrt_set);
+					setUnion(cur_not_follow, remove_blank);
+
+					//右侧字符能推出空,并入左侧字符的follow
+					if (getTokenType(after) == 1 || isBlankInTokenFirst(after) ) {
+						std::cout << prod_iter->getProducitonLeft() << std::endl;
+						setUnion(cur_not_follow, (m_follow_sets.find(prod_iter->getProducitonLeft()))->second);
+					}
+				}
+				printSetMap(m_follow_sets);
+				if (before != cur_not_follow.size()) {
+
+					expanded = true;
+				}
+
+			}
+		}
+	}
+	return;
+
+
+
+}
+
+bool ProductionSet::getAfterTokenInRightProd(const LL1Token& to_find, const Production& prod, LL1Token& after_token)
+{
+	vector<LL1Token> right = prod.getProductionRight();
+	for (auto iter = right.begin(); iter != right.end(); iter++) {
+		if (*iter == to_find) {
+			if (iter == right.end() - 1) {
+				after_token = Token_Blank;
+				return true;
+			}
+			else {
+				after_token = *(iter + 1);
+				return true;
+			}
+		}
+		
+	}
+
+	return false;
 }
 
 

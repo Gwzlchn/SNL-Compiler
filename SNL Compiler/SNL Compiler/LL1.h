@@ -55,11 +55,13 @@ public:
 
 	bool isLeftTerminal();
 
-	LL1Token getProducitonLeft();
-	vector<LL1Token> getProductionRight();
+	LL1Token getProducitonLeft()const;
+	vector<LL1Token> getProductionRight() const ;
 
 	set<LL1Token> getProdTer();
 	set<LL1Token> getProdNotTer();
+
+	
 
 };
 
@@ -83,9 +85,9 @@ public:
 	//ProductionSet(vector<Production> productions, bool is_init);
 	//set<Production> getProductionClosure(Production one_prod);
 	void getProdsFirstSet();
-	void makeProdFirstSet(LL1Token not_ter, vector<LL1Token> r_token);
+	
 	void setUnion(set<LL1Token>& dst, const set<LL1Token>& src);
-
+	bool isBlankInTokenFirst(const LL1Token& tok) const ;
 	template <typename T>
 	string get_token_str(const T& tok_vec)const  ;
 
@@ -99,6 +101,10 @@ public:
 	int getTokenType(LL1Token tok);
 
 	void getProdsFollowSet();
+
+	//找该终极符是否在右侧表达式出现,出现则返回true,否则返回false;
+	//如果出现,同时返回紧接着字符的First集
+	bool getAfterTokenInRightProd(const LL1Token& to_find, const Production& prod, LL1Token& after_token);
 
 
 
