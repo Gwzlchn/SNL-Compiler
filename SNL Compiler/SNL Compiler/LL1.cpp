@@ -142,7 +142,29 @@ ProductionSet::ProductionSet() {
 	this->setPredictSet();
 	this->setAnalyseMap();
 
+	//构造输入流
+	this->m_input_stream = makeInputStreamFromPage61();
+
+
 }
+
+
+//构造输入流
+vector<LL1Token> ProductionSet::makeInputStreamFromPage61() {
+	vector<LL1Token> ret;
+	ret.push_back(Token_id);
+	ret.push_back(Token_add);
+	ret.push_back(Token_id);
+	ret.push_back(Token_mul);
+	ret.push_back(Token_id);
+	ret.push_back(Token_eof);
+
+	return ret;
+}
+
+
+
+
 
 //按书中76页构造
 
@@ -240,7 +262,7 @@ void ProductionSet::getProdsFirstSet()
 							
 						}
 					}
-					//printSetMap(m_first_sets);
+					
 					//只要有一个非终极符First集扩大,则继续循环
 					if (m_first_sets[*notTer_iter].size() != before) {
 						expanded = true;
@@ -249,6 +271,8 @@ void ProductionSet::getProdsFirstSet()
 			}
 		}
 	}
+	printSetMap(m_first_sets);
+	return;
 
 }
 
@@ -387,11 +411,11 @@ void ProductionSet::getProdsFollowSet()
 
 					//右侧字符能推出空,并入左侧字符的follow
 					if (getTokenType(after) == 1 || isBlankInTokenFirst(after) ) {
-						std::cout << prod_iter->getProducitonLeft() << std::endl;
+						//std::cout << prod_iter->getProducitonLeft() << std::endl;
 						setUnion(cur_not_follow, (m_follow_sets.find(prod_iter->getProducitonLeft()))->second);
 					}
 				}
-				printSetMap(m_follow_sets);
+				
 				if (before != cur_not_follow.size()) {
 
 					expanded = true;
@@ -400,6 +424,9 @@ void ProductionSet::getProdsFollowSet()
 			}
 		}
 	}
+
+	printSetMap(m_follow_sets);
+
 	return;
 
 

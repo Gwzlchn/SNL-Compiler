@@ -6,13 +6,14 @@
 #include<vector>
 #include<set>
 #include <iostream>
-
+#include<stack>
 
 using std::vector;
 using std::string;
 using std::map;
 using std::pair;
 using std::set;
+using std::stack;
 
 
 enum LL1Token {
@@ -82,9 +83,14 @@ private:
 	set<LL1Token> m_terminal;
 	set<LL1Token> m_notTerminal;
 
+	//输入流
+	vector<LL1Token> m_input_stream;
+	
+
 public:
 		
 	ProductionSet();
+	vector<LL1Token> makeInputStreamFromPage61();
 	vector<Production> makeProdsFromPage77();
 	vector<Production> makeProdsFromPage53();
 	//ProductionSet(vector<Production> productions, bool is_init);
@@ -121,9 +127,6 @@ public:
 	//LL1 分析表
 	void setAnalyseMap();
 };
-
-
-
 
 
 
