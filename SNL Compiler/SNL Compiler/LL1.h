@@ -6,13 +6,14 @@
 #include<vector>
 #include<set>
 #include <iostream>
-
+#include<stack>
 
 using std::vector;
 using std::string;
 using std::map;
 using std::pair;
 using std::set;
+using std::stack;
 
 
 enum LL1Token {
@@ -73,15 +74,23 @@ private:
 	//每一个非终极符的Follow集
 	map<LL1Token, set<LL1Token>> m_follow_sets;
 	map<LL1Token, set<LL1Token>> m_first_sets;
-
-	map<int, set<LL1Token>> m_predict_set;
+	typedef  int Prod_Idx;
+	//Predict 集合
+	map<Prod_Idx, set<LL1Token>> m_predict_set;
+	//LL1 分析表
+	map<LL1Token, vector<pair<LL1Token, Prod_Idx>>> m_LL1_analyse_map;
 
 	set<LL1Token> m_terminal;
 	set<LL1Token> m_notTerminal;
 
+	//输入流
+	stack<LL1Token, vector<LL1Token>> m_input_stream;
+	
+
 public:
 		
 	ProductionSet();
+	stack<LL1Token, vector<LL1Token>> makeInputStreamFromPage61();
 	vector<Production> makeProdsFromPage77();
 	vector<Production> makeProdsFromPage53();
 	//ProductionSet(vector<Production> productions, bool is_init);
@@ -114,10 +123,14 @@ public:
 	set<LL1Token> getTokenVecFirst(const vector<LL1Token>& tok_vec) ;
 	set<LL1Token> getOneProdPredict(const Production& prod) ;
 
+
+	//LL1 分析表
+	void setAnalyseMap();
+	bool LL1AnalyseProcess();
+	void printStack(const stack<LL1Token>& tok_stack) const;
+	int getProdIdFromAnalyseMap(LL1Token ana_tok, LL1Token in_tok);
+	void pushProdToAnaylseStack(int prod_id, stack<LL1Token>& ana_stack);
 };
-
-
-
 
 
 

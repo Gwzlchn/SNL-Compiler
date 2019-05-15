@@ -140,15 +140,40 @@ ProductionSet::ProductionSet() {
 	this->getProdsFirstSet();
 	this->getProdsFollowSet();
 	this->setPredictSet();
+	this->setAnalyseMap();
+
+	//构造输入流
+	this->m_input_stream = makeInputStreamFromPage61();
+	
+	this->LL1AnalyseProcess();
 
 }
+
+
+//构造输入流
+stack<LL1Token, vector<LL1Token>> ProductionSet::makeInputStreamFromPage61() {
+	vector<LL1Token> ret;
+	ret.push_back(Token_id);
+	ret.push_back(Token_add);
+	ret.push_back(Token_id);
+	ret.push_back(Token_mul);
+	ret.push_back(Token_id);
+	ret.push_back(Token_eof);
+	std::reverse(ret.begin(), ret.end());
+
+	return stack<LL1Token,vector<LL1Token>>(ret);
+}
+
+
+
+
 
 //按书中76页构造
 
 vector<Production> ProductionSet::makeProdsFromPage77()
 {
 	vector<Production> ret = vector<Production>();
-	int i = 0;
+	int i = 1;
 	ret.push_back(Production(Token_S, { Token_E,Token_eof }, i++, 0));
 	ret.push_back(Production(Token_E, { Token_E,Token_add,Token_T }, i++, 0));
 	ret.push_back(Production(Token_E, { Token_T }, i++, 0));
@@ -163,7 +188,7 @@ vector<Production> ProductionSet::makeProdsFromPage77()
 vector<Production> ProductionSet::makeProdsFromPage53()
 {
 	auto ret = vector<Production>();
-	int i = 0;
+	int i = 1;
 	ret.push_back(Production(Token_E, { Token_T,Token_E_Hat }, i++, 0));
 	ret.push_back(Production(Token_E_Hat, { Token_add,Token_T,Token_E_Hat }, i++, 0));
 	ret.push_back(Production(Token_E_Hat, { Token_Blank }, i++, 0));
@@ -239,7 +264,7 @@ void ProductionSet::getProdsFirstSet()
 							
 						}
 					}
-					//printSetMap(m_first_sets);
+					
 					//只要有一个非终极符First集扩大,则继续循环
 					if (m_first_sets[*notTer_iter].size() != before) {
 						expanded = true;
@@ -248,6 +273,8 @@ void ProductionSet::getProdsFirstSet()
 			}
 		}
 	}
+	printSetMap(m_first_sets);
+	return;
 
 }
 
@@ -386,11 +413,11 @@ void ProductionSet::getProdsFollowSet()
 
 					//右侧字符能推出空,并入左侧字符的follow
 					if (getTokenType(after) == 1 || isBlankInTokenFirst(after) ) {
-						std::cout << prod_iter->getProducitonLeft() << std::endl;
+						//std::cout << prod_iter->getProducitonLeft() << std::endl;
 						setUnion(cur_not_follow, (m_follow_sets.find(prod_iter->getProducitonLeft()))->second);
 					}
 				}
-				printSetMap(m_follow_sets);
+				
 				if (before != cur_not_follow.size()) {
 
 					expanded = true;
@@ -399,6 +426,9 @@ void ProductionSet::getProdsFollowSet()
 			}
 		}
 	}
+
+	printSetMap(m_follow_sets);
+
 	return;
 
 
@@ -466,4 +496,87 @@ set<LL1Token> ProductionSet::getOneProdPredict(const Production& prod)  {
 	}
 }
 
+void ProductionSet::setAnalyseMap()
+{
+	m_LL1_analyse_map = map<LL1Token, vector<pair<LL1Token, Prod_Idx>>>();
+	size_t ter_size = m_terminal.size();
+	for (auto not_ter_iter = m_notTerminal.begin(); \
+		not_ter_iter != m_notTerminal.end(); not_ter_iter++) {
+		//m_LL1_analyse_map[*not_ter_iter] = vector<pair<LL1Token, Prod_Idx>>(ter_size);
+	}
 
+	for (auto prod_iter = m_productions.begin(); \
+		prod_iter != m_productions.end(); prod_iter++) {
+		
+		//找到当前Predict集
+		set<LL1Token>& cur_predict = m_predict_set.find(prod_iter->get_id())->second;
+
+		for (auto ter_iter = cur_predict.begin(); \
+			ter_iter != cur_predict.end(); ter_iter++) {
+			m_LL1_analyse_map[prod_iter->getProducitonLeft()].push_back({ *ter_iter,prod_iter->get_id() });
+			
+		}
+	}
+}
+
+
+bool ProductionSet::LL1AnalyseProcess() {
+	//初始化分析栈,对于输入流 front为栈底，end栈顶
+
+	LL1Token tok_start = m_productions[0].getProducitonLeft();
+	stack<LL1Token> LL1_analyse_stack;
+	LL1_analyse_stack.push(Token_eof);
+	LL1_analyse_stack.push(tok_start);
+
+	while (m_input_stream.size() != 0) {
+		LL1Token cur_input_tok = m_input_stream.top();
+		LL1Token cur_analyse_tok = LL1_analyse_stack.top();
+		//输入流和分析栈没match，输入流不弹出
+		if (cur_analyse_tok != cur_input_tok) {
+			int prod_id = getProdIdFromAnalyseMap(cur_analyse_tok, cur_input_tok);
+			LL1_analyse_stack.pop();
+			this->pushProdToAnaylseStack(prod_id, LL1_analyse_stack);
+			continue;
+		}
+		else { //Match
+			LL1_analyse_stack.pop();
+			m_input_stream.pop();
+		}
+
+		//int i = 1;
+	}
+
+	return true;
+
+}
+
+
+void ProductionSet::printStack(const stack<LL1Token>& tok_stack)const{
+	
+}
+
+int ProductionSet::getProdIdFromAnalyseMap(LL1Token ana_tok, LL1Token in_tok) {
+	auto iter = m_LL1_analyse_map.find(ana_tok);
+
+	for (vector<pair<LL1Token, Prod_Idx>>::iterator vec_iter = iter->second.begin();\
+		vec_iter != (iter->second).end(); vec_iter++) {
+
+		if (vec_iter->first == in_tok) {
+			return vec_iter->second;
+		}
+	}
+	return -1;
+}
+
+void ProductionSet::pushProdToAnaylseStack(int prod_id, stack<LL1Token>& ana_stack) {
+
+	const vector<LL1Token>& prod_right = m_productions[prod_id-1].getProductionRight();
+	for (auto res_iter = prod_right.rbegin(); res_iter != prod_right.rend(); res_iter++) {
+		if (*res_iter != Token_Blank) {
+			ana_stack.push(*res_iter);
+		}
+		
+	}
+
+	return;
+}
