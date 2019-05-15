@@ -531,9 +531,16 @@ bool ProductionSet::LL1AnalyseProcess() {
 	while (m_input_stream.size() != 0) {
 		LL1Token cur_input_tok = m_input_stream.top();
 		LL1Token cur_analyse_tok = LL1_analyse_stack.top();
+		//输入流和分析栈没match，输入流不弹出
 		if (cur_analyse_tok != cur_input_tok) {
 			int prod_id = getProdIdFromAnalyseMap(cur_analyse_tok, cur_input_tok);
-
+			LL1_analyse_stack.pop();
+			this->pushProdToAnaylseStack(prod_id, LL1_analyse_stack);
+			continue;
+		}
+		else { //Match
+			LL1_analyse_stack.pop();
+			m_input_stream.pop();
 		}
 
 		//int i = 1;
@@ -543,6 +550,10 @@ bool ProductionSet::LL1AnalyseProcess() {
 
 }
 
+
+void ProductionSet::printStack(const stack<LL1Token>& tok_stack)const{
+	
+}
 
 int ProductionSet::getProdIdFromAnalyseMap(LL1Token ana_tok, LL1Token in_tok) {
 	auto iter = m_LL1_analyse_map.find(ana_tok);
@@ -557,4 +568,15 @@ int ProductionSet::getProdIdFromAnalyseMap(LL1Token ana_tok, LL1Token in_tok) {
 	return -1;
 }
 
+void ProductionSet::pushProdToAnaylseStack(int prod_id, stack<LL1Token>& ana_stack) {
 
+	const vector<LL1Token>& prod_right = m_productions[prod_id-1].getProductionRight();
+	for (auto res_iter = prod_right.rbegin(); res_iter != prod_right.rend(); res_iter++) {
+		if (*res_iter != Token_Blank) {
+			ana_stack.push(*res_iter);
+		}
+		
+	}
+
+	return;
+}

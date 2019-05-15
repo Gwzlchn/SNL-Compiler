@@ -127,7 +127,9 @@ public:
 	//LL1 ·ÖÎö±í
 	void setAnalyseMap();
 	bool LL1AnalyseProcess();
+	void printStack(const stack<LL1Token>& tok_stack) const;
 	int getProdIdFromAnalyseMap(LL1Token ana_tok, LL1Token in_tok);
+	void pushProdToAnaylseStack(int prod_id, stack<LL1Token>& ana_stack);
 };
 
 
