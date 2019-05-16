@@ -151,21 +151,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="LL1.cpp" />
     <ClCompile Include="SNL Compiler.cpp" />
     <ClCompile Include="SNL_Parser.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Parser.h" />
     <ClInclude Include="LL1.h" />
     <ClInclude Include="SNL_Parser.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample.snl" />
-    <None Include="TokenName.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="garbage.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

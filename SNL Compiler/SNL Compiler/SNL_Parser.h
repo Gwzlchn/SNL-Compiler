@@ -15,6 +15,8 @@ using std::string;
 /********************** 单词的词法类型 ********************/
  enum SNL_TOKEN_TYPE
 {
+	 //空白符
+	 TOKEN_BLANK,
 	/* 簿记单词符号 */
 	 TOKEN_ENDFILE, TOKEN_ERROR,
 	/* 保留字 */
@@ -39,17 +41,17 @@ using std::string;
 	TOKEN_BIT_SHIFT_RIGHT,TOKEN_BIT_SHIFT_LEFT,
 	TOKEN_LOGIC_AND,TOKEN_LOGIC_OR,TOKEN_LOGIC_NOT,
 	TOKEN_NOT_EQUAL,TOKEN_GREATER,TOKEN_GREATER_EQUAL,
-	TOKEN_LESS_EQUAL,TOKEN_QUESTION,
+	TOKEN_LESS_EQUAL,TOKEN_QUESTION, TOKEN_STRING,
 
 
 /*所有非终极符，其各自含义可参考LL1文法*/
 
 	Token_Program, Token_ProgramHead, Token_ProgramName, Token_DeclarePart,
-	Token_TypeDec, Token_TypeDeclaration, Token_TypeDecList, Token_TypeDecMore,
+	Token_TypeDec, Token_TypeDecpart, Token_TypeDecList, Token_TypeDecMore,
 	Token_TypeId, Token_TypeName, Token_BaseType, Token_StructureType,
 	Token_ArrayType, Token_Low, Token_Top, Token_RecType,
 	Token_FieldDecList, Token_FieldDecMore, Token_IdList, Token_IdMore,
-	Token_VarDec, Token_VarDeclaration, Token_VarDecList, Token_VarDecMore,
+	Token_VarDec, Token_VarDecpart, Token_VarDecList, Token_VarDecMore,
 	Token_VarIdList, Token_VarIdMore, Token_ProcDec, Token_ProcDeclaration,
 	Token_ProcDecMore, Token_ProcName, Token_ParamList, Token_ParamDecList,
 	Token_ParamMore, Token_Param, Token_FormList, Token_FidMore,
@@ -61,14 +63,17 @@ using std::string;
 	Token_Exp, Token_OtherTerm, Token_Term, Token_OtherFactor,
 	Token_Factor, Token_Variable, Token_VariMore, Token_FieldVar,
 	Token_FieldVarMore, Token_CmpOp, Token_AddOp, Token_MultOp,
+	
 
-	TOKEN_STRING
+
+
+	
 
 }  ;
 
  extern map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map;
  extern map<string , SNL_TOKEN_TYPE> Token_Name_Type_Map;
-
+ extern map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map;
 
 
  struct Token
@@ -82,7 +87,7 @@ using std::string;
 
  class Parser
  {
- public:
+ private:
 	 const char* file;
 	 const char* sourceCode;
 	 const char* nextCharPtr;
@@ -98,8 +103,16 @@ using std::string;
 	 vector<SNL_TOKEN_TYPE> m_Token_Vec;
 
  public:
-	 Parser(const char* file, const char* sourceCode);
+	 Parser(const char* file);
 
+	 char* readFile(const char* path);
+
+	 void RunFile();
+
+
+	 const char* getFileName();
+
+	 uint32_t getCurrentLineNo();
 
 	 SNL_TOKEN_TYPE idOrKeyword(const char* start, uint32_t length);
 
@@ -129,7 +142,7 @@ using std::string;
 
 	 void consumeNextToken(SNL_TOKEN_TYPE expected, const char* errMsg);
 
-	 void initParser(const char* file, const char* sourceCode);
+	
  };
 
 

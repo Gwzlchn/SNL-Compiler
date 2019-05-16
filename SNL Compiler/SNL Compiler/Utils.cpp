@@ -1,5 +1,5 @@
 #include "Utils.h"
-#include "Parser.h"
+#include "SNL_Parser.h"
 
 #include <cstdarg>
 #include <stdio.h>
@@ -25,8 +25,8 @@ void errorReport(void* parser,
 	case ERROR_LEX:
 	case ERROR_COMPILE:
 		ASSERT(parser != NULL, "parser is null!");
-		fprintf(stderr, "%s:%d \"%s\"\n", ((Parser*)parser)->file,
-			((Parser*)parser)->preToken.lineNo, buffer);
+		fprintf(stderr, "%s:%d \"%s\"\n", ((Parser*)parser)->getFileName(),
+			((Parser*)parser)->getCurrentLineNo(), buffer);
 		break;
 	case ERROR_RUNTIME:
 		fprintf(stderr, "%s\n", buffer);

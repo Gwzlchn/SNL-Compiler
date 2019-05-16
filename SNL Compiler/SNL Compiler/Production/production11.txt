@@ -1,0 +1,8 @@
+1)     Program    ::=    ProgramHead  DeclarePart ProgramBody
+2)     ProgramHead    ::=    PROGRAM    ProgramName
+3)     ProgramName      ::=       ID
+4)     DeclarePart    ::=    TypeDecpart  VarDecpart  ProcDecPart
+5)     TypeDecpart        ::=    ? 
+6)     TypeDecpart        ::= TypeDec 
+7) VarDecpart  ::= ?
+8) ProcDecPart ::= ?

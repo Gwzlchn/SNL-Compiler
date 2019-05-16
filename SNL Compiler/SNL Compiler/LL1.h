@@ -1,5 +1,8 @@
-#ifndef _LL1_H
-#define _LL1_H
+#ifndef _SNL__H
+#define _SNL__H
+
+#include"SNL_Parser.h"
+
 
 #include<map>
 #include<string>
@@ -16,35 +19,12 @@ using std::set;
 using std::stack;
 
 
-enum LL1Token {
-	Token_S,
-	Token_E,
-	Token_T,
-	Token_P,
-	Token_E_Hat,
-	Token_T_Hat,
-	Token_F,
-	Token_id,
-	Token_left_paren,
-	Token_right_paren,
-	Token_add,
-	Token_mul,
-	Token_eof,
-	Token_start,
-	Token_Blank,
-	
-
-
-};
-
-
-extern map<LL1Token, pair<string, bool>> TokenNameMap;
 
 
 class Production {
 private:
-	LL1Token m_left;
-	vector<LL1Token> m_right;
+	SNL_TOKEN_TYPE m_left;
+	vector<SNL_TOKEN_TYPE> m_right;
 	int m_id;
 	int m_look_ahead_idx;	//当前展望符分界，即小圆点；
 
@@ -52,15 +32,15 @@ public:
 	bool operator < (const Production& prod) const;
 	int get_id();
 	Production();
-	Production(LL1Token left, vector<LL1Token> right, int id, int idx = 0);
+	Production(SNL_TOKEN_TYPE left, vector<SNL_TOKEN_TYPE> right, int id, int idx = 0);
 
 	bool isLeftTerminal();
 
-	LL1Token getProducitonLeft()const;
-	vector<LL1Token> getProductionRight() const ;
+	SNL_TOKEN_TYPE getProducitonLeft()const;
+	vector<SNL_TOKEN_TYPE> getProductionRight() const ;
 
-	set<LL1Token> getProdTer();
-	set<LL1Token> getProdNotTer();
+	set<SNL_TOKEN_TYPE> getProdTer();
+	set<SNL_TOKEN_TYPE> getProdNotTer();
 
 	
 
@@ -72,64 +52,68 @@ private:
 	//bool m_is_init;		//这个set可能有两个用处，一个是用来存全部文法，另一个是用来存放闭包；
 		
 	//每一个非终极符的Follow集
-	map<LL1Token, set<LL1Token>> m_follow_sets;
-	map<LL1Token, set<LL1Token>> m_first_sets;
+	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_follow_sets;
+	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_first_sets;
 	typedef  int Prod_Idx;
 	//Predict 集合
-	map<Prod_Idx, set<LL1Token>> m_predict_set;
-	//LL1 分析表
-	map<LL1Token, vector<pair<LL1Token, Prod_Idx>>> m_LL1_analyse_map;
+	map<Prod_Idx, set<SNL_TOKEN_TYPE>> m_predict_set;
+	//SNL_ 分析表
+	map<SNL_TOKEN_TYPE, vector<pair<SNL_TOKEN_TYPE, Prod_Idx>>> m_SNL_analyse_map;
 
-	set<LL1Token> m_terminal;
-	set<LL1Token> m_notTerminal;
+	set<SNL_TOKEN_TYPE> m_terminal;
+	set<SNL_TOKEN_TYPE> m_notTerminal;
 
 	//输入流
-	stack<LL1Token, vector<LL1Token>> m_input_stream;
+	stack<SNL_TOKEN_TYPE, vector<SNL_TOKEN_TYPE>> m_input_stream;
 	
 
 public:
 		
-	ProductionSet();
-	stack<LL1Token, vector<LL1Token>> makeInputStreamFromPage61();
-	vector<Production> makeProdsFromPage77();
-	vector<Production> makeProdsFromPage53();
+	ProductionSet(string prods_file_name);
+
+	vector<Production> makePordsFromFile(const string& file_name)const ;
+
+
+
 	//ProductionSet(vector<Production> productions, bool is_init);
 	//set<Production> getProductionClosure(Production one_prod);
 	void getProdsFirstSet();
 	
-	void setUnion(set<LL1Token>& dst, const set<LL1Token>& src);
-	bool isBlankInTokenFirst(const LL1Token& tok) const ;
+	void setUnion(set<SNL_TOKEN_TYPE>& dst, const set<SNL_TOKEN_TYPE>& src);
+	//bool isBlankInTokenFirst(const SNL_TOKEN_TYPE& tok) const ;
 	template <typename T>
 	string get_token_str(const T& tok_vec)const  ;
 
 	
-	void printSetMap(const map<LL1Token, set<LL1Token>>& sets) const;
+	void printSetMap(const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets) const;
 
 	void printPredictMap() const;
 
-	set<LL1Token> setRemoveBlank(const set<LL1Token>& src) const ;
+	set<SNL_TOKEN_TYPE> setRemoveBlank(const set<SNL_TOKEN_TYPE>& src) const ;
 
-	bool isNotTerDeriBlank(LL1Token not_ter);
+	bool isNotTerDeriBlank(SNL_TOKEN_TYPE not_ter);
 
-	int getTokenType(LL1Token tok);
+	int getTokenType(SNL_TOKEN_TYPE tok);
 
 	void getProdsFollowSet();
 
 	//找该终极符是否在右侧表达式出现,出现则返回true,否则返回false;
 	//如果出现,同时返回紧接着字符的First集
-	bool getAfterTokenInRightProd(const LL1Token& to_find, const Production& prod, LL1Token& after_token);
+	//bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, SNL_TOKEN_TYPE& after_token);
+
+	bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, vector<SNL_TOKEN_TYPE>& after_token);
 
 	void setPredictSet();
-	set<LL1Token> getTokenVecFirst(const vector<LL1Token>& tok_vec) ;
-	set<LL1Token> getOneProdPredict(const Production& prod) ;
+	set<SNL_TOKEN_TYPE> getTokenVecFirst(const vector<SNL_TOKEN_TYPE>& tok_vec) ;
+	set<SNL_TOKEN_TYPE> getOneProdPredict(const Production& prod) ;
 
 
-	//LL1 分析表
+	//SNL_ 分析表
 	void setAnalyseMap();
-	bool LL1AnalyseProcess();
-	void printStack(const stack<LL1Token>& tok_stack) const;
-	int getProdIdFromAnalyseMap(LL1Token ana_tok, LL1Token in_tok);
-	void pushProdToAnaylseStack(int prod_id, stack<LL1Token>& ana_stack);
+	bool SNL_AnalyseProcess();
+	void printStack(const stack<SNL_TOKEN_TYPE>& tok_stack) const;
+	int getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok);
+	void pushProdToAnaylseStack(int prod_id, stack<SNL_TOKEN_TYPE>& ana_stack);
 };
 
 
@@ -137,7 +121,7 @@ public:
 
 
 
-#endif // !_LL1_H
+#endif // !_SNL__H
 
 
 

@@ -1,12 +1,13 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #include"SNL_Parser.h"
-
+#include <algorithm>
 
 
 
 map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 {
+	{"?",TOKEN_BLANK},
 	{ "EOF",TOKEN_ENDFILE},
 	{ "ERROR",TOKEN_ERROR},
 
@@ -49,7 +50,7 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 	{ ",", TOKEN_COMMA},
 	{ "[", TOKEN_LMIDPAREN},
 	{ "]", TOKEN_RMIDPAREN},
-	{ "UNDERANGE", TOKEN_UNDERANGE},
+	{ "..", TOKEN_UNDERANGE},
 
 
 	
@@ -74,7 +75,7 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 	{ "ProgramName", Token_ProgramName },
 	{ "DeclarePart", Token_DeclarePart },
 	{ "TypeDec", Token_TypeDec },
-	{ "TypeDecpart", Token_TypeDeclaration },/***************************************************/
+	{ "TypeDecpart", Token_TypeDecpart },/***************************************************/
 	{ "TypeDecList", Token_TypeDecList },
 	{ "TypeDecMore", Token_TypeDecMore },
 	{ "TypeId", Token_TypeId },
@@ -90,7 +91,7 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 	{ "IdList", Token_IdList },
 	{ "IdMore", Token_IdMore },
 	{ "VarDec", Token_VarDec },
-	{ "VarDecpart", Token_VarDeclaration },/********************************************************/
+	{ "VarDecpart", Token_VarDecpart },/********************************************************/
 	{ "VarDecList", Token_VarDecList },
 	{ "VarDecMore", Token_VarDecMore },
 	{ "VarIdList", Token_VarIdList },
@@ -137,9 +138,42 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 	{ "CmpOp", Token_CmpOp },
 	{ "AddOp", Token_AddOp },
 	{ "MultOp", Token_MultOp },
-	{"String",TOKEN_STRING }
+	{"Low",Token_Low},
+	{"Top",Token_Top},
+	
 
  };
+
+ template <typename T, typename F>
+ map<T, F> reserveMap(const map<F, T>& to_res) {
+	 map<T, F> ret;
+	 for (auto iter = to_res.begin();
+		 iter != to_res.end(); iter++)
+		 ret.insert({ iter->second,iter->first });
+
+	 return ret;
+ }
+ map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map = reserveMap<SNL_TOKEN_TYPE, string>(Token_Name_Type_Map);
+
+
+#define TERMIN true
+#define NOTTER false
+ template<typename T, typename F>
+ map<F, bool> make_terminal_map(map<T, F> full_map) {
+	 map<F, bool> ret;
+	 for (auto iter = full_map.begin(); \
+		 iter != full_map.end(); iter++) {
+
+		 if (std::all_of(iter->first.begin(), iter->first.end(), [](unsigned char c) { return !std::isalpha(c) ||std::isupper(c); })) {
+			 ret.insert({ iter->second, TERMIN });
+		 }
+		 else {
+			 ret.insert({ iter->second, NOTTER });
+		 }
+	 }
+	 return ret;
+ }
+ map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map = make_terminal_map<string, SNL_TOKEN_TYPE>(Token_Name_Type_Map);
 
 
 
@@ -192,21 +226,18 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 
  };
 
- template <typename T, typename F>
- map<T, F> reserveMap(const map<F, T>& to_res) {
-	 map<T, F> ret;
-	 for (auto iter = to_res.begin();
-		 iter != to_res.end(); iter++)
-		 ret.insert({ iter->second,iter->first });
 
-	 return ret;
- }
- map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map = reserveMap<SNL_TOKEN_TYPE, string>(Token_Name_Type_Map);
 
- Parser::Parser(const char* file, const char* sourceCode) {
+
+ 
+
+
+
+
+ Parser::Parser(const char* file) {
 	 
 	 this->file = file;
-	 this->sourceCode = sourceCode;
+	 this->sourceCode = this->readFile(file);
 	 this->curChar = *this->sourceCode;
 	 this->nextCharPtr = this->sourceCode + 1;
 
@@ -219,6 +250,74 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 	 this->preToken = this->curToken;
 	 this->interpolation_ExpectRightParemNum = 0;
  }
+
+
+ char* Parser::readFile(const char* path) {
+	 FILE* file;
+	 errno_t err;
+
+	 if (err = fopen_s(&file, path, "r") != 0) {
+		 IO_ERROR("Could`t open file \"%s\".\n", path);
+	 }
+	 else {
+		 printf("The file  was opened\n");
+	 }
+
+	 struct stat fileStat;
+	 stat(path, &fileStat);
+	 size_t fileSize = fileStat.st_size;
+	 char* fileContent = (char*)malloc(fileSize + 1);
+	 if (fileContent == NULL) {
+		 MEM_ERROR("Could`t allocate memory for reading file \"%s\".\n", path);
+		 return NULL;
+	 }
+	 else {
+		 size_t numRead = fread(fileContent, sizeof(char), fileSize, file);
+
+		 for (int i = numRead; i < fileSize; i++) {
+			 fileContent[i] = '\0';
+		 }
+		 fclose(file);
+		 return fileContent;
+	 }
+}
+
+
+
+
+void Parser::RunFile() {
+
+	 //const char* srcCode = this->readFile(file_name);
+
+	
+	 //initParser(&parser, file_name, srcCode);
+	 while (this->curToken.type != TOKEN_ENDFILE) {
+		 this->getNextToken();
+		 printf("%d Line: \t\t%s [", \
+			 this->curToken.lineNo, Token_Type_Name_Map[this->curToken.type].c_str());
+
+		 uint32_t idx = 0;
+		 while (idx < this->curToken.length) {
+			 printf("%c", *(this->curToken.start + idx));
+			 idx++;
+		 }
+		 printf("]\n");
+
+		 this->m_Token_Vec.push_back(this->curToken.type);
+	 }
+
+ }
+
+
+
+const char* Parser::getFileName() {
+	return this->file;
+}
+
+uint32_t Parser::getCurrentLineNo() {
+	return this->curToken.lineNo;
+}
+
 
 
  //判断当前单词是否为关键字，是返回相应token，否则是普通标识符
