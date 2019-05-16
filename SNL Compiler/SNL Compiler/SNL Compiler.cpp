@@ -28,17 +28,21 @@ char* readFile(const char* path) {
 	char* fileContent = (char*)malloc(fileSize + 1);
 	if (fileContent == NULL) {
 		MEM_ERROR("Could`t allocate memory for reading file \"%s\".\n", path);
+		return NULL;
+	}
+	else {
+		size_t numRead = fread(fileContent, sizeof(char), fileSize, file);
+
+		for (int i = numRead; i < fileSize; i++) {
+			fileContent[i] = '\0';
+		}
+
+
+		fclose(file);
+		return fileContent;
 	}
 
-	size_t numRead = fread(fileContent, sizeof(char), fileSize, file);
-
-	for (int i = numRead; i < fileSize; i++) {
-		fileContent[i] = '\0';
-	}
-
-
-	fclose(file);
-	return fileContent;
+	
 }
 
 
