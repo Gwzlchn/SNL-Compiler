@@ -2,6 +2,9 @@
 #ifndef _SNL_PARSER_H
 #define _SNL_PARSER_H
 
+#include"Utils.h"
+
+
 #include<map>
 #include<string>
 #include<vector>
@@ -79,7 +82,7 @@ using std::string;
 
  class Parser
  {
- private:
+ public:
 	 const char* file;
 	 const char* sourceCode;
 	 const char* nextCharPtr;
@@ -109,6 +112,8 @@ using std::string;
 	 void parserId(SNL_TOKEN_TYPE type);
 
 	 void parseString();
+
+	 void parseNum();
 
 	 void skipBlanks();
 

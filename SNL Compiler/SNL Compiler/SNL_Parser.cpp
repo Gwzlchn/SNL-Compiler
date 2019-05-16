@@ -1,6 +1,10 @@
+
+#define _CRT_SECURE_NO_WARNINGS
 #include"SNL_Parser.h"
 
-#include"Utils.h"
+
+
+
 map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 {
 	{ "EOF",TOKEN_ENDFILE},
@@ -45,7 +49,7 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 	{ ",", TOKEN_COMMA},
 	{ "[", TOKEN_LMIDPAREN},
 	{ "]", TOKEN_RMIDPAREN},
-	{ "..", TOKEN_UNDERANGE},
+	{ "UNDERANGE", TOKEN_UNDERANGE},
 
 
 	
@@ -162,6 +166,30 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 	{ "RETURN", {  6,TOKEN_RETURN}},
 	{ "INTEGER", {  7,TOKEN_INTEGER}},
 	{ "CHAR", {  4,TOKEN_CHAR}},
+
+
+	{ "program",{7,TOKEN_PROGRAM}},
+	{ "procedure", { 9,TOKEN_PROCEDURE}},
+	{ "type", {  4,TOKEN_TYPE}},
+	{ "var", { 3, TOKEN_VAR}},
+	{ "if", {  2,TOKEN_IF}},
+	{ "then", { 4, TOKEN_THEN}},
+	{ "else", {  4,TOKEN_ELSE}},
+	{ "fi", {  2, TOKEN_FI}},
+	{ "while", {  5,TOKEN_WHILE}},
+	{ "do", {  2, TOKEN_DO}},
+	{ "endwh", {  5,TOKEN_ENDWH}},
+	{ "begin", {  5,TOKEN_BEGIN}},
+	{ "end", {  3,TOKEN_END}},
+	{ "read", {  4,TOKEN_READ}},
+	{ "write", {  5,TOKEN_WRITE}},
+	{ "array", {  5,TOKEN_ARRAY}},
+	{ "of", {  2,TOKEN_OF}},
+	{ "record", {  6,TOKEN_RECORD}},
+	{ "return", {  6,TOKEN_RETURN}},
+	{ "integer", {  7,TOKEN_INTEGER}},
+	{ "char", {  4,TOKEN_CHAR}},
+
  };
 
  template <typename T, typename F>
@@ -202,9 +230,13 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 	 char* str = (char*)malloc(length + 1);
 	 if (str != NULL) {
 		 strncpy(str, start, length);
-		 std::string token_start = str;
+		 std::string token_start(str,length);
+		 //token_start += '\0';
 		 auto keywordsIter = SNL_Keywords_Map.find(token_start);
 		 if (keywordsIter != SNL_Keywords_Map.end() && keywordsIter->second.first == length) {
+			 if (keywordsIter->second.second == TOKEN_END && this->matchNextChar('.')) {
+				 return TOKEN_ENDFILE;
+			 }
 			 return keywordsIter->second.second;
 		 }
 	 }
@@ -220,8 +252,11 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
  //指针移动，指向下一个字符
  void Parser::getNextChar()
  {
-	 this->curChar = *this->nextCharPtr;
-	 this->nextCharPtr++;
+	 if (this->nextCharPtr != NULL) {
+		 this->curChar = *this->nextCharPtr;
+		 this->nextCharPtr++;
+	 }
+	 
  }
 
  //下一个字符是否与预期匹配
@@ -236,29 +271,52 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 
  //跳过连续空白
 void Parser::skipBlanks() {
-	 while (isspace(this->curChar)) {
-		 if (this->curChar == '\n') {
+	if (!(this->curChar)) {
+		return;
+	}
+	while (isspace(static_cast<unsigned char>(this->curChar))) {
+		 if (this->curChar == '\n' || (this->curChar == '\r' && this->matchNextChar('\n'))) {
 			 this->curToken.lineNo++;
 		 }
 		 this->getNextChar();
 	 }
  }
 
-//解析标识符：变量名&函数名
-void Parser::parserId(SNL_TOKEN_TYPE type) {
 
-	while (isalnum(this->curChar) || this->curChar == '_') {
+void Parser::skipAline() {
+	this->getNextChar();
+	while (this->curChar != '\0') {
+		if (this->curChar == '\n') {
+			this->curToken.lineNo++;
+			this->getNextChar();
+			break;
+		}
 		this->getNextChar();
 	}
+}
 
-	uint32_t length = (uint32_t)(this->nextCharPtr - this->curToken.start - 1);
-	if (type != TOKEN_ERROR) {
-		this->curToken.type = type;
+
+
+//解析标识符：变量名&函数名
+void Parser::parserId(SNL_TOKEN_TYPE type) {
+	if ((this->curChar)) {
+
+
+		while (isalnum(static_cast<unsigned char>(this->curChar)) || this->curChar == '_') {
+			this->getNextChar();
+			if (this->curChar == NULL)
+				break;
+		}
+
+		uint32_t length = (uint32_t)(this->nextCharPtr - this->curToken.start - 1);
+		if (type != TOKEN_ERROR) {
+			this->curToken.type = type;
+		}
+		else {
+			this->curToken.type = idOrKeyword(this->curToken.start, length);
+		}
+		this->curToken.length = length;
 	}
-	else {
-		this->curToken.type = idOrKeyword(this->curToken.start, length);
-	}
-	this->curToken.length = length;
 }
 
 
@@ -278,32 +336,23 @@ void Parser::parseString() {
 			break;
 		}
 
-		/*if (this->curChar == '%') {
-			if (!this->matchNextChar('(')) {
-				LEX_ERROR(this, "'%' should followed by '('!");
-			}
-			if (this->interpolation_ExpectRightParemNum > 0) {
-				COMPILE_ERROR(this, "sorry, I don`t support nest interpolate expression!");
-			}
-			this->interpolation_ExpectRightParemNum = 1;
-			this->curToken.type = TOKEN_INTERPOLATION;
-			break;
-		}*/
 	}
 }
 
 
-void Parser::skipAline() {
-	this->getNextChar();
-	while (this->curChar != '\0') {
-		if (this->curChar == '\n') {
-			this->curToken.lineNo++;
-			this->getNextChar();
-			break;
-		}
+
+void Parser::parseNum() {
+	while (isdigit(this->curChar)) {
 		this->getNextChar();
 	}
+	this->curToken.type = TOKEN_INTC;
+	this->curToken.length = (uint32_t)(this->nextCharPtr - this->curToken.start - 1 );
 }
+
+
+
+
+
 
 //跳过注释：块注释&单行注释
 void Parser::skipComment() {
@@ -414,7 +463,8 @@ void Parser::getNextToken() {
 
 		case '{':
 			this->skipComment();
-			break;
+			this->curToken.start = this->nextCharPtr - 1;
+			continue;
 
 
 		case '.':
@@ -515,8 +565,11 @@ void Parser::getNextToken() {
 
 		default:
 			//处理变量名和数字
-			if (isalpha(this->curChar) || this->curChar == '_') {
+			if (isalpha(static_cast<unsigned char>(this->curChar)) || this->curChar == '_') {
 				this->parserId(TOKEN_ERROR);
+			}
+			else if(isdigit(static_cast<unsigned char>(this->curChar))) {
+				this->parseNum();
 			}
 			else {
 				LEX_ERROR(this, "unsupport char: \'%c\', quit.", this->curChar);
