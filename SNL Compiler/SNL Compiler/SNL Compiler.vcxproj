@@ -151,14 +151,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LL1.cpp" />
+    <ClCompile Include="SNL_LL1.cpp" />
     <ClCompile Include="SNL Compiler.cpp" />
-    <ClCompile Include="SNL_Parser.cpp" />
+    <ClCompile Include="SNL_Lexer.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LL1.h" />
-    <ClInclude Include="SNL_Parser.h" />
+    <ClInclude Include="SNL_LL1.h" />
+    <ClInclude Include="SNL_Lexer.h" />
+    <ClInclude Include="SNL_Tokens.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>

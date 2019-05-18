@@ -1,12 +1,11 @@
-#include "LL1.h"
-#include"./SNL_Parser.h"
+#include "SNL_LL1.h"
+
 #include <algorithm>
 #include <iterator>
 #include<fstream>
 #include <sstream>
 
-
-int a = 1;
+extern map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map;
 
 
 bool Production::operator<(const Production& prod) const
@@ -124,7 +123,7 @@ ProductionSet::ProductionSet(string prods_file_name) {
 	this->getProdsFirstSet();
 	this->getProdsFollowSet();
 	this->setPredictSet();
-	this->setAnalyseMap();
+	//this->setAnalyseMap();
 	//int a = 1;
 	//构造输入流
 	//this->m_input_stream = makeInputStreamFromPage61();
@@ -406,6 +405,11 @@ void ProductionSet::getProdsFollowSet()
 			for (auto prod_iter = m_productions.begin(); \
 				prod_iter != m_productions.end(); prod_iter++) {
 
+				
+if (*not_iter == Token_ProcDecpart) {
+					int a = 1;
+				}
+
 				vector<SNL_TOKEN_TYPE> after;
 				if (getAfterTokenInRightProd(*not_iter, *prod_iter, after)) {
 					set<SNL_TOKEN_TYPE> after_fisrt_set = this->getTokenVecFirst(after);
@@ -441,22 +445,25 @@ void ProductionSet::getProdsFollowSet()
 bool ProductionSet::getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, vector<SNL_TOKEN_TYPE>& after_token)
 {
 	vector<SNL_TOKEN_TYPE> right = prod.getProductionRight();
-	for (auto iter = right.begin(); iter != right.end(); iter++) {
-		if (*iter == to_find) {
-			if (iter == right.end() - 1) {
-				after_token.push_back(TOKEN_BLANK);
-				
-			}
-			else {
-				after_token.push_back(*(iter + 1));
-				
-			}
-			return true;
-		}
-		
+	bool found = false;
+
+	if (*(right.end() - 1) == to_find) {
+		found = true;
+		after_token = { TOKEN_BLANK };
+		return found;
 	}
 
-	return false;
+	for (auto iter = right.begin(); iter != right.end() - 1; iter++) {
+		if (*iter == to_find || found) {
+			found = true;
+			after_token.push_back(*(iter + 1));
+
+			}
+		}
+		
+	
+
+	return found;
 }
 
 void ProductionSet::setPredictSet()
@@ -524,7 +531,14 @@ void ProductionSet::setAnalyseMap()
 }
 
 
-bool ProductionSet::SNL_AnalyseProcess() {
+bool ProductionSet::SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input_vec) {
+	
+	//std::reverse(token_input_vec.begin()token_input_vec.end());
+	for (auto iter = token_input_vec.begin(); \
+		iter != token_input_vec.end(); iter++) {
+		m_input_stream.push(*iter);
+	}
+
 	//初始化分析栈,对于输入流 front为栈底，end栈顶
 
 	SNL_TOKEN_TYPE tok_start = m_productions[0].getProducitonLeft();
@@ -538,6 +552,9 @@ bool ProductionSet::SNL_AnalyseProcess() {
 		//输入流和分析栈没match，输入流不弹出
 		if (cur_analyse_tok != cur_input_tok) {
 			int prod_id = getProdIdFromAnalyseMap(cur_analyse_tok, cur_input_tok);
+			if (prod_id <= 0) {
+				system("pause");
+			}
 			LL1_analyse_stack.pop();
 			this->pushProdToAnaylseStack(prod_id, LL1_analyse_stack);
 			continue;

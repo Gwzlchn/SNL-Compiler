@@ -21,10 +21,10 @@
     <ClCompile Include="Utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="LL1.cpp">
+    <ClCompile Include="SNL_Lexer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SNL_Parser.cpp">
+    <ClCompile Include="SNL_LL1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,10 +32,13 @@
     <ClInclude Include="Utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="LL1.h">
+    <ClInclude Include="SNL_Lexer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="SNL_Parser.h">
+    <ClInclude Include="SNL_LL1.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SNL_Tokens.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

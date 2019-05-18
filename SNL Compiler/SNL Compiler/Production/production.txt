@@ -1,7 +1,7 @@
 1)     Program    ::=    ProgramHead  DeclarePart ProgramBody
 2)     ProgramHead    ::=    PROGRAM    ProgramName
 3)     ProgramName      ::=       ID
-4)     DeclarePart    ::=    TypeDecpart  VarDecpart  ProcDecPart
+4)     DeclarePart    ::=    TypeDecpart  VarDecpart  ProcDecpart
 5)     TypeDecpart        ::=    ? 
 6)     TypeDecpart        ::= TypeDec        
 7)     TypeDec  ::=     TYPE    TypeDecList        
@@ -36,8 +36,8 @@
 36£©  VarIdList    ::=    ID  VarIdMore    
 37£©  VarIdMore    ::=     ?                  
 38£©  VarIdMore    ::=  ,  VarIdList                    
-39)    ProcDecPart    ::=     ?                        
-40)    ProcDecPart    ::=  ProcDec              
+39)    ProcDecpart    ::=     ?                        
+40)    ProcDecpart    ::=  ProcDec              
 41)    ProcDec    ::=    PROCEDURE  ProcName (  ParamList  )   ;   ProcDecPart ProcBody ProcDecMore 
 42)    ProcDecMore ::=    ?                      
 43)    ProcDecMore ::=  ProcDec

@@ -32,7 +32,7 @@ typedef enum {
 	ERROR_RUNTIME
 } ErrorType;
 
-void errorReport(void* parser,
+void errorReport(void* lexer,
 	ErrorType errorType, const char* fmt, ...);
 
 
@@ -42,11 +42,11 @@ void errorReport(void* parser,
 #define MEM_ERROR(...)\
    errorReport(NULL, ERROR_MEM, __VA_ARGS__)
 
-#define LEX_ERROR(parser, ...)\
-   errorReport(parser, ERROR_LEX, __VA_ARGS__)
+#define LEX_ERROR(lexer, ...)\
+   errorReport(lexer, ERROR_LEX, __VA_ARGS__)
 
-#define COMPILE_ERROR(parser, ...)\
-   errorReport(parser, ERROR_COMPILE, __VA_ARGS__)
+#define COMPILE_ERROR(lexer, ...)\
+   errorReport(lexer, ERROR_COMPILE, __VA_ARGS__)
 
 #define RUN_ERROR(...)\
    errorReport(NULL, ERROR_RUNTIME, __VA_ARGS__)

@@ -1,5 +1,5 @@
 #include "Utils.h"
-#include "SNL_Parser.h"
+#include "SNL_Lexer.h"
 
 #include <cstdarg>
 #include <stdio.h>
@@ -8,7 +8,7 @@
 
 
 //通用报错函数
-void errorReport(void* parser,
+void errorReport(void* lexer,
 	ErrorType errorType, const char* fmt, ...) {
 	char buffer[DEFAULT_BUfFER_SIZE] = { '\0' };
 	va_list ap;
@@ -24,9 +24,9 @@ void errorReport(void* parser,
 		break;
 	case ERROR_LEX:
 	case ERROR_COMPILE:
-		ASSERT(parser != NULL, "parser is null!");
-		fprintf(stderr, "%s:%d \"%s\"\n", ((Parser*)parser)->getFileName(),
-			((Parser*)parser)->getCurrentLineNo(), buffer);
+		ASSERT(lexer != NULL, "lexer is null!");
+		fprintf(stderr, "%s:%d \"%s\"\n", ((Lexer*)lexer)->getFileName(),
+			((Lexer*)lexer)->getCurrentLineNo(), buffer);
 		break;
 	case ERROR_RUNTIME:
 		fprintf(stderr, "%s\n", buffer);

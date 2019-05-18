@@ -1,148 +1,9 @@
 
 #define _CRT_SECURE_NO_WARNINGS
-#include"SNL_Parser.h"
+#include"SNL_Lexer.h"
 #include <algorithm>
 
 
-
-map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
-{
-	{"?",TOKEN_BLANK},
-	{ "EOF",TOKEN_ENDFILE},
-	{ "ERROR",TOKEN_ERROR},
-
-	{ "PROGRAM",TOKEN_PROGRAM},
-	{ "PROCEDURE",TOKEN_PROCEDURE},
-	{ "TYPE", TOKEN_TYPE},
-	{ "VAR", TOKEN_VAR},
-	{ "IF", TOKEN_IF},
-	{ "THEN", TOKEN_THEN},
-	{ "ELSE", TOKEN_ELSE},
-	{ "FI", TOKEN_FI},
-	{ "WHILE", TOKEN_WHILE},
-	{ "DO", TOKEN_DO},
-	{ "ENDWH", TOKEN_ENDWH},
-	{ "BEGIN", TOKEN_BEGIN},
-	{ "END", TOKEN_END},
-	{ "READ", TOKEN_READ},
-	{ "WRITE", TOKEN_WRITE},
-	{ "ARRAY", TOKEN_ARRAY},
-	{ "OF", TOKEN_OF},
-	{ "RECORD", TOKEN_RECORD},
-	{ "RETURN", TOKEN_RETURN},
-	{ "INTEGER", TOKEN_INTEGER},
-	{ "CHAR", TOKEN_CHAR},
-	{ "ID",TOKEN_ID },
-	{ "INTC", TOKEN_INTC},
-	{ "CHARC", TOKEN_CHARC},
-	{ ":=", TOKEN_ASSIGN},
-	{ "=", TOKEN_EQ},
-	{ "<", TOKEN_LESS},
-	{ "+", TOKEN_ADD},
-	{ "-", TOKEN_SUB},
-	{ "*", TOKEN_MUL},
-	{ "/", TOKEN_DIV},
-	{ "(", TOKEN_LPAREN},
-	{ ")", TOKEN_RPAREN},
-	{ ".", TOKEN_DOT},
-	{ ":", TOKEN_COLON},
-	{ ";", TOKEN_SEMI},
-	{ ",", TOKEN_COMMA},
-	{ "[", TOKEN_LMIDPAREN},
-	{ "]", TOKEN_RMIDPAREN},
-	{ "..", TOKEN_UNDERANGE},
-
-
-	
-	{"MOD",TOKEN_MOD},
-	{"BIT_AND",TOKEN_BIT_AND},
-	{"BIT_OR",TOKEN_BIT_OR},
-	{"BIT_NOT",TOKEN_BIT_NOT},
-	{"BIT_SHIFT_RIGHT",TOKEN_BIT_SHIFT_RIGHT},
-	{"BIT_SHIFT_LEFT",TOKEN_BIT_SHIFT_LEFT},
-	{"LOGIC_AND",TOKEN_LOGIC_AND},
-	{"LOGIC_OR",TOKEN_LOGIC_OR},
-	{"LOGIC_NOT",TOKEN_LOGIC_NOT},
-	{"NOT_EQUAL",TOKEN_NOT_EQUAL},
-	{"GREATER",TOKEN_GREATER},
-	{"GREATER_EQUAL",TOKEN_GREATER_EQUAL},
-	{"LESS_EQUAL",TOKEN_LESS_EQUAL},
-	{"QUESTION",TOKEN_QUESTION},
-
-
-	{ "Program",Token_Program },
-	{ "ProgramHead", Token_ProgramHead },
-	{ "ProgramName", Token_ProgramName },
-	{ "DeclarePart", Token_DeclarePart },
-	{ "TypeDec", Token_TypeDec },
-	{ "TypeDecpart", Token_TypeDecpart },/***************************************************/
-	{ "TypeDecList", Token_TypeDecList },
-	{ "TypeDecMore", Token_TypeDecMore },
-	{ "TypeId", Token_TypeId },
-	{ "TypeDef", Token_TypeName },/***************************************************************/
-	{ "BaseType", Token_BaseType },
-	{ "StructureType", Token_StructureType },
-	{ "ArrayType", Token_ArrayType },
-	{ "Low", Token_Low },
-	{ "Top", Token_Top },
-	{ "RecType", Token_RecType },
-	{ "FieldDecList", Token_FieldDecList },
-	{ "FieldDecMore", Token_FieldDecMore },
-	{ "IdList", Token_IdList },
-	{ "IdMore", Token_IdMore },
-	{ "VarDec", Token_VarDec },
-	{ "VarDecpart", Token_VarDecpart },/********************************************************/
-	{ "VarDecList", Token_VarDecList },
-	{ "VarDecMore", Token_VarDecMore },
-	{ "VarIdList", Token_VarIdList },
-	{ "VarIdMore", Token_VarIdMore },
-	{ "ProcDec", Token_ProcDec },
-	//{ "", Token_ProcDeclaration},
-	{ "ProcDecMore", Token_ProcDecMore },
-	{ "ProcName", Token_ProcName },
-	{ "ParamList", Token_ParamList },
-	{ "ParamDecList", Token_ParamDecList },
-	{ "ParamMore", Token_ParamMore },
-	{ "Param", Token_Param },
-	{ "FormList", Token_FormList },
-	{ "FidMore", Token_FidMore },
-	{ "ProcDecPart", Token_ProcDecPart },
-	{ "ProcBody", Token_ProcBody },
-	{ "ProgramBody", Token_ProgramBody },
-	{ "StmList", Token_StmList },
-	{ "StmMore", Token_StmMore },
-	{ "Stm", Token_Stm },
-	{ "AssCall", Token_AssCall },
-	{ "AssignmentRest", Token_AssignmentRest },
-	{ "ConditionalStm", Token_ConditionalStm },
-	//{ "", Token_StmL},
-	{ "LoopStm", Token_LoopStm },
-	{ "InputStm", Token_InputStm },
-	{ "Invar", Token_InVar },
-	{ "OutputStm", Token_OutputStm },
-	{ "ReturnStm", Token_ReturnStm },
-	{ "CallStmRest", Token_CallStmRest },
-	{ "ActParamList", Token_ActParamList },
-	{ "ActParamMore", Token_ActParamMore },
-	{ "RelExp", Token_RelExp },
-	{ "OtherRelE", Token_OtherRelE },
-	{ "Exp", Token_Exp },
-	{ "OtherTerm", Token_OtherTerm },
-	{ "Term", Token_Term },
-	{ "OtherFactor", Token_OtherFactor },
-	{ "Factor", Token_Factor },
-	{ "Variable", Token_Variable },
-	{ "VariMore", Token_VariMore },
-	{ "FieldVar", Token_FieldVar },
-	{ "FieldVarMore", Token_FieldVarMore },
-	{ "CmpOp", Token_CmpOp },
-	{ "AddOp", Token_AddOp },
-	{ "MultOp", Token_MultOp },
-	{"Low",Token_Low},
-	{"Top",Token_Top},
-	
-
- };
 
  template <typename T, typename F>
  map<T, F> reserveMap(const map<F, T>& to_res) {
@@ -234,7 +95,7 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 
 
 
- Parser::Parser(const char* file) {
+ Lexer::Lexer(const char* file) {
 	 
 	 this->file = file;
 	 this->sourceCode = this->readFile(file);
@@ -252,7 +113,7 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
  }
 
 
- char* Parser::readFile(const char* path) {
+ char* Lexer::readFile(const char* path) {
 	 FILE* file;
 	 errno_t err;
 
@@ -285,7 +146,7 @@ map<string, SNL_TOKEN_TYPE> Token_Name_Type_Map=
 
 
 
-void Parser::RunFile() {
+void Lexer::RunFile() {
 
 	 //const char* srcCode = this->readFile(file_name);
 
@@ -305,23 +166,24 @@ void Parser::RunFile() {
 
 		 this->m_Token_Vec.push_back(this->curToken.type);
 	 }
+	 std::reverse(m_Token_Vec.begin(), m_Token_Vec.end());
 
  }
 
 
 
-const char* Parser::getFileName() {
+const char* Lexer::getFileName() {
 	return this->file;
 }
 
-uint32_t Parser::getCurrentLineNo() {
+uint32_t Lexer::getCurrentLineNo() {
 	return this->curToken.lineNo;
 }
 
 
 
  //判断当前单词是否为关键字，是返回相应token，否则是普通标识符
- SNL_TOKEN_TYPE  Parser::idOrKeyword(const char* start, uint32_t length) {
+ SNL_TOKEN_TYPE  Lexer::idOrKeyword(const char* start, uint32_t length) {
 	 if (start == NULL) {
 		 return TOKEN_ERROR;
 	 }
@@ -343,13 +205,13 @@ uint32_t Parser::getCurrentLineNo() {
  }
 
  //向前看一个字符
- char Parser::lookAheadChar()
+ char Lexer::lookAheadChar()
  {
 	 return *this->nextCharPtr;
  }
 
  //指针移动，指向下一个字符
- void Parser::getNextChar()
+ void Lexer::getNextChar()
  {
 	 if (this->nextCharPtr != NULL) {
 		 this->curChar = *this->nextCharPtr;
@@ -359,7 +221,7 @@ uint32_t Parser::getCurrentLineNo() {
  }
 
  //下一个字符是否与预期匹配
- bool Parser::matchNextChar(char expectedChar)
+ bool Lexer::matchNextChar(char expectedChar)
  {
 	 if (this->lookAheadChar() == expectedChar) {
 		 this->getNextChar();
@@ -369,7 +231,7 @@ uint32_t Parser::getCurrentLineNo() {
  }
 
  //跳过连续空白
-void Parser::skipBlanks() {
+void Lexer::skipBlanks() {
 	if (!(this->curChar)) {
 		return;
 	}
@@ -382,7 +244,7 @@ void Parser::skipBlanks() {
  }
 
 
-void Parser::skipAline() {
+void Lexer::skipAline() {
 	this->getNextChar();
 	while (this->curChar != '\0') {
 		if (this->curChar == '\n') {
@@ -397,7 +259,7 @@ void Parser::skipAline() {
 
 
 //解析标识符：变量名&函数名
-void Parser::parserId(SNL_TOKEN_TYPE type) {
+void Lexer::parserId(SNL_TOKEN_TYPE type) {
 	if ((this->curChar)) {
 
 
@@ -421,7 +283,7 @@ void Parser::parserId(SNL_TOKEN_TYPE type) {
 
 
 //解析字符串,暂不支持转义字符
-void Parser::parseString() {
+void Lexer::parseString() {
 
 	while (true) {
 		getNextChar();
@@ -440,7 +302,7 @@ void Parser::parseString() {
 
 
 
-void Parser::parseNum() {
+void Lexer::parseNum() {
 	while (isdigit(this->curChar)) {
 		this->getNextChar();
 	}
@@ -454,7 +316,7 @@ void Parser::parseNum() {
 
 
 //跳过注释：块注释&单行注释
-void Parser::skipComment() {
+void Lexer::skipComment() {
 	char nextChar = this->lookAheadChar();
 
 	// 单行注释,like {...}
@@ -484,7 +346,7 @@ void Parser::skipComment() {
 
 //若当前token为expected则读入下一个token并返回true,
 //否则不读入token且返回false
-bool Parser::matchToken(SNL_TOKEN_TYPE expected) {
+bool Lexer::matchToken(SNL_TOKEN_TYPE expected) {
 	if (this->curToken.type == expected) {
 		this->getNextToken();
 		return true;
@@ -493,7 +355,7 @@ bool Parser::matchToken(SNL_TOKEN_TYPE expected) {
 }
 
 //断言当前token为expected并读入下一token,否则报错errMsg
-void Parser::consumeCurToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
+void Lexer::consumeCurToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
 	if (this->curToken.type != expected) {
 		COMPILE_ERROR(this, errMsg);
 	}
@@ -501,16 +363,21 @@ void Parser::consumeCurToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
 }
 
 //断言下一个token为expected,否则报错errMsg
-void Parser::consumeNextToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
+void Lexer::consumeNextToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
 	this->getNextToken();
 	if (this->curToken.type != expected) {
 		COMPILE_ERROR(this, errMsg);
 	}
 }
 
+vector<SNL_TOKEN_TYPE> Lexer::getTokenVec()
+{
+	return this->m_Token_Vec;
+}
+
 
 //获得下一个token
-void Parser::getNextToken() {
+void Lexer::getNextToken() {
 	this->preToken = this->curToken;
 	this->skipBlanks();
 

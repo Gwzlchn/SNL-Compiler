@@ -1,8 +1,8 @@
-#ifndef _SNL__H
-#define _SNL__H
+#ifndef _SNL_LL1_H
+#define _SNL_LL1_H
 
-#include"SNL_Parser.h"
-
+#include"./SNL_Lexer.h"
+#include"SNL_Tokens.h"
 
 #include<map>
 #include<string>
@@ -110,7 +110,8 @@ public:
 
 	//SNL_ ·ÖÎö±í
 	void setAnalyseMap();
-	bool SNL_AnalyseProcess();
+	bool SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input_vec);
+	//bool SNL_AnalyseProcess();
 	void printStack(const stack<SNL_TOKEN_TYPE>& tok_stack) const;
 	int getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok);
 	void pushProdToAnaylseStack(int prod_id, stack<SNL_TOKEN_TYPE>& ana_stack);
