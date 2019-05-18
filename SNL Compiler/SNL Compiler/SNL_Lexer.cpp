@@ -4,38 +4,16 @@
 #include <algorithm>
 
 
-
- template <typename T, typename F>
+template <typename T, typename F>
  map<T, F> reserveMap(const map<F, T>& to_res) {
-	 map<T, F> ret;
-	 for (auto iter = to_res.begin();
-		 iter != to_res.end(); iter++)
-		 ret.insert({ iter->second,iter->first });
+	map<T, F> ret;
+	for (auto iter = to_res.begin();
+		iter != to_res.end(); iter++)
+		ret.insert({ iter->second,iter->first });
 
-	 return ret;
- }
- map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map = reserveMap<SNL_TOKEN_TYPE, string>(Token_Name_Type_Map);
-
-
-#define TERMIN true
-#define NOTTER false
- template<typename T, typename F>
- map<F, bool> make_terminal_map(map<T, F> full_map) {
-	 map<F, bool> ret;
-	 for (auto iter = full_map.begin(); \
-		 iter != full_map.end(); iter++) {
-
-		 if (std::all_of(iter->first.begin(), iter->first.end(), [](unsigned char c) { return !std::isalpha(c) ||std::isupper(c); })) {
-			 ret.insert({ iter->second, TERMIN });
-		 }
-		 else {
-			 ret.insert({ iter->second, NOTTER });
-		 }
-	 }
-	 return ret;
- }
- map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map = make_terminal_map<string, SNL_TOKEN_TYPE>(Token_Name_Type_Map);
-
+	return ret;
+}
+map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map = reserveMap<SNL_TOKEN_TYPE, string>(Token_Name_Type_Map);
 
 
  typedef int length;
@@ -88,13 +66,6 @@
  };
 
 
-
-
- 
-
-
-
-
  Lexer::Lexer(const char* file) {
 	 
 	 this->file = file;
@@ -102,14 +73,12 @@
 	 this->curChar = *this->sourceCode;
 	 this->nextCharPtr = this->sourceCode + 1;
 
-
 	 this->curToken.lineNo = 1;
 	 this->curToken.type = TOKEN_ERROR;
 	 this->curToken.start = NULL;
 	 this->curToken.length = 0;
 
 	 this->preToken = this->curToken;
-	 this->interpolation_ExpectRightParemNum = 0;
  }
 
 
@@ -135,7 +104,7 @@
 	 else {
 		 size_t numRead = fread(fileContent, sizeof(char), fileSize, file);
 
-		 for (int i = numRead; i < fileSize; i++) {
+		 for (size_t i = numRead; i < fileSize; i++) {
 			 fileContent[i] = '\0';
 		 }
 		 fclose(file);
@@ -148,14 +117,10 @@
 
 void Lexer::RunFile() {
 
-	 //const char* srcCode = this->readFile(file_name);
-
-	
-	 //initParser(&parser, file_name, srcCode);
 	 while (this->curToken.type != TOKEN_ENDFILE) {
 		 this->getNextToken();
 		 printf("%d Line: \t\t%s [", \
-			 this->curToken.lineNo, Token_Type_Name_Map[this->curToken.type].c_str());
+			 this->curToken.lineNo, Token_Type_Name_Map.find(this->curToken.type)->second.c_str());
 
 		 uint32_t idx = 0;
 		 while (idx < this->curToken.length) {
@@ -180,6 +145,10 @@ uint32_t Lexer::getCurrentLineNo() {
 	return this->curToken.lineNo;
 }
 
+vector<SNL_TOKEN_TYPE> Lexer::getTokenVec()
+{
+	return this->m_Token_Vec;
+}
 
 
  //判断当前单词是否为关键字，是返回相应token，否则是普通标识符
@@ -311,10 +280,6 @@ void Lexer::parseNum() {
 }
 
 
-
-
-
-
 //跳过注释：块注释&单行注释
 void Lexer::skipComment() {
 	char nextChar = this->lookAheadChar();
@@ -368,11 +333,6 @@ void Lexer::consumeNextToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
 	if (this->curToken.type != expected) {
 		COMPILE_ERROR(this, errMsg);
 	}
-}
-
-vector<SNL_TOKEN_TYPE> Lexer::getTokenVec()
-{
-	return this->m_Token_Vec;
 }
 
 

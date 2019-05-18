@@ -1,14 +1,13 @@
 #ifndef _SNL_LL1_H
 #define _SNL_LL1_H
 
-#include"./SNL_Lexer.h"
+
 #include"SNL_Tokens.h"
 
 #include<map>
 #include<string>
 #include<vector>
 #include<set>
-#include <iostream>
 #include<stack>
 
 using std::vector;
@@ -19,7 +18,7 @@ using std::set;
 using std::stack;
 
 
-
+extern const map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map;
 
 class Production {
 private:
@@ -37,12 +36,12 @@ public:
 	bool isLeftTerminal();
 
 	SNL_TOKEN_TYPE getProducitonLeft()const;
-	vector<SNL_TOKEN_TYPE> getProductionRight() const ;
+	vector<SNL_TOKEN_TYPE> getProductionRight() const;
 
 	set<SNL_TOKEN_TYPE> getProdTer();
 	set<SNL_TOKEN_TYPE> getProdNotTer();
 
-	
+
 
 };
 
@@ -50,7 +49,7 @@ class ProductionSet {
 private:
 	vector<Production> m_productions;
 	//bool m_is_init;		//这个set可能有两个用处，一个是用来存全部文法，另一个是用来存放闭包；
-		
+
 	//每一个非终极符的Follow集
 	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_follow_sets;
 	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_first_sets;
@@ -65,31 +64,31 @@ private:
 
 	//输入流
 	stack<SNL_TOKEN_TYPE, vector<SNL_TOKEN_TYPE>> m_input_stream;
-	
+
 
 public:
-		
+
 	ProductionSet(string prods_file_name);
 
-	vector<Production> makePordsFromFile(const string& file_name)const ;
+	vector<Production> makePordsFromFile(const string& file_name)const;
 
 
 
 	//ProductionSet(vector<Production> productions, bool is_init);
 	//set<Production> getProductionClosure(Production one_prod);
 	void getProdsFirstSet();
-	
+
 	void setUnion(set<SNL_TOKEN_TYPE>& dst, const set<SNL_TOKEN_TYPE>& src);
 	//bool isBlankInTokenFirst(const SNL_TOKEN_TYPE& tok) const ;
 	template <typename T>
-	string get_token_str(const T& tok_vec)const  ;
+	string get_token_str(const T& tok_vec)const;
 
-	
+
 	void printSetMap(const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets) const;
 
 	void printPredictMap() const;
 
-	set<SNL_TOKEN_TYPE> setRemoveBlank(const set<SNL_TOKEN_TYPE>& src) const ;
+	set<SNL_TOKEN_TYPE> setRemoveBlank(const set<SNL_TOKEN_TYPE>& src) const;
 
 	bool isNotTerDeriBlank(SNL_TOKEN_TYPE not_ter);
 
@@ -104,8 +103,8 @@ public:
 	bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, vector<SNL_TOKEN_TYPE>& after_token);
 
 	void setPredictSet();
-	set<SNL_TOKEN_TYPE> getTokenVecFirst(const vector<SNL_TOKEN_TYPE>& tok_vec) ;
-	set<SNL_TOKEN_TYPE> getOneProdPredict(const Production& prod) ;
+	set<SNL_TOKEN_TYPE> getTokenVecFirst(const vector<SNL_TOKEN_TYPE>& tok_vec);
+	set<SNL_TOKEN_TYPE> getOneProdPredict(const Production& prod);
 
 
 	//SNL_ 分析表
