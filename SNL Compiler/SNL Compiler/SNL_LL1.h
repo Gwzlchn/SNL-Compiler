@@ -22,14 +22,15 @@ extern const map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map;
 
 class Production {
 private:
-	SNL_TOKEN_TYPE m_left;
-	vector<SNL_TOKEN_TYPE> m_right;
-	int m_id;
-	int m_look_ahead_idx;	//当前展望符分界，即小圆点；
+
+	SNL_TOKEN_TYPE m_left = TOKEN_BLANK;
+	vector<SNL_TOKEN_TYPE> m_right = { TOKEN_BLANK };
+	size_t m_id = -1;
+	size_t m_look_ahead_idx = -1;	//当前展望符分界，即小圆点；
 
 public:
 	bool operator < (const Production& prod) const;
-	int get_id();
+	size_t get_id();
 	Production();
 	Production(SNL_TOKEN_TYPE left, vector<SNL_TOKEN_TYPE> right, int id, int idx = 0);
 
@@ -53,11 +54,11 @@ private:
 	//每一个非终极符的Follow集
 	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_follow_sets;
 	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_first_sets;
-	typedef  int Prod_Idx;
+	typedef  size_t Prod_Idx;
 	//Predict 集合
 	map<Prod_Idx, set<SNL_TOKEN_TYPE>> m_predict_set;
 	//SNL_ 分析表
-	map<SNL_TOKEN_TYPE, vector<pair<SNL_TOKEN_TYPE, Prod_Idx>>> m_SNL_analyse_map;
+	int** m_LL1_Analyse_Map;
 
 	set<SNL_TOKEN_TYPE> m_terminal;
 	set<SNL_TOKEN_TYPE> m_notTerminal;
@@ -112,7 +113,7 @@ public:
 	bool SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input_vec);
 	//bool SNL_AnalyseProcess();
 	void printStack(const stack<SNL_TOKEN_TYPE>& tok_stack) const;
-	int getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok);
+	size_t getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok);
 	void pushProdToAnaylseStack(int prod_id, stack<SNL_TOKEN_TYPE>& ana_stack);
 };
 

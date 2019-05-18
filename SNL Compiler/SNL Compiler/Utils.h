@@ -29,7 +29,8 @@ typedef enum {
 	ERROR_MEM,
 	ERROR_LEX,
 	ERROR_COMPILE,
-	ERROR_RUNTIME
+	ERROR_RUNTIME,
+	ERROR_LL1_ANALYSE
 } ErrorType;
 
 void errorReport(void* lexer,
@@ -51,6 +52,9 @@ void errorReport(void* lexer,
 #define RUN_ERROR(...)\
    errorReport(NULL, ERROR_RUNTIME, __VA_ARGS__)
 
-#define DEFAULT_BUfFER_SIZE 512
+#define LL1ANALYSE_ERROR(productionSet,...)\
+	errorReport(productionSet,ERROR_LL1_ANALYSE,__VA_ARGS__)
 
+
+#define DEFAULT_BUfFER_SIZE 128
 #endif

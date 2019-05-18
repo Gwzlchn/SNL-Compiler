@@ -1,7 +1,7 @@
 #include "SNL_LL1.h"
 #include "SNL_Lexer.h"
 #include "SNL_Tokens.h"
-
+#include "Utils.h" 
 #include <algorithm>
 #include <iterator>
 #include <fstream>
@@ -35,15 +35,11 @@ bool Production::operator<(const Production& prod) const
 	return this->m_id < prod.m_id;
 }
 
-int Production::get_id() {
+size_t Production::get_id() {
 	return this->m_id;
 }
-Production::Production() {
-	m_left = TOKEN_BLANK;
-	m_right = { TOKEN_BLANK };
-	m_id = -1;
-	m_look_ahead_idx = -1;
-}
+
+
 
 Production::Production(SNL_TOKEN_TYPE left, vector<SNL_TOKEN_TYPE> right, int id, int idx)
 {
@@ -65,7 +61,7 @@ Production::Production(SNL_TOKEN_TYPE left, vector<SNL_TOKEN_TYPE> right, int id
 	m_right = right;
 	m_id = id;
 	m_look_ahead_idx = idx;
-	return;
+
 }
 
 inline bool Production::isLeftTerminal() {
@@ -139,6 +135,19 @@ ProductionSet::ProductionSet(string prods_file_name) {
 	this->getProdsFirstSet();
 	this->getProdsFollowSet();
 	this->setPredictSet();
+
+
+	//初始化LL1 分析表
+	const size_t size = m_terminal.size() + m_notTerminal.size();
+	m_LL1_Analyse_Map = new int * [size];
+	for (size_t i = 0; i < size; i++) {
+		m_LL1_Analyse_Map[i] = new int[size];
+		for (size_t j = 0; j < size; j++) {
+			m_LL1_Analyse_Map[i][j] = -1;
+		}
+	}
+
+
 
 
 }
@@ -497,19 +506,20 @@ set<SNL_TOKEN_TYPE> ProductionSet::getOneProdPredict(const Production& prod)  {
 
 void ProductionSet::setAnalyseMap()
 {
-	m_SNL_analyse_map = map<SNL_TOKEN_TYPE, vector<pair<SNL_TOKEN_TYPE, Prod_Idx>>>();
+
 	size_t ter_size = m_terminal.size();
-	for (auto not_ter_iter = m_notTerminal.begin(); \
-		not_ter_iter != m_notTerminal.end(); not_ter_iter++) {
-	}
+
 	for (auto prod_iter = m_productions.begin(); \
 		prod_iter != m_productions.end(); prod_iter++) {
+
+		SNL_TOKEN_TYPE left = prod_iter->getProducitonLeft();
+		int prod_id = prod_iter->get_id();
 		//找到当前Predict集
 		set<SNL_TOKEN_TYPE>& cur_predict = m_predict_set.find(prod_iter->get_id())->second;
 		for (auto ter_iter = cur_predict.begin(); \
 			ter_iter != cur_predict.end(); ter_iter++) {
-			m_SNL_analyse_map[prod_iter->getProducitonLeft()].push_back({ *ter_iter,prod_iter->get_id() });
-			
+			SNL_TOKEN_TYPE cur_sigle_right = *ter_iter;
+			m_LL1_Analyse_Map[left][cur_sigle_right] = prod_id;
 		}
 	}
 }
@@ -524,20 +534,23 @@ bool ProductionSet::SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input
 	}
 
 	//初始化分析栈,对于输入流 front为栈底，end栈顶
-
 	SNL_TOKEN_TYPE tok_start = m_productions[0].getProducitonLeft();
 	stack<SNL_TOKEN_TYPE> LL1_analyse_stack;
 	LL1_analyse_stack.push(TOKEN_ENDFILE);
 	LL1_analyse_stack.push(tok_start);
 
+	const size_t prod_size = m_productions.size();
 	while (m_input_stream.size() != 0) {
 		SNL_TOKEN_TYPE cur_input_tok = m_input_stream.top();
 		SNL_TOKEN_TYPE cur_analyse_tok = LL1_analyse_stack.top();
 		//输入流和分析栈没match，输入流不弹出
 		if (cur_analyse_tok != cur_input_tok) {
-			int prod_id = getProdIdFromAnalyseMap(cur_analyse_tok, cur_input_tok);
-			if (prod_id <= 0) {
-				system("pause");
+			size_t prod_id = getProdIdFromAnalyseMap(cur_analyse_tok, cur_input_tok);
+			if (prod_id == 0 || prod_id > prod_size) {
+				LL1ANALYSE_ERROR(this,"Can't Match these two words in LL1 AnalyseMap: %s \t %s quit",\
+					Token_Type_Name_Map.find(cur_analyse_tok)->second.c_str(),\
+					Token_Type_Name_Map.find(cur_input_tok)->second.c_str()\
+				);
 			}
 			LL1_analyse_stack.pop();
 			this->pushProdToAnaylseStack(prod_id, LL1_analyse_stack);
@@ -547,8 +560,6 @@ bool ProductionSet::SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input
 			LL1_analyse_stack.pop();
 			m_input_stream.pop();
 		}
-
-		//int i = 1;
 	}
 
 	return true;
@@ -560,17 +571,16 @@ void ProductionSet::printStack(const stack<SNL_TOKEN_TYPE>& tok_stack)const{
 	
 }
 
-int ProductionSet::getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok) {
-	auto iter = m_SNL_analyse_map.find(ana_tok);
-
-	for (vector<pair<SNL_TOKEN_TYPE, Prod_Idx>>::iterator vec_iter = iter->second.begin();\
-		vec_iter != (iter->second).end(); vec_iter++) {
-
-		if (vec_iter->first == in_tok) {
-			return vec_iter->second;
-		}
+size_t ProductionSet::getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok) {
+	const size_t full_size = m_terminal.size() + m_notTerminal.size();
+	if (size_t(ana_tok)<0 || size_t(ana_tok) > full_size || \
+		size_t(in_tok) < 0 || size_t(in_tok) > full_size) {
+		return 0;
 	}
-	return -1;
+	else {
+		return m_LL1_Analyse_Map[ana_tok][in_tok];
+	}
+	
 }
 
 void ProductionSet::pushProdToAnaylseStack(int prod_id, stack<SNL_TOKEN_TYPE>& ana_stack) {

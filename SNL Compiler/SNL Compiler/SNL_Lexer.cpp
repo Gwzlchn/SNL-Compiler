@@ -83,33 +83,32 @@ map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map = reserveMap<SNL_TOKEN_TYPE, str
 
 
  char* Lexer::readFile(const char* path) {
-	 FILE* file;
-	 errno_t err;
-
-	 if (err = fopen_s(&file, path, "r") != 0) {
+	 FILE* file = fopen(path, "r");
+	 if (file == NULL) {
 		 IO_ERROR("Could`t open file \"%s\".\n", path);
 	 }
 	 else {
 		 printf("The file  was opened\n");
-	 }
 
-	 struct stat fileStat;
-	 stat(path, &fileStat);
-	 size_t fileSize = fileStat.st_size;
-	 char* fileContent = (char*)malloc(fileSize + 1);
-	 if (fileContent == NULL) {
-		 MEM_ERROR("Could`t allocate memory for reading file \"%s\".\n", path);
-		 return NULL;
-	 }
-	 else {
-		 size_t numRead = fread(fileContent, sizeof(char), fileSize, file);
-
-		 for (size_t i = numRead; i < fileSize; i++) {
-			 fileContent[i] = '\0';
+		 struct stat fileStat;
+		 stat(path, &fileStat);
+		 size_t fileSize = fileStat.st_size;
+		 char* fileContent = (char*)malloc(fileSize + 1);
+		 if (fileContent == NULL) {
+			 MEM_ERROR("Could`t allocate memory for reading file \"%s\".\n", path);
+			 return NULL;
 		 }
-		 fclose(file);
-		 return fileContent;
+		 else {
+			 size_t numRead = fread(fileContent, sizeof(char), fileSize, file);
+
+			 for (size_t i = numRead; i < fileSize; i++) {
+				 fileContent[i] = '\0';
+			 }
+			 fclose(file);
+			 return fileContent;
+		 }
 	 }
+	 return NULL;
 }
 
 
