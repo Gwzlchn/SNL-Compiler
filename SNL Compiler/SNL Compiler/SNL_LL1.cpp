@@ -528,15 +528,15 @@ void ProductionSet::setAnalyseMap(){
 
 
 void ProductionSet::PrintLL1AnalyseMap() {
-	const size_t size = m_terminal.size() + m_notTerminal.size();
+	const size_t size = m_LL1_Analyse_Map.size();
 	for (size_t i = 0; i < size; i++) {
 		for (size_t j = 0; j < size; j++) {
 			if (m_LL1_Analyse_Map[i][j] == 0) {
 				continue;
 			}
 			else {
-				std::cout << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)i)->second << "\t";
-				std::cout << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)j)->second << "\t";
+				std::cout << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)i)->second << "\t\t";
+				std::cout << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)j)->second << "\t\t";
 				std::cout << m_LL1_Analyse_Map[i][j] << std::endl;
 			}
 		}
