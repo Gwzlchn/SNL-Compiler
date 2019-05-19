@@ -13,6 +13,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="资源文件\SNL_TEST">
+      <UniqueIdentifier>{afbab01e-f3f3-4478-8101-093755e22d99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Prodctions">
+      <UniqueIdentifier>{8dfc2e6c-285e-4124-9a67-8a9a6761c7ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SNL Compiler.cpp">
@@ -43,13 +49,58 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="sample.snl">
-      <Filter>资源文件</Filter>
+    <None Include="SNL-Test\sample.snl">
+      <Filter>资源文件\SNL_TEST</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="garbage.txt">
       <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="SNL-Test\check error.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\C1.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\C2.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\C4.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\C5.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\C6.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\C7.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\C8.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\EASY.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\EXP.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\SCAN.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="SNL-Test\simple\SD1.TXT">
+      <Filter>资源文件\SNL_TEST</Filter>
+    </Text>
+    <Text Include="Production\production.txt">
+      <Filter>资源文件\Prodctions</Filter>
+    </Text>
+    <Text Include="Production\production11.txt">
+      <Filter>资源文件\Prodctions</Filter>
+    </Text>
+    <Text Include="Production\productions_ppt.txt">
+      <Filter>资源文件\Prodctions</Filter>
     </Text>
   </ItemGroup>
 </Project>

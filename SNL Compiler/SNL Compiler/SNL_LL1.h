@@ -58,7 +58,7 @@ private:
 	//Predict 集合
 	map<Prod_Idx, set<SNL_TOKEN_TYPE>> m_predict_set;
 	//SNL_ 分析表
-	int** m_LL1_Analyse_Map;
+	vector<vector<int>> m_LL1_Analyse_Map;
 
 	set<SNL_TOKEN_TYPE> m_terminal;
 	set<SNL_TOKEN_TYPE> m_notTerminal;
@@ -110,6 +110,7 @@ public:
 
 	//SNL_ 分析表
 	void setAnalyseMap();
+	void PrintLL1AnalyseMap();
 	bool SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input_vec);
 	//bool SNL_AnalyseProcess();
 	void printStack(const stack<SNL_TOKEN_TYPE>& tok_stack) const;

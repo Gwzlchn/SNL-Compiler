@@ -45,7 +45,7 @@ const enum SNL_TOKEN_TYPE
 	Token_DeclarePart,
 
 	//类型声明
-	Token_TypeDec, Token_TypeDecpart,
+	Token_TypeDec, Token_TypeDeclaration,
 	Token_TypeDecList, Token_TypeDecMore, Token_TypeId,
 	//类型
 	Token_TypeName, Token_BaseType, Token_StructureType,
@@ -53,11 +53,11 @@ const enum SNL_TOKEN_TYPE
 	Token_FieldDecList, Token_FieldDecMore, Token_IdList, Token_IdMore,
 
 	//变量声明
-	Token_VarDec, Token_VarDecpart, Token_VarDecList, Token_VarDecMore,
+	Token_VarDec, Token_VarDeclaration, Token_VarDecList, Token_VarDecMore,
 	Token_VarIdList, Token_VarIdMore,
 
 	//过程声明
-	Token_ProcDecpart, Token_ProcDec,
+	Token_ProcDec, Token_ProcDeclaration,
 	Token_ProcDecMore, Token_ProcName,
 	//参数声明
 	Token_ParamList, Token_ParamDecList,
@@ -104,6 +104,7 @@ const enum SNL_TOKEN_TYPE
 	Token_Factor, Token_Variable, Token_VariMore, Token_FieldVar,
 	Token_FieldVarMore, Token_CmpOp, Token_AddOp, Token_MultOp,
 
+	
 };
 
 const std::map<std::string, SNL_TOKEN_TYPE> Token_Name_Type_Map =
@@ -167,18 +168,18 @@ const std::map<std::string, SNL_TOKEN_TYPE> Token_Name_Type_Map =
 	{"GREATER_EQUAL",TOKEN_GREATER_EQUAL},
 	{"LESS_EQUAL",TOKEN_LESS_EQUAL},
 	{"QUESTION",TOKEN_QUESTION},
-
+	{"STRING",TOKEN_STRING},
 	//********************************非终极符******************************
 	{ "Program",Token_Program },
 	{ "ProgramHead", Token_ProgramHead },
 	{ "ProgramName", Token_ProgramName },
 	{ "DeclarePart", Token_DeclarePart },
 	{ "TypeDec", Token_TypeDec },
-	{ "TypeDecpart", Token_TypeDecpart },
+	{ "TypeDeclaration", Token_TypeDeclaration },
 	{ "TypeDecList", Token_TypeDecList },
 	{ "TypeDecMore", Token_TypeDecMore },
 	{ "TypeId", Token_TypeId },
-	{ "TypeDef", Token_TypeName },
+	{ "TypeName", Token_TypeName },
 	{ "BaseType", Token_BaseType },
 	{ "StructureType", Token_StructureType },
 	{ "ArrayType", Token_ArrayType },
@@ -190,13 +191,13 @@ const std::map<std::string, SNL_TOKEN_TYPE> Token_Name_Type_Map =
 	{ "IdList", Token_IdList },
 	{ "IdMore", Token_IdMore },
 	{ "VarDec", Token_VarDec },
-	{ "VarDecpart", Token_VarDecpart },
+	{ "VarDeclaration", Token_VarDeclaration },
 	{ "VarDecList", Token_VarDecList },
 	{ "VarDecMore", Token_VarDecMore },
 	{ "VarIdList", Token_VarIdList },
 	{ "VarIdMore", Token_VarIdMore },
 	{ "ProcDec", Token_ProcDec },
-	{ "ProcDecpart", Token_ProcDecpart},
+	{ "ProcDeclaration", Token_ProcDeclaration},
 	{ "ProcDecMore", Token_ProcDecMore },
 	{ "ProcName", Token_ProcName },
 	{ "ParamList", Token_ParamList },

@@ -163,10 +163,25 @@
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="sample.snl" />
+    <None Include="SNL-Test\sample.snl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="garbage.txt" />
+    <Text Include="Production\production.txt" />
+    <Text Include="Production\production11.txt" />
+    <Text Include="Production\productions_ppt.txt" />
+    <Text Include="SNL-Test\check error.TXT" />
+    <Text Include="SNL-Test\simple\C1.TXT" />
+    <Text Include="SNL-Test\simple\C2.TXT" />
+    <Text Include="SNL-Test\simple\C4.TXT" />
+    <Text Include="SNL-Test\simple\C5.TXT" />
+    <Text Include="SNL-Test\simple\C6.TXT" />
+    <Text Include="SNL-Test\simple\C7.TXT" />
+    <Text Include="SNL-Test\simple\C8.TXT" />
+    <Text Include="SNL-Test\simple\EASY.TXT" />
+    <Text Include="SNL-Test\simple\EXP.TXT" />
+    <Text Include="SNL-Test\simple\SCAN.TXT" />
+    <Text Include="SNL-Test\simple\SD1.TXT" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

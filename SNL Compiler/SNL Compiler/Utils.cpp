@@ -34,8 +34,8 @@ void errorReport(void* ptr,
 	case ERROR_LL1_ANALYSE:
 		ASSERT(lexer != NULL, "Production Set is null!");
 		fprintf(stderr, "Error LL1");
-	default:
-		NOT_REACHED();
+	//default:
+		//NOT_REACHED();
 	}
 	exit(1);
 }

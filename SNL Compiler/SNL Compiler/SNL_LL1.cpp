@@ -138,14 +138,17 @@ ProductionSet::ProductionSet(string prods_file_name) {
 
 
 	//初始化LL1 分析表
-	const size_t size = m_terminal.size() + m_notTerminal.size();
-	m_LL1_Analyse_Map = new int * [size];
+	const size_t size = Token_Terminal_Map.size();
+	m_LL1_Analyse_Map = vector<vector<int>>(size, vector<int>(size));
 	for (size_t i = 0; i < size; i++) {
-		m_LL1_Analyse_Map[i] = new int[size];
+		//m_LL1_Analyse_Map[i] = new int[size];
 		for (size_t j = 0; j < size; j++) {
-			m_LL1_Analyse_Map[i][j] = -1;
+			m_LL1_Analyse_Map[i][j] = 0;
 		}
 	}
+
+	this->setAnalyseMap();
+	this->PrintLL1AnalyseMap();
 
 
 
@@ -504,8 +507,7 @@ set<SNL_TOKEN_TYPE> ProductionSet::getOneProdPredict(const Production& prod)  {
 	}
 }
 
-void ProductionSet::setAnalyseMap()
-{
+void ProductionSet::setAnalyseMap(){
 
 	size_t ter_size = m_terminal.size();
 
@@ -523,6 +525,24 @@ void ProductionSet::setAnalyseMap()
 		}
 	}
 }
+
+
+void ProductionSet::PrintLL1AnalyseMap() {
+	const size_t size = m_terminal.size() + m_notTerminal.size();
+	for (size_t i = 0; i < size; i++) {
+		for (size_t j = 0; j < size; j++) {
+			if (m_LL1_Analyse_Map[i][j] == 0) {
+				continue;
+			}
+			else {
+				std::cout << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)i)->second << "\t";
+				std::cout << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)j)->second << "\t";
+				std::cout << m_LL1_Analyse_Map[i][j] << std::endl;
+			}
+		}
+	}
+}
+
 
 
 bool ProductionSet::SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input_vec) {
