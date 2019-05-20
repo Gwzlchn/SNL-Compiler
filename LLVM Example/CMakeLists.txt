@@ -2,18 +2,26 @@ cmake_minimum_required(VERSION 3.6)
 project(kaleidoscope)
 
 set(CMAKE_CXX_STANDARD 11)
+# 定义需要的库
+set(LLVM_LINK_COMPONENTS
+        Core
+        Support
 
-# 使用llvm来设置路径
+        )
+
+# 使用llvm
 find_package(LLVM REQUIRED CONFIG)
 
-# 打印信息
-message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+set(SOURCE_FILES toy.cpp)
 
-set(SOURCE_FILES top.cpp)
-
-# 添加头文件包含路径
+# 添加头文件路径
+message(STATUS "include path: ${LLVM_INCLUDE_DIRS}")
 include_directories(${LLVM_INCLUDE_DIRS})
-add_definitions(${LLVM_DEFINITIONS})
 
 add_executable(kaleidoscope ${SOURCE_FILES})
+message(STATUS "src path: ${SOURCE_FILES}")
+# 寻找对应的库
+llvm_map_components_to_libnames(llvm_libs ${LLVM_LINK_COMPONENTS})
+message(STATUS "link path: ${LLVM_LINK_COMPONENTS}")
+# 将库与目标代码一起链接
+target_link_libraries(kaleidoscope ${llvm_libs})

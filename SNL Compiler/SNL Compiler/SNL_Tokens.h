@@ -4,11 +4,11 @@
 #include<map>
 #include<string>
 
-const enum SNL_TOKEN_TYPE
+ enum SNL_TOKEN_TYPE
 {
 	//*************************ÖÕ¼«·û**********************************
 	//¿Õ°×·û
-	TOKEN_BLANK,
+	TOKEN_BLANK,TOKEN_SHARP,
 	/* ²¾¼Çµ¥´Ê·ûºÅ */
 	TOKEN_ENDFILE, TOKEN_ERROR,
 	/* ±£Áô×Ö */
@@ -111,6 +111,7 @@ const std::map<std::string, SNL_TOKEN_TYPE> Token_Name_Type_Map =
 {
 	//********************************ÖÕ¼«·û********************************
 	{"?",TOKEN_BLANK},
+	{"#",TOKEN_SHARP},
 	{ "EOF",TOKEN_ENDFILE},
 	{ "ERROR",TOKEN_ERROR},
 	{ "PROGRAM",TOKEN_PROGRAM},

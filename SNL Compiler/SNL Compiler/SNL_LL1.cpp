@@ -2,6 +2,7 @@
 #include "SNL_Lexer.h"
 #include "SNL_Tokens.h"
 #include "Utils.h" 
+#include <queue>
 #include <algorithm>
 #include <iterator>
 #include <fstream>
@@ -149,8 +150,8 @@ ProductionSet::ProductionSet(string prods_file_name) {
 
 	this->setAnalyseMap();
 	this->PrintLL1AnalyseMap();
-
-
+	
+	//this->grammarAnalysis();
 
 
 }
@@ -171,7 +172,7 @@ vector<Production> ProductionSet::makePordsFromFile(const string& file_name) con
 	string substr;//承载分割后的字符串
 	//production* ptrProduc;//指向一个产生式
 	bool equalFlag = false;//标志是否已读到"::="这个符号
-	int seqNum = 1;//当前行号，也即产生式的编号
+	int seqNum = 0;//当前行号，也即产生式的编号
 
 
 	while (getline(infile, line))
@@ -545,46 +546,46 @@ void ProductionSet::PrintLL1AnalyseMap() {
 
 
 
-bool ProductionSet::SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input_vec) {
-	
-	//std::reverse(token_input_vec.begin()token_input_vec.end());
-	for (auto iter = token_input_vec.begin(); \
-		iter != token_input_vec.end(); iter++) {
-		m_input_stream.push(*iter);
-	}
-
-	//初始化分析栈,对于输入流 front为栈底，end栈顶
-	SNL_TOKEN_TYPE tok_start = m_productions[0].getProducitonLeft();
-	stack<SNL_TOKEN_TYPE> LL1_analyse_stack;
-	LL1_analyse_stack.push(TOKEN_ENDFILE);
-	LL1_analyse_stack.push(tok_start);
-
-	const size_t prod_size = m_productions.size();
-	while (m_input_stream.size() != 0) {
-		SNL_TOKEN_TYPE cur_input_tok = m_input_stream.top();
-		SNL_TOKEN_TYPE cur_analyse_tok = LL1_analyse_stack.top();
-		//输入流和分析栈没match，输入流不弹出
-		if (cur_analyse_tok != cur_input_tok) {
-			size_t prod_id = getProdIdFromAnalyseMap(cur_analyse_tok, cur_input_tok);
-			if (prod_id == 0 || prod_id > prod_size) {
-				LL1ANALYSE_ERROR(this,"Can't Match these two words in LL1 AnalyseMap: %s \t %s quit",\
-					Token_Type_Name_Map.find(cur_analyse_tok)->second.c_str(),\
-					Token_Type_Name_Map.find(cur_input_tok)->second.c_str()\
-				);
-			}
-			LL1_analyse_stack.pop();
-			this->pushProdToAnaylseStack(prod_id, LL1_analyse_stack);
-			continue;
-		}
-		else { //Match
-			LL1_analyse_stack.pop();
-			m_input_stream.pop();
-		}
-	}
-
-	return true;
-
-}
+//bool ProductionSet::SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input_vec) {
+//	
+//	//std::reverse(token_input_vec.begin()token_input_vec.end());
+//	for (auto iter = token_input_vec.begin(); \
+//		iter != token_input_vec.end(); iter++) {
+//		//m_input_stream.push(*iter);
+//	}
+//
+//	//初始化分析栈,对于输入流 front为栈底，end栈顶
+//	SNL_TOKEN_TYPE tok_start = m_productions[0].getProducitonLeft();
+//	stack<SNL_TOKEN_TYPE> LL1_analyse_stack;
+//	LL1_analyse_stack.push(TOKEN_ENDFILE);
+//	LL1_analyse_stack.push(tok_start);
+//
+//	const size_t prod_size = m_productions.size();
+//	while (m_input_stream.size() != 0) {
+//		SNL_TOKEN_TYPE cur_input_tok = m_input_stream.top();
+//		SNL_TOKEN_TYPE cur_analyse_tok = LL1_analyse_stack.top();
+//		//输入流和分析栈没match，输入流不弹出
+//		if (cur_analyse_tok != cur_input_tok) {
+//			size_t prod_id = getProdIdFromAnalyseMap(cur_analyse_tok, cur_input_tok);
+//			if (prod_id == 0 || prod_id > prod_size) {
+//				LL1ANALYSE_ERROR(this,"Can't Match these two words in LL1 AnalyseMap: %s \t %s quit",\
+//					Token_Type_Name_Map.find(cur_analyse_tok)->second.c_str(),\
+//					Token_Type_Name_Map.find(cur_input_tok)->second.c_str()\
+//				);
+//			}
+//			LL1_analyse_stack.pop();
+//			this->pushProdToAnaylseStack(prod_id, LL1_analyse_stack);
+//			continue;
+//		}
+//		else { //Match
+//			LL1_analyse_stack.pop();
+//			//m_input_stream.pop();
+//		}
+//	}
+//
+//	return true;
+//
+//}
 
 
 void ProductionSet::printStack(const stack<SNL_TOKEN_TYPE>& tok_stack)const{
@@ -592,7 +593,7 @@ void ProductionSet::printStack(const stack<SNL_TOKEN_TYPE>& tok_stack)const{
 }
 
 size_t ProductionSet::getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok) {
-	const size_t full_size = m_terminal.size() + m_notTerminal.size();
+	const size_t full_size = Token_Type_Name_Map.size();
 	if (size_t(ana_tok)<0 || size_t(ana_tok) > full_size || \
 		size_t(in_tok) < 0 || size_t(in_tok) > full_size) {
 		return 0;
@@ -611,4 +612,270 @@ void ProductionSet::pushProdToAnaylseStack(int prod_id, stack<SNL_TOKEN_TYPE>& a
 		}	
 	}
 	return;
+}
+
+void ProductionSet::dfsBuildTree(Node*& parent)
+{
+	// 传过来的参数parent一定是非终极符
+
+	if (Token_Terminal_Map.find(parent->curr)->second == true) {
+		std::cerr << "[error] dfsBuildTree invalid param" << std::endl;
+		exit(-1);
+	}
+	if (treeIndex >= vTree.size()) {
+		std::cerr << "[error] dfsBuildTree treeIndex" << std::endl;
+		exit(-1);
+	}
+	// 构造子节点
+	const auto& cur_right = vTree[treeIndex].getProductionRight();
+	for (auto iter = cur_right.begin(); iter != cur_right.end(); iter++) {
+		parent->children.emplace_back(new Node(*iter, parent, global_id++));
+	}
+
+	// 构造完推导式下标就加加
+	treeIndex++;
+	for (unsigned int i = 0; i < parent->children.size(); i++) {
+		if (Token_Terminal_Map.find(parent->children[i]->curr)->second) {
+			// 将ID转化为实际值
+			if (parent->children[i]->curr == TOKEN_BLANK) {}
+			else {
+				//cout << tokenSymbols[global_token_index] <<"\t\ttokenlist"<< endl;
+				//cout << parent->children[i]->curr << endl;
+				//cout << endl;
+				parent->children[i]->curr_str = Token_Type_Name_Map.find(m_input_stream[global_token_index])->second;
+				global_token_index++;
+			}
+			continue;// 终极符是叶节点
+		}
+		dfsBuildTree(parent->children[i]);
+	}
+}
+
+
+int ProductionSet::grammarAnalysis()
+{
+		// 例 分析栈 #E   输入流 i+i*i#
+		std::list<SNL_TOKEN_TYPE> s;//因为栈不能遍历输出所以用list链表代替
+		s.emplace_back(TOKEN_ENDFILE); // #
+		s.emplace_back(m_productions.front().getProducitonLeft()); // 文法开始符
+		m_input_stream.emplace_back(TOKEN_SHARP);
+		int i = 0;//输入流索引
+		while (!s.empty()) {
+			SNL_TOKEN_TYPE t = s.back();//栈顶元素
+			SNL_TOKEN_TYPE r = m_input_stream[static_cast<unsigned int>(i)];//输入流当前扫描符号
+			if (!Token_Terminal_Map.find(t)->second) {
+				//非终极符 寻找 t->啥 的Predict集 中有输入流当前索引符号
+				bool notFound = true;
+				for (map<Prod_Idx, set<SNL_TOKEN_TYPE>>::iterator a = m_predict_set.begin(); a != m_predict_set.end();a++) {
+					if (m_productions[a->first].getProducitonLeft() != t)continue;
+					set<SNL_TOKEN_TYPE>::iterator f;
+					if (Token_Type_Name_Map.find(r)->second == "ID") {
+						f = a->second.find(TOKEN_ID);
+					}
+					else {
+						f = a->second.find(r);
+					}
+					if (f == a->second.end())continue;
+					// 找到了 t->a->second的Predict集中有 r
+
+					// 绘制语法树部分
+					vTree.emplace_back(m_productions[a->first]);
+
+					notFound = false;
+					s.pop_back();//先弹栈
+					// 然后推导式倒着入栈
+					const vector<SNL_TOKEN_TYPE>& cur_right = m_productions[a->first].getProductionRight();
+					for (auto it = cur_right.rbegin(); \
+						it != cur_right.rend(); \
+						it++) {
+						s.emplace_back(*it);
+					}
+					break;
+				}
+				if (notFound) {
+					system("pause");
+					return 0;
+					// 出错
+					/*errMsg = "[Grammatical error] line " +
+						to_string(tokenSymbols[static_cast<unsigned int>(i)].line) + " Current parsing \'" +
+						r.v + "\'";
+					return E_GRAMMAR;*/
+					//cerr << "[error] " << __LINE__ << " " << t << " can not predict " << r << endl;
+					//cerr << "at line " << tokenSymbols[i].line << endl;
+					//exit(-1);
+				}
+				else {
+					continue;// 继续
+				}
+			}
+			else {
+				if (Token_Type_Name_Map.find(t)->second == "ID") {
+					// 非关键字的标识符
+					if (Token_Type_Name_Map.find(r)->second == "ID") {
+						// 匹配了!!!
+						s.pop_back();
+						i++;
+						continue;
+					}
+					else {
+						system("pause");
+						return 0;
+						/*errMsg = "[Grammatical error] line " +
+							to_string(tokenSymbols[static_cast<unsigned int>(i)].line) +
+							" Current parsing \'" + r.v + "\'";
+						return E_GRAMMAR;*/
+						// 出错
+						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
+						//	<< endl;
+						//cerr << "at line " << tokenSymbols[i].line << endl;
+						//exit(-1);
+					}
+				}
+				else if (t == TOKEN_BLANK) {
+					// 空串，直接弹栈继续
+					s.pop_back();
+					continue;
+				}
+				else if (Token_Type_Name_Map.find(t)->second == "INTC") {
+					// 无符号整数
+					if (Token_Type_Name_Map.find(r)->second == "INTC") {
+						// 匹配了!!!
+						s.pop_back();
+						i++;
+						continue;
+					}
+					else {
+						system("pause");
+						return 0;
+						/*errMsg = "[Grammatical error] line " +
+							to_string(tokenSymbols[static_cast<unsigned int>(i)].line) +
+							" Current parsing \'" + r.v + "\'";
+						return E_GRAMMAR;*/
+						// 出错
+						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
+						//	<< endl;
+						//cerr << "at line " << tokenSymbols[i].line << endl;
+						//exit(-1);
+					}
+
+				}
+				else {
+					// 单独的
+					if (t == r) {
+						// 匹配了!!!
+						if (t == TOKEN_ENDFILE) {
+							// 完成了!!!
+							break;
+						}
+						s.pop_back();
+						i++;
+						continue;
+					}
+					else {
+						system("pause");
+						return 0;
+						//// 出错
+						//errMsg = "[Grammatical error] line " +
+						//	to_string(tokenSymbols[static_cast<unsigned int>(i)].line) +
+						//	" Current parsing \'" + r.v + "\'";
+						//return E_GRAMMAR;
+						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
+						//	<< endl;
+						//cerr << "at line " << tokenSymbols[i].line << endl;
+						//exit(-1);
+					}
+				}
+			}
+		}
+		//cout << endl << "Grammar analysis completed! 0 error!" << endl;
+		return 0;
+
+
+
+}
+
+void ProductionSet::setInputStrem(const vector<SNL_TOKEN_TYPE>& input_stream)
+{
+	m_input_stream = input_stream;
+}
+
+
+
+
+
+string ProductionSet::getTree()
+{
+	
+
+		////DEBUG 输出所有已知顺序的推导式
+		//cout << "DEBUG 所有推导式" << endl;
+		//for (const Derivation& d : vTree) {
+		//	cout << d << endl;
+		//}
+		//cout << "DEBUG 所有推导式" << endl;
+
+		int global_id = 1;
+
+		Node* root = new Node(vTree[0].getProducitonLeft(), nullptr, global_id++);
+		vector<SNL_TOKEN_TYPE> cur_right = vTree[0].getProductionRight();
+		for (auto iter = cur_right.begin(); iter != cur_right.end();iter++) {
+			root->children.emplace_back(new Node(*iter, root, global_id++));
+		}
+		treeIndex = 1;
+		global_token_index = 0;
+		for (unsigned int i = 0; i < root->children.size(); i++) {
+			if (Token_Terminal_Map.find(root->children[i]->curr)->second)continue;
+			dfsBuildTree(root->children[i]);
+		}
+
+		std::stringstream ss;//把DOT Language表示的语法树的字符串放到这里边
+
+		ss.clear();
+		ss << "digraph GrammarTree {" << std::endl;
+		std::queue<Node*> q;
+		q.push(root);
+		while (!q.empty()) {
+			Node* c = q.front();
+			q.pop();
+
+			// 该节点的样式和内容
+			if (Token_Terminal_Map.find(c->curr)->second) {
+				if (c->curr == TOKEN_BLANK) {
+					ss << "\"" << c->id << "\" [shape=square; style=filled; fillcolor=cornsilk; label=\""
+						<< "ε" << "\"];" << std::endl;
+				}
+				else if (Token_Type_Name_Map.find(c->curr)->second == "ID") {
+					ss << "\"" << c->id << "\" [shape=square; style=filled; fillcolor=lightpink; label=\""
+						<< c->curr_str << "\"];" << std::endl;
+				}
+				else {
+					ss << "\"" << c->id << "\" [shape=square; style=filled; fillcolor=chartreuse1; label=\""
+						<< c->curr_str << "\"];" << std::endl;
+				}
+			}
+			else {
+				ss << "\"" << c->id << "\" [style=filled; fillcolor=cyan; label=\""
+					<< Token_Type_Name_Map.find(c->curr)->second << "\"];" << std::endl;
+			}
+
+			if (c->children.size() == 0) {
+				// 叶子结点
+				continue;
+			}
+
+			// 跟其他节点的关系
+			string children = "";
+			for (unsigned int i = 0; i < c->children.size(); i++) {
+				children += "\"" + std::to_string(c->children[i]->id) + "\"; "; // "id; "
+			}
+			ss << "\"" << c->id << "\" -> {" << children << "}" << std::endl;
+			ss << "{rank=same; " << children << "}" << std::endl;
+
+			// 入栈
+			for (Node* nd : c->children) {
+				q.push(nd);
+			}
+		}
+		ss << "}" << std::endl;
+		return ss.str();
 }

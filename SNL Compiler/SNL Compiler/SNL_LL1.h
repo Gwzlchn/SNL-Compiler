@@ -9,7 +9,7 @@
 #include<vector>
 #include<set>
 #include<stack>
-
+#include<list>
 using std::vector;
 using std::string;
 using std::map;
@@ -46,6 +46,20 @@ public:
 
 };
 
+
+
+struct Node {
+	SNL_TOKEN_TYPE curr;
+	string curr_str;
+	vector<Node*> children;
+	Node* parent;
+	int id;
+
+	explicit Node(const SNL_TOKEN_TYPE& s, Node* parent, int id) : curr(s), parent(parent), id(id) {}
+};
+
+
+
 class ProductionSet {
 private:
 	vector<Production> m_productions;
@@ -64,7 +78,9 @@ private:
 	set<SNL_TOKEN_TYPE> m_notTerminal;
 
 	//输入流
-	stack<SNL_TOKEN_TYPE, vector<SNL_TOKEN_TYPE>> m_input_stream;
+	//stack<SNL_TOKEN_TYPE, vector<SNL_TOKEN_TYPE>> m_input_stream;
+
+	vector<SNL_TOKEN_TYPE> m_input_stream;
 
 
 public:
@@ -116,9 +132,33 @@ public:
 	void printStack(const stack<SNL_TOKEN_TYPE>& tok_stack) const;
 	size_t getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok);
 	void pushProdToAnaylseStack(int prod_id, stack<SNL_TOKEN_TYPE>& ana_stack);
+
+	string getTree();
+
+
+
+
+	int treeIndex = 0;
+	vector<Production> vTree;
+	int global_id = 0;
+	//Node* root;
+	unsigned int global_token_index;//用于将ID转化为变量名后者函数名等
+
+
+	void dfsBuildTree(Node*& parent);
+
+
+	/**
+	 * 语法分析
+	 */
+	int grammarAnalysis();
+
+
+
+
+	void setInputStrem(const vector<SNL_TOKEN_TYPE>& input_stream);
+
 };
-
-
 
 
 

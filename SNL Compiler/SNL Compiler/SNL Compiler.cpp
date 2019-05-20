@@ -4,11 +4,14 @@
 
 int main()
 {
-	Lexer* lex = new Lexer("./SNL-Test/simple/C2.TXT");
+	Lexer* lex = new Lexer("./SNL-Test/simple/C1.TXT");
 	lex->RunFile();
 	ProductionSet* p = new ProductionSet("./Production/productions_ppt.txt");
-	p->SNL_AnalyseProcess(lex->getTokenVec());
-
+	//p->SNL_AnalyseProcess(lex->getTokenVec());
+	vector<SNL_TOKEN_TYPE> in = lex->getTokenVec();
+	p->setInputStrem(in);
+	p->grammarAnalysis();
+	p->getTree();
 	
 	return 0;
 }

@@ -130,7 +130,7 @@ void Lexer::RunFile() {
 
 		 this->m_Token_Vec.push_back(this->curToken.type);
 	 }
-	 std::reverse(m_Token_Vec.begin(), m_Token_Vec.end());
+	// std::reverse(m_Token_Vec.begin(), m_Token_Vec.end());
 
  }
 

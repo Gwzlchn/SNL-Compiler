@@ -8,7 +8,8 @@
 #include<map>
 #include<string>
 #include<vector>
-
+#include<sys/stat.h>
+#include<cstring>
 using std::vector;
 using std::map;
 using std::string;
