@@ -807,12 +807,6 @@ string ProductionSet::getTree()
 {
 	
 
-		////DEBUG 输出所有已知顺序的推导式
-		//cout << "DEBUG 所有推导式" << endl;
-		//for (const Derivation& d : vTree) {
-		//	cout << d << endl;
-		//}
-		//cout << "DEBUG 所有推导式" << endl;
 
 		int global_id = 1;
 

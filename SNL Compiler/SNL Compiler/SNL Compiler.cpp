@@ -1,7 +1,7 @@
 ﻿
 #include "SNL_LL1.h"
 #include"SNL_Lexer.h"
-
+#include <iostream>
 int main()
 {
 	Lexer* lex = new Lexer("./SNL-Test/simple/C1.TXT");
@@ -11,7 +11,7 @@ int main()
 	vector<SNL_TOKEN_TYPE> in = lex->getTokenVec();
 	p->setInputStrem(in);
 	p->grammarAnalysis();
-	p->getTree();
+	std::cout<<p->getTree();
 	
 	return 0;
 }
