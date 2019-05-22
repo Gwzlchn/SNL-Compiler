@@ -1,6 +1,5 @@
-{骞跺垪澹版槑鍑芥暟涔嬮棿鐨勮皟鐢▆
-{杈撳叆n锛屽鏋渘<10,鍒欒緭鍑簄+10,n,n+10;
-              鍚﹀垯杈撳嚭n-10,n,n-10}
+{并列声明函数之间的调用}
+{*adfasdfadfasdf*}
 program  example
 type w1=integer;
 var  

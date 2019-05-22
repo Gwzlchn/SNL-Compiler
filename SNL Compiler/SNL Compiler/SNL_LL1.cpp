@@ -1,6 +1,7 @@
 #include "SNL_LL1.h"
 #include "SNL_Lexer.h"
 #include "SNL_Tokens.h"
+
 #include "Utils.h" 
 #include <queue>
 #include <algorithm>
@@ -8,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <cctype>
 
 
 #define TERMIN true
@@ -31,85 +33,6 @@ const map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map = make_terminal_map<string, S
 
 
 
-bool Production::operator<(const Production& prod) const
-{
-	return this->m_id < prod.m_id;
-}
-
-size_t Production::get_id() {
-	return this->m_id;
-}
-
-
-
-Production::Production(SNL_TOKEN_TYPE left, vector<SNL_TOKEN_TYPE> right, int id, int idx)
-{
-	//先验证产生式是否正确
-	if (Token_Terminal_Map.find(left) == Token_Terminal_Map.end()) {
-		std::cerr << "this Token  cannot identified" << std::endl;
-		return;
-	};
-	size_t right_size = right.size();
-	for (size_t i = 0; i < right_size; i++) {
-		if (Token_Terminal_Map.find(right[i]) == Token_Terminal_Map.end()) {
-			std::cerr << "this Token  cannot identified" << std::endl;
-			return;
-		}
-	}
-
-
-	m_left = left;
-	m_right = right;
-	m_id = id;
-	m_look_ahead_idx = idx;
-
-}
-
-inline bool Production::isLeftTerminal() {
-	auto iter = Token_Terminal_Map.find(m_left);
-	return iter->second;
-}
-
-SNL_TOKEN_TYPE Production::getProducitonLeft() const
-{
-	return this->m_left;
-}
-
-vector<SNL_TOKEN_TYPE> Production::getProductionRight() const
-{
-	return this->m_right;
-}
-
-set<SNL_TOKEN_TYPE> Production::getProdTer()
-{
-	set<SNL_TOKEN_TYPE> ret;
-	if (this->isLeftTerminal()) {
-		ret.insert(this->m_left);
-	}
-	for (size_t i = 0; i < m_right.size(); i++) {
-		auto iter = Token_Terminal_Map.find(m_right[i]);
-		if (iter->second) {
-			ret.insert(this->m_right[i]);
-		}
-	}
-	return ret;
-}
-
-set<SNL_TOKEN_TYPE> Production::getProdNotTer()
-{
-	set<SNL_TOKEN_TYPE> ret;
-	if (!this->isLeftTerminal()) {
-		ret.insert(this->m_left);
-	}
-	for (size_t i = 0; i < m_right.size(); i++) {
-		auto iter = Token_Terminal_Map.find(m_right[i]);
-		if (!iter->second) {
-			ret.insert(this->m_right[i]);
-		}
-	}
-	return ret;
-
-}
 
 
 
@@ -122,46 +45,25 @@ ProductionSet::ProductionSet(string prods_file_name) {
 	m_notTerminal = set<SNL_TOKEN_TYPE>();
 
 	m_productions = makePordsFromFile(prods_file_name);
-	for (auto prod_iter = m_productions.begin(); \
-		prod_iter != m_productions.end();prod_iter++) {
-
-		auto temp_ter = prod_iter->getProdTer();
-		auto temp_not = prod_iter->getProdNotTer();
-		//对终极符集合求并，对非终极符集合求并
-		setUnion(m_notTerminal, temp_not);
-		setUnion(m_terminal, temp_ter);
-	}
-
-
-	this->getProdsFirstSet();
-	this->getProdsFollowSet();
+	this->setTokenTerminalOrNot();
+	this->setTokenFirstSet();
+	this->setTokenFollowSet();
 	this->setPredictSet();
-
-
-	//初始化LL1 分析表
-	const size_t size = Token_Terminal_Map.size();
-	m_LL1_Analyse_Map = vector<vector<int>>(size, vector<int>(size));
-	for (size_t i = 0; i < size; i++) {
-		//m_LL1_Analyse_Map[i] = new int[size];
-		for (size_t j = 0; j < size; j++) {
-			m_LL1_Analyse_Map[i][j] = 0;
-		}
-	}
-
 	this->setAnalyseMap();
-	this->PrintLL1AnalyseMap();
-	
-	//this->grammarAnalysis();
 
+	//std::cout << getSetMapToStr(m_first_sets).str();
+	//std::cout << getSetMapToStr(m_follow_sets).str();
+	//std::cout << getAllSetMapToStr().str();
+	//std::cout << getPredictMapToStr().str();
+	//std::cout << getLL1AnalyseMapToStr().str();
 
+	int a = 1;
+	//this->PrintLL1AnalyseMap();
 }
 
 vector<Production> ProductionSet::makePordsFromFile(const string& file_name) const
 {
 	vector<Production> ret = vector<Production>();
-	//填充产生式list和非终极符set
-	/*****************************************************************************************/
-	/*****************************************************************************************/
 	std::ifstream infile;
 	infile.open(file_name);
 	if (!infile)
@@ -170,23 +72,18 @@ vector<Production> ProductionSet::makePordsFromFile(const string& file_name) con
 	}
 	string line;//从文件中读取一行产生式
 	string substr;//承载分割后的字符串
-	//production* ptrProduc;//指向一个产生式
 	bool equalFlag = false;//标志是否已读到"::="这个符号
-	int seqNum = 0;//当前行号，也即产生式的编号
+	int seqNum = 1;//当前行号，也即产生式的编号
 
 
 	while (getline(infile, line))
 	{
 		std::istringstream stream(line);//用于分割字符
-		//Production* prod = new Production();//一行对应一个产生式
 		SNL_TOKEN_TYPE cur_prod_left = TOKEN_ERROR;
 		vector<SNL_TOKEN_TYPE> cur_prod_right = vector<SNL_TOKEN_TYPE>();
 
-		stream >> substr;//每行的第一个元素必定是行号
-		substr.pop_back();
-
-		//cout << "Sequence:" << seqNum << endl;
-
+		//stream >> substr;//每行的第一个元素必定是行号
+		//substr.pop_back();
 		while (stream >> substr)
 		{
 			if (substr == "::=")
@@ -233,7 +130,21 @@ vector<Production> ProductionSet::makePordsFromFile(const string& file_name) con
 
 
 
-void ProductionSet::getProdsFirstSet()
+void ProductionSet::setTokenTerminalOrNot()
+{
+	for (auto prod_iter = m_productions.begin(); \
+		prod_iter != m_productions.end(); prod_iter++) {
+
+		auto temp_ter = prod_iter->getProdTer();
+		auto temp_not = prod_iter->getProdNotTer();
+		//对终极符集合求并，对非终极符集合求并
+		setUnion(m_notTerminal, temp_not);
+		setUnion(m_terminal, temp_ter);
+	}
+
+}
+
+void ProductionSet::setTokenFirstSet()
 {
 	//first集合初始化
 	for (auto ter_iter = m_terminal.begin(); \
@@ -301,9 +212,7 @@ void ProductionSet::getProdsFirstSet()
 			}
 		}
 	}
-	printSetMap(m_first_sets);
 	return;
-
 }
 
 
@@ -318,7 +227,7 @@ inline void ProductionSet::setUnion(set<SNL_TOKEN_TYPE>& dst, const set<SNL_TOKE
 }
 
 template <typename T>
-string ProductionSet::get_token_str(const T& tok_vec) const
+static string ProductionSet::get_token_str(const T& tok_vec) 
 {
 	string ret = "";
 	for (auto i = tok_vec.begin(); i != tok_vec.end(); i++) {
@@ -328,27 +237,76 @@ string ProductionSet::get_token_str(const T& tok_vec) const
 	return ret;
 }
 
-void ProductionSet::printSetMap(const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets) const
+ostream& operator <<(ostream& os, const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets)
 {
-	std::cout << "----------------------" << std::endl;
+	os << "----------------------\n";
 	for (auto iter = sets.begin(); iter != sets.end(); iter++) {
-		if (m_terminal.find(iter->first) == m_terminal.end()) {
-			std::cout << Token_Type_Name_Map.find(iter->first)->second << "\t\t\t";
-			std::cout << get_token_str<set<SNL_TOKEN_TYPE>>(iter->second) << std::endl;
+		if (!(Token_Terminal_Map.find(iter->first) ->second)) {
+			os << Token_Type_Name_Map.find(iter->first)->second << "\t\t\t";
+			os << ProductionSet::get_token_str<set<SNL_TOKEN_TYPE>>(iter->second) << std::endl;
 		}
 	}
+	return os;
 }
 
 
-void ProductionSet::printPredictMap() const {
-	std::cout << "----------------------" << std::endl;
-	for (auto iter = m_predict_set.begin(); iter != m_predict_set.end(); iter++) {
-		
-			std::cout << iter->first << "\t";
-			std::cout << get_token_str<set<SNL_TOKEN_TYPE>>(iter->second) << std::endl;
+
+stringstream ProductionSet::getAllSetMapToStr() const
+{
+	stringstream ss;
+	ss << "----------------------\n";
+	auto first_iter = m_first_sets.begin();
+	auto follow_iter = m_follow_sets.begin();
+	int i = 1;
+	for (; first_iter != m_first_sets.end();) {
+		if (m_terminal.find(first_iter->first) == m_terminal.end()) {
+			ss << i <<".1\t";
+			ss << Token_Type_Name_Map.find(first_iter->first)->second << "\t\t\t";
+			ss << get_token_str<set<SNL_TOKEN_TYPE>>(first_iter->second) << std::endl;
+			ss << i << ".2\t";
+			ss << Token_Type_Name_Map.find(follow_iter->first)->second << "\t\t\t";
+			ss  << get_token_str<set<SNL_TOKEN_TYPE>>(follow_iter->second) << std::endl;
+			i++;
+		} 
+		first_iter++;
+		follow_iter++;
+	}
+	return ss;
+}
+
+
+ostream& operator <<(ostream& os, const map<int, set<SNL_TOKEN_TYPE>>& predict_set)
+{
+
+	os << "----------------------\n";
+	for (auto iter = predict_set.begin(); iter != predict_set.end(); iter++) {
+
+		os << iter->first << "\t";
+		os << ProductionSet::get_token_str<set<SNL_TOKEN_TYPE>>(iter->second) << std::endl;
 
 	}
+	return os;
 }
+
+
+ostream& operator <<(ostream& os, const vector<vector<int>>& LL1_Analyse_Map) {
+	const size_t size = LL1_Analyse_Map.size();
+	for (size_t i = 0; i < size; i++) {
+		for (size_t j = 0; j < size; j++) {
+			if (LL1_Analyse_Map[i][j] == 0) {
+				continue;
+			}
+			else {
+				os << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)i)->second << "\t\t";
+				os << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)j)->second << "\t\t";
+				os << LL1_Analyse_Map[i][j] << std::endl;
+			}
+		}
+	}
+	return os;
+}
+
+
 
 
 set<SNL_TOKEN_TYPE> ProductionSet::setRemoveBlank(const set<SNL_TOKEN_TYPE>& src) const
@@ -395,7 +353,7 @@ int ProductionSet::getTokenType(SNL_TOKEN_TYPE tok)
 	return 0;
 }
 
-void ProductionSet::getProdsFollowSet()
+void ProductionSet::setTokenFollowSet()
 {
 	for (auto ter_iter = m_terminal.begin(); \
 		ter_iter != m_terminal.end(); ter_iter++) {
@@ -418,13 +376,21 @@ void ProductionSet::getProdsFollowSet()
 
 			set<SNL_TOKEN_TYPE>& cur_not_follow = m_follow_sets[*not_iter];
 			size_t before = cur_not_follow.size();
+			
 			for (auto prod_iter = m_productions.begin(); \
 				prod_iter != m_productions.end(); prod_iter++) {
 
-				vector<SNL_TOKEN_TYPE> after;
-				if (getAfterTokenInRightProd(*not_iter, *prod_iter, after)) {
+				const auto& cur_right = prod_iter->getProductionRight();
+				size_t not_ter_in_right = std::count(cur_right.begin(), cur_right.end(), *not_iter);
+				size_t now_prod_right_index = 0;
+				
+				if (not_ter_in_right == 1 ) {
+
+					vector<SNL_TOKEN_TYPE> after = vector<SNL_TOKEN_TYPE>();
+					getAfterTokenInRightProd(*not_iter, *prod_iter, after);
 					set<SNL_TOKEN_TYPE> after_fisrt_set = this->getTokenVecFirst(after);
-					
+				
+
 					set<SNL_TOKEN_TYPE> remove_blank = setRemoveBlank(after_fisrt_set);
 					setUnion(cur_not_follow, remove_blank);
 
@@ -433,7 +399,26 @@ void ProductionSet::getProdsFollowSet()
 						//std::cout << prod_iter->getProducitonLeft() << std::endl;
 						setUnion(cur_not_follow, (m_follow_sets.find(prod_iter->getProducitonLeft()))->second);
 					}
-				}			
+				}
+				else if (not_ter_in_right >= 1) {
+					for (int i = 0; i < cur_right.size(); i++) {
+						vector<SNL_TOKEN_TYPE> after = vector<SNL_TOKEN_TYPE>();
+						getAfterTokenInRightProd(*not_iter, *prod_iter, after, now_prod_right_index);
+
+						set<SNL_TOKEN_TYPE> after_fisrt_set = this->getTokenVecFirst(after);
+						set<SNL_TOKEN_TYPE> remove_blank = setRemoveBlank(after_fisrt_set);
+						setUnion(cur_not_follow, remove_blank);
+
+						//右侧字符能推出空,并入左侧字符的follow
+						if (after_fisrt_set.find(TOKEN_BLANK) != after_fisrt_set.end()) {
+							//std::cout << prod_iter->getProducitonLeft() << std::endl;
+							setUnion(cur_not_follow, (m_follow_sets.find(prod_iter->getProducitonLeft()))->second);
+						}
+
+						now_prod_right_index++;
+					}
+
+				}
 				if (before != cur_not_follow.size()) {
 					expanded = true;
 				}
@@ -441,14 +426,14 @@ void ProductionSet::getProdsFollowSet()
 			}
 		}
 	}
-	printSetMap(m_follow_sets);
 	return;
 }
 
 //当前字符的下一个字符是什么
 bool ProductionSet::getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, \
 											const Production& prod, \
-											vector<SNL_TOKEN_TYPE>& after_token)
+											vector<SNL_TOKEN_TYPE>& after_token,\
+											int prod_inx)
 {
 	vector<SNL_TOKEN_TYPE> right = prod.getProductionRight();
 	bool found = false;
@@ -458,7 +443,7 @@ bool ProductionSet::getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, \
 		after_token = { TOKEN_BLANK };
 		return found;
 	}
-	for (auto iter = right.begin(); iter != right.end() - 1; iter++) {
+	for (auto iter = right.begin()+ prod_inx; iter != right.end() - 1; iter++) {
 		if (*iter == to_find || found) {
 			found = true;
 			after_token.push_back(*(iter + 1));
@@ -473,7 +458,7 @@ void ProductionSet::setPredictSet()
 		prod_iter != m_productions.end(); prod_iter++) {
 		m_predict_set[prod_iter->get_id()] = getOneProdPredict(*prod_iter);
 	}
-	printPredictMap();
+
 	return;
 }
 
@@ -510,6 +495,15 @@ set<SNL_TOKEN_TYPE> ProductionSet::getOneProdPredict(const Production& prod)  {
 
 void ProductionSet::setAnalyseMap(){
 
+	//初始化LL1 分析表
+	const size_t size = Token_Terminal_Map.size();
+	m_LL1_Analyse_Map = vector<vector<int>>(size, vector<int>(size));
+	for (size_t i = 0; i < size; i++) {
+		//m_LL1_Analyse_Map[i] = new int[size];
+		for (size_t j = 0; j < size; j++) {
+			m_LL1_Analyse_Map[i][j] = 0;
+		}
+	}
 	size_t ter_size = m_terminal.size();
 
 	for (auto prod_iter = m_productions.begin(); \
@@ -528,91 +522,7 @@ void ProductionSet::setAnalyseMap(){
 }
 
 
-void ProductionSet::PrintLL1AnalyseMap() {
-	const size_t size = m_LL1_Analyse_Map.size();
-	for (size_t i = 0; i < size; i++) {
-		for (size_t j = 0; j < size; j++) {
-			if (m_LL1_Analyse_Map[i][j] == 0) {
-				continue;
-			}
-			else {
-				std::cout << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)i)->second << "\t\t";
-				std::cout << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)j)->second << "\t\t";
-				std::cout << m_LL1_Analyse_Map[i][j] << std::endl;
-			}
-		}
-	}
-}
 
-
-
-//bool ProductionSet::SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input_vec) {
-//	
-//	//std::reverse(token_input_vec.begin()token_input_vec.end());
-//	for (auto iter = token_input_vec.begin(); \
-//		iter != token_input_vec.end(); iter++) {
-//		//m_input_stream.push(*iter);
-//	}
-//
-//	//初始化分析栈,对于输入流 front为栈底，end栈顶
-//	SNL_TOKEN_TYPE tok_start = m_productions[0].getProducitonLeft();
-//	stack<SNL_TOKEN_TYPE> LL1_analyse_stack;
-//	LL1_analyse_stack.push(TOKEN_ENDFILE);
-//	LL1_analyse_stack.push(tok_start);
-//
-//	const size_t prod_size = m_productions.size();
-//	while (m_input_stream.size() != 0) {
-//		SNL_TOKEN_TYPE cur_input_tok = m_input_stream.top();
-//		SNL_TOKEN_TYPE cur_analyse_tok = LL1_analyse_stack.top();
-//		//输入流和分析栈没match，输入流不弹出
-//		if (cur_analyse_tok != cur_input_tok) {
-//			size_t prod_id = getProdIdFromAnalyseMap(cur_analyse_tok, cur_input_tok);
-//			if (prod_id == 0 || prod_id > prod_size) {
-//				LL1ANALYSE_ERROR(this,"Can't Match these two words in LL1 AnalyseMap: %s \t %s quit",\
-//					Token_Type_Name_Map.find(cur_analyse_tok)->second.c_str(),\
-//					Token_Type_Name_Map.find(cur_input_tok)->second.c_str()\
-//				);
-//			}
-//			LL1_analyse_stack.pop();
-//			this->pushProdToAnaylseStack(prod_id, LL1_analyse_stack);
-//			continue;
-//		}
-//		else { //Match
-//			LL1_analyse_stack.pop();
-//			//m_input_stream.pop();
-//		}
-//	}
-//
-//	return true;
-//
-//}
-
-
-void ProductionSet::printStack(const stack<SNL_TOKEN_TYPE>& tok_stack)const{
-	
-}
-
-size_t ProductionSet::getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok) {
-	const size_t full_size = Token_Type_Name_Map.size();
-	if (size_t(ana_tok)<0 || size_t(ana_tok) > full_size || \
-		size_t(in_tok) < 0 || size_t(in_tok) > full_size) {
-		return 0;
-	}
-	else {
-		return m_LL1_Analyse_Map[ana_tok][in_tok];
-	}
-	
-}
-
-void ProductionSet::pushProdToAnaylseStack(int prod_id, stack<SNL_TOKEN_TYPE>& ana_stack) {
-	const vector<SNL_TOKEN_TYPE>& prod_right = m_productions[prod_id-1].getProductionRight();
-	for (auto res_iter = prod_right.rbegin(); res_iter != prod_right.rend(); res_iter++) {
-		if (*res_iter != TOKEN_BLANK) {
-			ana_stack.push(*res_iter);
-		}	
-	}
-	return;
-}
 
 void ProductionSet::dfsBuildTree(Node*& parent)
 {
@@ -666,8 +576,9 @@ int ProductionSet::grammarAnalysis()
 			if (!Token_Terminal_Map.find(t)->second) {
 				//非终极符 寻找 t->啥 的Predict集 中有输入流当前索引符号
 				bool notFound = true;
-				for (map<Prod_Idx, set<SNL_TOKEN_TYPE>>::iterator a = m_predict_set.begin(); a != m_predict_set.end();a++) {
-					if (m_productions[a->first].getProducitonLeft() != t)continue;
+				for (map<int, set<SNL_TOKEN_TYPE>>::iterator a = m_predict_set.begin(); a != m_predict_set.end();a++) {
+					const Production& cur_prod = m_productions[a->first - 1];
+					if (cur_prod.getProducitonLeft() != t)continue;
 					set<SNL_TOKEN_TYPE>::iterator f;
 					if (Token_Type_Name_Map.find(r)->second == "ID") {
 						f = a->second.find(TOKEN_ID);
@@ -679,12 +590,12 @@ int ProductionSet::grammarAnalysis()
 					// 找到了 t->a->second的Predict集中有 r
 
 					// 绘制语法树部分
-					vTree.emplace_back(m_productions[a->first]);
+					vTree.emplace_back(cur_prod);
 
 					notFound = false;
 					s.pop_back();//先弹栈
 					// 然后推导式倒着入栈
-					const vector<SNL_TOKEN_TYPE>& cur_right = m_productions[a->first].getProductionRight();
+					const vector<SNL_TOKEN_TYPE>& cur_right = cur_prod.getProductionRight();
 					for (auto it = cur_right.rbegin(); \
 						it != cur_right.rend(); \
 						it++) {

@@ -3,50 +3,25 @@
 
 
 #include"SNL_Tokens.h"
+#include "SNL_Production.h"
 
 #include<map>
 #include<string>
 #include<vector>
 #include<set>
-#include<stack>
 #include<list>
+#include<sstream>
 using std::vector;
 using std::string;
 using std::map;
 using std::pair;
 using std::set;
-using std::stack;
+using std::stringstream;
+using std::ostream;
+
 
 
 extern const map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map;
-
-class Production {
-private:
-
-	SNL_TOKEN_TYPE m_left = TOKEN_BLANK;
-	vector<SNL_TOKEN_TYPE> m_right = { TOKEN_BLANK };
-	size_t m_id = -1;
-	size_t m_look_ahead_idx = -1;	//当前展望符分界，即小圆点；
-
-public:
-	bool operator < (const Production& prod) const;
-	size_t get_id();
-	Production();
-	Production(SNL_TOKEN_TYPE left, vector<SNL_TOKEN_TYPE> right, int id, int idx = 0);
-
-	bool isLeftTerminal();
-
-	SNL_TOKEN_TYPE getProducitonLeft()const;
-	vector<SNL_TOKEN_TYPE> getProductionRight() const;
-
-	set<SNL_TOKEN_TYPE> getProdTer();
-	set<SNL_TOKEN_TYPE> getProdNotTer();
-
-
-
-};
-
-
 
 struct Node {
 	SNL_TOKEN_TYPE curr;
@@ -54,110 +29,81 @@ struct Node {
 	vector<Node*> children;
 	Node* parent;
 	int id;
-
 	explicit Node(const SNL_TOKEN_TYPE& s, Node* parent, int id) : curr(s), parent(parent), id(id) {}
 };
 
 
-
 class ProductionSet {
 private:
+	//所有产生式
 	vector<Production> m_productions;
-	//bool m_is_init;		//这个set可能有两个用处，一个是用来存全部文法，另一个是用来存放闭包；
-
-	//每一个非终极符的Follow集
+	//Follow Set
 	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_follow_sets;
+	//First Set
 	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_first_sets;
-	typedef  size_t Prod_Idx;
-	//Predict 集合
-	map<Prod_Idx, set<SNL_TOKEN_TYPE>> m_predict_set;
-	//SNL_ 分析表
+	//Predict 集合，产生式标号->Token_type 集合
+	map<int, set<SNL_TOKEN_TYPE>> m_predict_set;
+	//SNL 分析表
 	vector<vector<int>> m_LL1_Analyse_Map;
-
+	//终极符集合
 	set<SNL_TOKEN_TYPE> m_terminal;
+	//非终极符集合
 	set<SNL_TOKEN_TYPE> m_notTerminal;
-
 	//输入流
-	//stack<SNL_TOKEN_TYPE, vector<SNL_TOKEN_TYPE>> m_input_stream;
-
 	vector<SNL_TOKEN_TYPE> m_input_stream;
-
+	//产生式顺序
+	vector<Production> vTree;
 
 public:
 
 	ProductionSet(string prods_file_name);
-
 	vector<Production> makePordsFromFile(const string& file_name)const;
+	void setInputStrem(const vector<SNL_TOKEN_TYPE>& input_stream);
+	
+	//终极符、非终极符
+	void setTokenTerminalOrNot();
+	//First 集合生成
+	void setTokenFirstSet();
+	//Follow 集合生成
+	void setTokenFollowSet();
+	//Predict 集合生成
+	void setPredictSet();
+	//SNL_ 分析表
+	void  setAnalyseMap();
 
+	int treeIndex = 0;
+	int global_id = 0;
+	unsigned int global_token_index;//用于将ID转化为变量名后者函数名等
 
+	string getTree();
+	void dfsBuildTree(Node*& parent);
+	int grammarAnalysis();
+	
 
-	//ProductionSet(vector<Production> productions, bool is_init);
-	//set<Production> getProductionClosure(Production one_prod);
-	void getProdsFirstSet();
-
-	void setUnion(set<SNL_TOKEN_TYPE>& dst, const set<SNL_TOKEN_TYPE>& src);
-	//bool isBlankInTokenFirst(const SNL_TOKEN_TYPE& tok) const ;
-	template <typename T>
-	string get_token_str(const T& tok_vec)const;
-
-
-	void printSetMap(const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets) const;
-
-	void printPredictMap() const;
-
+	//构造集合时用到的函数
 	set<SNL_TOKEN_TYPE> setRemoveBlank(const set<SNL_TOKEN_TYPE>& src) const;
-
+	void setUnion(set<SNL_TOKEN_TYPE>& dst, const set<SNL_TOKEN_TYPE>& src);
 	bool isNotTerDeriBlank(SNL_TOKEN_TYPE not_ter);
-
 	int getTokenType(SNL_TOKEN_TYPE tok);
-
-	void getProdsFollowSet();
-
 	//找该终极符是否在右侧表达式出现,出现则返回true,否则返回false;
 	//如果出现,同时返回紧接着字符的First集
-	//bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, SNL_TOKEN_TYPE& after_token);
+	bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, vector<SNL_TOKEN_TYPE>& after_token,int prod_inx=0);
 
-	bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, vector<SNL_TOKEN_TYPE>& after_token);
-
-	void setPredictSet();
 	set<SNL_TOKEN_TYPE> getTokenVecFirst(const vector<SNL_TOKEN_TYPE>& tok_vec);
 	set<SNL_TOKEN_TYPE> getOneProdPredict(const Production& prod);
 
 
-	//SNL_ 分析表
-	void setAnalyseMap();
-	void PrintLL1AnalyseMap();
-	bool SNL_AnalyseProcess(const vector<SNL_TOKEN_TYPE>& token_input_vec);
-	//bool SNL_AnalyseProcess();
-	void printStack(const stack<SNL_TOKEN_TYPE>& tok_stack) const;
-	size_t getProdIdFromAnalyseMap(SNL_TOKEN_TYPE ana_tok, SNL_TOKEN_TYPE in_tok);
-	void pushProdToAnaylseStack(int prod_id, stack<SNL_TOKEN_TYPE>& ana_stack);
 
-	string getTree();
+	//***************打印相关****************
+	//从容器中得到Token String
+	template <typename T>
+	static string get_token_str(const T& tok_vec);
+	
+	stringstream getAllSetMapToStr() const;
 
-
-
-
-	int treeIndex = 0;
-	vector<Production> vTree;
-	int global_id = 0;
-	//Node* root;
-	unsigned int global_token_index;//用于将ID转化为变量名后者函数名等
-
-
-	void dfsBuildTree(Node*& parent);
-
-
-	/**
-	 * 语法分析
-	 */
-	int grammarAnalysis();
-
-
-
-
-	void setInputStrem(const vector<SNL_TOKEN_TYPE>& input_stream);
-
+	friend ostream& operator <<(ostream& os, const vector<vector<int>>& LL1_Analyse_Map);
+	friend ostream& operator <<(ostream& os, const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets);
+	friend ostream& operator <<(ostream& os, const map<int, set<SNL_TOKEN_TYPE>>& predict_set);
 };
 
 

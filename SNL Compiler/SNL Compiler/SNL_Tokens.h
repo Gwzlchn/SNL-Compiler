@@ -93,7 +93,7 @@
 	Token_CallStmRest,
 	Token_ActParamList, Token_ActParamMore,
 	//条件表达式
-	Token_RelExp, Token_OtherRelE,
+	Token_RelExp, Token_OtherExp, Token_SimpleExp,
 	//算术表达式
 	Token_Exp, Token_OtherTerm,
 
@@ -225,8 +225,9 @@ const std::map<std::string, SNL_TOKEN_TYPE> Token_Name_Type_Map =
 	{ "ActParamList", Token_ActParamList },
 	{ "ActParamMore", Token_ActParamMore },
 	{ "RelExp", Token_RelExp },
-	{ "OtherRelE", Token_OtherRelE },
+	{ "OtherExp", Token_OtherExp },
 	{ "Exp", Token_Exp },
+	{"SimpleExp",Token_SimpleExp},
 	{ "OtherTerm", Token_OtherTerm },
 	{ "Term", Token_Term },
 	{ "OtherFactor", Token_OtherFactor },

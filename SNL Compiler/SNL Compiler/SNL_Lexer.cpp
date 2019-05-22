@@ -2,7 +2,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include"SNL_Lexer.h"
 #include <algorithm>
-
+#include <sstream>
+#include <iostream>     // std::streambuf, std::cout
+#include <fstream>  
 
 template <typename T, typename F>
  map<T, F> reserveMap(const map<F, T>& to_res) {
@@ -82,33 +84,22 @@ map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map = reserveMap<SNL_TOKEN_TYPE, str
  }
 
 
- char* Lexer::readFile(const char* path) {
-	 FILE* file = fopen(path, "r");
-	 if (file == NULL) {
-		 IO_ERROR("Could`t open file \"%s\".\n", path);
-	 }
-	 else {
-		 printf("The file  was opened\n");
+const char* Lexer::readFile(const char* path) {
+	
+	//¶ÁÎÄ¼þifstream,Ð´ÎÄ¼þofstream£¬¿É¶Á¿ÉÐ´fstream
+	std::ifstream file(path);
+	if (!file.is_open()) {
+		IO_ERROR("Could`t open file \"%s\".\n", path);
+	}
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+		 
+	std::string s = buffer.str() + '\0';
+		 
+	char* str = (char*)malloc(s.size() + 1);
+	strcpy(str, s.c_str());
+	return str;
 
-		 struct stat fileStat;
-		 stat(path, &fileStat);
-		 size_t fileSize = fileStat.st_size;
-		 char* fileContent = (char*)malloc(fileSize + 1);
-		 if (fileContent == NULL) {
-			 MEM_ERROR("Could`t allocate memory for reading file \"%s\".\n", path);
-			 return NULL;
-		 }
-		 else {
-			 size_t numRead = fread(fileContent, sizeof(char), fileSize, file);
-
-			 for (size_t i = numRead; i < fileSize; i++) {
-				 fileContent[i] = '\0';
-			 }
-			 fclose(file);
-			 return fileContent;
-		 }
-	 }
-	 return NULL;
 }
 
 
@@ -118,21 +109,15 @@ void Lexer::RunFile() {
 
 	 while (this->curToken.type != TOKEN_ENDFILE) {
 		 this->getNextToken();
-		 printf("%d Line: \t\t%s [", \
-			 this->curToken.lineNo, Token_Type_Name_Map.find(this->curToken.type)->second.c_str());
-
-		 uint32_t idx = 0;
-		 while (idx < this->curToken.length) {
-			 printf("%c", *(this->curToken.start + idx));
-			 idx++;
-		 }
-		 printf("]\n");
-
+		 string cur_str(this->curToken.start, this->curToken.length);
+		 this->m_Token_Contant_Vec.push_back(cur_str);
 		 this->m_Token_Vec.push_back(this->curToken.type);
 	 }
-	// std::reverse(m_Token_Vec.begin(), m_Token_Vec.end());
-
  }
+
+
+
+
 
 
 
@@ -147,6 +132,28 @@ uint32_t Lexer::getCurrentLineNo() {
 vector<SNL_TOKEN_TYPE> Lexer::getTokenVec()
 {
 	return this->m_Token_Vec;
+}
+
+
+
+
+const stringstream  Lexer::printToken_And_Content() const
+{
+	stringstream ss;
+	auto token_iter = m_Token_Vec.begin();
+	auto token_contain_iter = m_Token_Contant_Vec.begin();
+	while (token_iter != m_Token_Vec.end() || token_contain_iter != m_Token_Contant_Vec.end()) {
+		ss << Token_Type_Name_Map.find(*token_iter)->second << '\t';
+		ss << *token_contain_iter << '\n';
+
+		if (token_iter != m_Token_Vec.end()) {
+			token_iter++;
+		}
+		if (token_contain_iter != m_Token_Contant_Vec.end()) {
+			token_contain_iter++;
+		}
+	}
+	return ss;
 }
 
 
@@ -281,30 +288,32 @@ void Lexer::parseNum() {
 
 //Ìø¹ý×¢ÊÍ£º¿é×¢ÊÍ&µ¥ÐÐ×¢ÊÍ
 void Lexer::skipComment() {
-	char nextChar = this->lookAheadChar();
+	//char nextChar = this->lookAheadChar();
 
-	// µ¥ÐÐ×¢ÊÍ,like {...}
-	if (this->curChar == '{') {
-		this->skipAline();
-	}
-	else {	//¿é×¢ÊÍ,like {* .. *}
-		while (nextChar != '*' && nextChar != '\0') {
-			this->getNextChar();
-			if (this->curChar == '\n') {
-				this->curToken.lineNo++;
-			}
-			nextChar = this->lookAheadChar();
-		}
-		if (this->matchNextChar( '*')) {
-			if (!this->matchNextChar('}')) {
-				LEX_ERROR(this, "expect '}' after '*' !");
-			}
-			this->getNextChar();
-		}
-		else {
-			LEX_ERROR(this, "except '*}' before file end!");
-		}
-	}
+
+	//if (this->curChar == '{' && nextChar == '*') {
+	//	int a = 1;
+	//	this->getNextChar();
+	//	
+	////¿é×¢ÊÍ,like {* .. *}
+	//	while (nextChar != '*' && nextChar != '\0') {
+	//		this->getNextChar();
+	//		if (this->curChar == '\n') {
+	//			this->curToken.lineNo++;
+	//		}
+	//		nextChar = this->lookAheadChar();
+	//	}
+	//	if (this->matchNextChar('*')) {
+	//		if (!this->matchNextChar('}')) {
+	//			LEX_ERROR(this, "expect '}' after '*' !");
+	//		}
+	//		this->getNextChar();
+	//	}
+
+	//}
+	//else {	// µ¥ÐÐ×¢ÊÍ,like {...}
+	//	this->skipAline();
+	//}
 	this->skipBlanks();
 }
 
@@ -388,7 +397,7 @@ void Lexer::getNextToken() {
 
 		case '{':
 			this->skipComment();
-			this->curToken.start = this->nextCharPtr - 1;
+			this->curToken.start = this->nextCharPtr-1 ;
 			continue;
 
 

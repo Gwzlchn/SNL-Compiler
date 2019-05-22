@@ -10,6 +10,9 @@
 #include<vector>
 #include<sys/stat.h>
 #include<cstring>
+#include<sstream>
+
+using std::stringstream;
 using std::vector;
 using std::map;
 using std::string;
@@ -38,10 +41,12 @@ extern map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map;
 	 Token preToken;
 	 //Token序列
 	 vector<SNL_TOKEN_TYPE> m_Token_Vec;
+	 //Token序列对应内容
+	 vector<string> m_Token_Contant_Vec;
 
  public:
 	 Lexer(const char* file);
-	 char* readFile(const char* path);
+	const char* readFile(const char* path);
 	 void RunFile();
 	 const char* getFileName();
 
@@ -64,6 +69,7 @@ extern map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map;
 	 void consumeCurToken(SNL_TOKEN_TYPE expected, const char* errMsg);
 	 void consumeNextToken(SNL_TOKEN_TYPE expected, const char* errMsg);
 	 vector<SNL_TOKEN_TYPE> getTokenVec();	
+	 const stringstream printToken_And_Content() const ;
  };
 
 
