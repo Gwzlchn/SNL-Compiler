@@ -31,7 +31,7 @@ SOURCES += \
         source/SNL_Tokens.cpp \
         source/Utils.cpp \
         source/mainwindow.cpp \
-        source/snl_compiler.cpp
+        source/SNL_Compiler.cpp
 
 HEADERS += \
         source/SNL_LL1.h \
