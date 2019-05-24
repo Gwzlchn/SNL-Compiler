@@ -1,4 +1,4 @@
-#ifndef SNL_LL1_H
+﻿#ifndef SNL_LL1_H
 #define SNL_LL1_H
 
 
@@ -21,7 +21,7 @@ using std::ostream;
 
 
 
-
+extern const map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map;
 
 struct Node {
 	SNL_TOKEN_TYPE curr;
@@ -106,7 +106,7 @@ public:
 	//***************打印相关****************
 	//从容器中得到Token String
 	template <typename T>
-    static string get_token_vec_str(const T& tok_vec);
+	static string get_token_str(const T& tok_vec);
 	stringstream getAllSetMapToStr() const;
 
 

@@ -1,4 +1,4 @@
-
+﻿
 #ifndef SNL_Lexer_H
 #define SNL_Lexer_H
 
@@ -17,7 +17,7 @@ using std::vector;
 using std::map;
 using std::string;
 
-
+extern map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map;
 
  
 

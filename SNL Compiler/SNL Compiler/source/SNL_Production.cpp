@@ -1,4 +1,4 @@
-#include"SNL_Production.h"
+﻿#include"SNL_Production.h"
 #include"SNL_LL1.h"
 #include<iostream>
 
@@ -37,7 +37,8 @@ Production::Production(SNL_TOKEN_TYPE left, vector<SNL_TOKEN_TYPE> right, size_t
 }
 
 inline bool Production::isLeftTerminal() {
-    return is_Token_Terminal(m_left);
+	auto iter = Token_Terminal_Map.find(m_left);
+	return iter->second;
 }
 
 SNL_TOKEN_TYPE Production::getProducitonLeft() const
@@ -57,7 +58,8 @@ set<SNL_TOKEN_TYPE> Production::getProdTer()
 		ret.insert(this->m_left);
 	}
 	for (size_t i = 0; i < m_right.size(); i++) {
-        if (is_Token_Terminal(m_right[i])) {
+		auto iter = Token_Terminal_Map.find(m_right[i]);
+		if (iter->second) {
 			ret.insert(this->m_right[i]);
 		}
 	}
@@ -71,7 +73,8 @@ set<SNL_TOKEN_TYPE> Production::getProdNotTer()
 		ret.insert(this->m_left);
 	}
 	for (size_t i = 0; i < m_right.size(); i++) {
-        if (!is_Token_Terminal(m_right[i])) {
+		auto iter = Token_Terminal_Map.find(m_right[i]);
+		if (!iter->second) {
 			ret.insert(this->m_right[i]);
 		}
 	}

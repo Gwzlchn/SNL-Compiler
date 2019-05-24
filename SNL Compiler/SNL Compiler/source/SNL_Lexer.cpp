@@ -1,4 +1,4 @@
-
+﻿
 #define _CRT_SECURE_NO_WARNINGS
 #include"SNL_Lexer.h"
 #include <algorithm>
@@ -6,7 +6,16 @@
 #include <iostream>     // std::streambuf, std::cout
 #include <fstream>  
 
+template <typename T, typename F>
+ map<T, F> reserveMap(const map<F, T>& to_res) {
+	map<T, F> ret;
+	for (auto iter = to_res.begin();
+		iter != to_res.end(); iter++)
+		ret.insert({ iter->second,iter->first });
 
+	return ret;
+}
+map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map = reserveMap<SNL_TOKEN_TYPE, string>(Token_Name_Type_Map);
 
 
  typedef int length;
@@ -134,7 +143,7 @@ const stringstream  Lexer::printToken_And_Content() const
 	auto token_iter = m_Token_Vec.begin();
 	auto token_contain_iter = m_Token_Contant_Vec.begin();
 	while (token_iter != m_Token_Vec.end() || token_contain_iter != m_Token_Contant_Vec.end()) {
-        ss << get_Token_Str(*token_iter) << '\t';
+		ss << Token_Type_Name_Map.find(*token_iter)->second << '\t';
 		ss << *token_contain_iter << '\n';
 
 		if (token_iter != m_Token_Vec.end()) {
