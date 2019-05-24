@@ -245,6 +245,10 @@ const std::map<std::string, SNL_TOKEN_TYPE> Token_Name_Type_Map =
 
 };
 
+extern const std::map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map;
+extern const std::map<SNL_TOKEN_TYPE, std::string> Token_Type_Name_Map;
 
+std::string get_Token_Str(SNL_TOKEN_TYPE tok);
+bool is_Token_Terminal(SNL_TOKEN_TYPE tok);
 
 #endif // _SNL_TOKENS_H

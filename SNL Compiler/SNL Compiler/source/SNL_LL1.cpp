@@ -12,30 +12,6 @@
 #include <cctype>
 
 
-#define TERMIN true
-#define NOTTER false
-template<typename T, typename F>
-const map<F, bool> make_terminal_map(map<T, F> full_map) {
-	map<F, bool> ret;
-	for (auto iter = full_map.begin(); \
-		iter != full_map.end(); iter++) {
-
-		if (std::all_of(iter->first.begin(), iter->first.end(), [](unsigned char c) { return !std::isalpha(c) || std::isupper(c); })) {
-			ret.insert({ iter->second, TERMIN });
-		}
-		else {
-			ret.insert({ iter->second, NOTTER });
-		}
-	}
-	return ret;
-}
-const map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map = make_terminal_map<string, SNL_TOKEN_TYPE>(Token_Name_Type_Map);
-
-
-
-
-
-
 
 
 ProductionSet::ProductionSet(string prods_file_name) {
@@ -234,7 +210,7 @@ template <typename T>
 {
 	string ret = "";
 	for (auto i = tok_vec.begin(); i != tok_vec.end(); i++) {
-		ret += Token_Type_Name_Map.find(*i)->second;
+        ret += get_Token_Str(*i);
 		ret += " ";
 	}
 	return ret;
@@ -244,8 +220,8 @@ ostream& operator <<(ostream& os, const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>
 {
 	os << "----------------------\n";
 	for (auto iter = sets.begin(); iter != sets.end(); iter++) {
-		if (!(Token_Terminal_Map.find(iter->first) ->second)) {
-			os << Token_Type_Name_Map.find(iter->first)->second << "\t\t\t";
+        if (!is_Token_Terminal(iter->first)) {
+            os <<get_Token_Str(iter->first) << "\t\t\t";
 			os << ProductionSet::get_token_str<set<SNL_TOKEN_TYPE>>(iter->second) << std::endl;
 		}
 	}
@@ -264,10 +240,10 @@ stringstream ProductionSet::getAllSetMapToStr() const
 	for (; first_iter != m_first_sets.end();) {
 		if (m_terminal.find(first_iter->first) == m_terminal.end()) {
 			ss << i <<".1\t";
-			ss << Token_Type_Name_Map.find(first_iter->first)->second << "\t\t\t";
+            ss << get_Token_Str(first_iter->first)<< "\t\t\t";
 			ss << get_token_str<set<SNL_TOKEN_TYPE>>(first_iter->second) << std::endl;
 			ss << i << ".2\t";
-			ss << Token_Type_Name_Map.find(follow_iter->first)->second << "\t\t\t";
+            ss << get_Token_Str(follow_iter->first) << "\t\t\t";
 			ss  << get_token_str<set<SNL_TOKEN_TYPE>>(follow_iter->second) << std::endl;
 			i++;
 		} 
@@ -300,8 +276,8 @@ ostream& operator <<(ostream& os, const vector<vector<int>>& LL1_Analyse_Map)   
 				continue;
 			}
 			else {
-				os << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)i)->second << "\t\t";
-				os << Token_Type_Name_Map.find((SNL_TOKEN_TYPE)j)->second << "\t\t";
+                os << get_Token_Str((SNL_TOKEN_TYPE)i) << "\t\t";
+                os <<get_Token_Str((SNL_TOKEN_TYPE)j) << "\t\t";
 				os << LL1_Analyse_Map[i][j] << std::endl;
 			}
 		}
@@ -531,7 +507,7 @@ void ProductionSet::dfsBuildTree(Node*& parent)
 {
 	// 传过来的参数parent一定是非终极符
 
-	if (Token_Terminal_Map.find(parent->curr)->second == true) {
+    if (is_Token_Terminal(parent->curr) == true) {
 		std::cerr << "[error] dfsBuildTree invalid param" << std::endl;
 		exit(-1);
 	}
@@ -548,14 +524,14 @@ void ProductionSet::dfsBuildTree(Node*& parent)
 	// 构造完推导式下标就加加
 	treeIndex++;
 	for (unsigned int i = 0; i < parent->children.size(); i++) {
-		if (Token_Terminal_Map.find(parent->children[i]->curr)->second) {
+        if (is_Token_Terminal(parent->children[i]->curr)) {
 			// 将ID转化为实际值
 			if (parent->children[i]->curr == TOKEN_BLANK) {}
 			else {
 				//cout << tokenSymbols[global_token_index] <<"\t\ttokenlist"<< endl;
 				//cout << parent->children[i]->curr << endl;
 				//cout << endl;
-				parent->children[i]->curr_str = Token_Type_Name_Map.find(m_input_stream[global_token_index])->second;
+                parent->children[i]->curr_str = get_Token_Str(m_input_stream[global_token_index]);
 				global_token_index++;
 			}
 			continue;// 终极符是叶节点
@@ -576,14 +552,14 @@ int ProductionSet::grammarAnalysis()
 		while (!s.empty()) {
 			SNL_TOKEN_TYPE t = s.back();//栈顶元素
 			SNL_TOKEN_TYPE r = m_input_stream[static_cast<unsigned int>(i)];//输入流当前扫描符号
-			if (!Token_Terminal_Map.find(t)->second) {
+            if (!is_Token_Terminal(t)) {
 				//非终极符 寻找 t->啥 的Predict集 中有输入流当前索引符号
 				bool notFound = true;
 				for (map<int, set<SNL_TOKEN_TYPE>>::iterator a = m_predict_set.begin(); a != m_predict_set.end();a++) {
                     const Production& cur_prod = m_productions[size_t(a->first - 1)];
 					if (cur_prod.getProducitonLeft() != t)continue;
 					set<SNL_TOKEN_TYPE>::iterator f;
-					if (Token_Type_Name_Map.find(r)->second == "ID") {
+                    if (get_Token_Str(r) == "ID") {
 						f = a->second.find(TOKEN_ID);
 					}
 					else {
@@ -609,8 +585,8 @@ int ProductionSet::grammarAnalysis()
 				if (notFound) {
 					// 出错
                     analyse_err =  " Current parsing \'" +\
-                            Token_Type_Name_Map.find(r)->second + "\' and " + \
-                            Token_Type_Name_Map.find(t)->second +  "\n";
+                            get_Token_Str(r)+ "\' and " + \
+                            get_Token_Str(t) +  "\n";
                     return -1;
 					//cerr << "[error] " << __LINE__ << " " << t << " can not predict " << r << endl;
 					//cerr << "at line " << tokenSymbols[i].line << endl;
@@ -621,9 +597,9 @@ int ProductionSet::grammarAnalysis()
 				}
 			}
 			else {
-				if (Token_Type_Name_Map.find(t)->second == "ID") {
+                if (get_Token_Str(t) == "ID") {
 					// 非关键字的标识符
-					if (Token_Type_Name_Map.find(r)->second == "ID") {
+                    if (get_Token_Str(r) == "ID") {
 						// 匹配了!!!
 						s.pop_back();
 						i++;
@@ -631,8 +607,8 @@ int ProductionSet::grammarAnalysis()
 					}
 					else {
                         analyse_err =  " Current parsing \'" +\
-                                Token_Type_Name_Map.find(r)->second + "\' and " + \
-                                Token_Type_Name_Map.find(t)->second +  "\n";
+                                get_Token_Str(r) + "\' and " + \
+                                get_Token_Str(t) +  "\n";
                         return -1;
 						// 出错
 						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
@@ -646,9 +622,9 @@ int ProductionSet::grammarAnalysis()
 					s.pop_back();
 					continue;
 				}
-				else if (Token_Type_Name_Map.find(t)->second == "INTC") {
+                else if (get_Token_Str(t) == "INTC") {
 					// 无符号整数
-					if (Token_Type_Name_Map.find(r)->second == "INTC") {
+                    if (get_Token_Str(r) == "INTC") {
 						// 匹配了!!!
 						s.pop_back();
 						i++;
@@ -656,8 +632,8 @@ int ProductionSet::grammarAnalysis()
 					}
 					else {
                         analyse_err =  " Current parsing \'" +\
-                                Token_Type_Name_Map.find(r)->second + "\' and " + \
-                                Token_Type_Name_Map.find(t)->second +  "\n";
+                                get_Token_Str(r) + "\' and " + \
+                                get_Token_Str(t) +  "\n";
                         return -1;
 						// 出错
 						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
@@ -682,8 +658,8 @@ int ProductionSet::grammarAnalysis()
 					else {
 
                         analyse_err =  " Current parsing \'" +\
-                                Token_Type_Name_Map.find(r)->second + "\' and " + \
-                                Token_Type_Name_Map.find(t)->second +  "\n";
+                                get_Token_Str(r) + "\' and " + \
+                                get_Token_Str(t) +  "\n";
                         return -1;
 						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
 						//	<< endl;
@@ -721,7 +697,7 @@ string ProductionSet::getTree()
 		treeIndex = 1;
 		global_token_index = 0;
 		for (unsigned int i = 0; i < root->children.size(); i++) {
-			if (Token_Terminal_Map.find(root->children[i]->curr)->second)continue;
+            if (is_Token_Terminal(root->children[i]->curr))continue;
 			dfsBuildTree(root->children[i]);
 		}
 
@@ -736,12 +712,12 @@ string ProductionSet::getTree()
 			q.pop();
 
 			// 该节点的样式和内容
-			if (Token_Terminal_Map.find(c->curr)->second) {
+            if (is_Token_Terminal(c->curr)) {
 				if (c->curr == TOKEN_BLANK) {
 					ss << "\"" << c->id << "\" [shape=square; style=filled; fillcolor=cornsilk; label=\""
                         << "BLANK" << "\"];" << std::endl;
 				}
-				else if (Token_Type_Name_Map.find(c->curr)->second == "ID") {
+                else if (get_Token_Str(c->curr)== "ID") {
 					ss << "\"" << c->id << "\" [shape=square; style=filled; fillcolor=lightpink; label=\""
 						<< c->curr_str << "\"];" << std::endl;
 				}
@@ -752,7 +728,7 @@ string ProductionSet::getTree()
 			}
 			else {
 				ss << "\"" << c->id << "\" [style=filled; fillcolor=cyan; label=\""
-					<< Token_Type_Name_Map.find(c->curr)->second << "\"];" << std::endl;
+                    << get_Token_Str(c->curr) << "\"];" << std::endl;
 			}
 
 			if (c->children.size() == 0) {

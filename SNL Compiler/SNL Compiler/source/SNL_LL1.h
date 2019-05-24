@@ -21,7 +21,7 @@ using std::ostream;
 
 
 
-extern const map<SNL_TOKEN_TYPE, bool> Token_Terminal_Map;
+
 
 struct Node {
 	SNL_TOKEN_TYPE curr;

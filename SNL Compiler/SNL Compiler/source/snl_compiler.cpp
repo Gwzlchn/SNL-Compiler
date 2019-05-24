@@ -16,7 +16,9 @@ int main()
         std::cout<<p->get_errMsg();
 
     };
-    std::cout<<p->getTree();
+
+   std::cout<< get_Token_Str(TOKEN_DOT);
+   // std::cout<<p->getTree();
 
     return 0;
 }

@@ -17,7 +17,7 @@ using std::vector;
 using std::map;
 using std::string;
 
-extern map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map;
+
 
  
 

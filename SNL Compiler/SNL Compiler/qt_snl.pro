@@ -28,6 +28,7 @@ SOURCES += \
         source/SNL_LL1.cpp \
         source/SNL_Lexer.cpp \
         source/SNL_Production.cpp \
+        source/SNL_Tokens.cpp \
         source/Utils.cpp \
         source/mainwindow.cpp \
         source/snl_compiler.cpp
