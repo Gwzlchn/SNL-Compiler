@@ -1,4 +1,4 @@
-#include "SNL_LL1.h"
+ï»¿#include "SNL_LL1.h"
 #include "SNL_Lexer.h"
 #include "SNL_Tokens.h"
 
@@ -51,6 +51,8 @@ ProductionSet::ProductionSet(string prods_file_name) {
 	this->setPredictSet();
 	this->setAnalyseMap();
 
+	//std::cout << m_first_sets;
+	//std::cout << m_follow_sets;
 	//std::cout << getSetMapToStr(m_first_sets).str();
 	//std::cout << getSetMapToStr(m_follow_sets).str();
 	//std::cout << getAllSetMapToStr().str();
@@ -68,21 +70,21 @@ vector<Production> ProductionSet::makePordsFromFile(const string& file_name) con
 	infile.open(file_name);
 	if (!infile)
 	{
-		std::cerr << "ÎÄ¼ş´ò¿ªÊ§°Ü£¡" << std::endl;
+		std::cerr << "æ–‡ä»¶æ‰“å¼€å¤±è´¥ï¼" << std::endl;
 	}
-	string line;//´ÓÎÄ¼şÖĞ¶ÁÈ¡Ò»ĞĞ²úÉúÊ½
-	string substr;//³ĞÔØ·Ö¸îºóµÄ×Ö·û´®
-	bool equalFlag = false;//±êÖ¾ÊÇ·ñÒÑ¶Áµ½"::="Õâ¸ö·ûºÅ
-	int seqNum = 1;//µ±Ç°ĞĞºÅ£¬Ò²¼´²úÉúÊ½µÄ±àºÅ
+	string line;//ä»æ–‡ä»¶ä¸­è¯»å–ä¸€è¡Œäº§ç”Ÿå¼
+	string substr;//æ‰¿è½½åˆ†å‰²åçš„å­—ç¬¦ä¸²
+	bool equalFlag = false;//æ ‡å¿—æ˜¯å¦å·²è¯»åˆ°"::="è¿™ä¸ªç¬¦å·
+	int seqNum = 1;//å½“å‰è¡Œå·ï¼Œä¹Ÿå³äº§ç”Ÿå¼çš„ç¼–å·
 
 
 	while (getline(infile, line))
 	{
-		std::istringstream stream(line);//ÓÃÓÚ·Ö¸î×Ö·û
+		std::istringstream stream(line);//ç”¨äºåˆ†å‰²å­—ç¬¦
 		SNL_TOKEN_TYPE cur_prod_left = TOKEN_ERROR;
 		vector<SNL_TOKEN_TYPE> cur_prod_right = vector<SNL_TOKEN_TYPE>();
 
-		//stream >> substr;//Ã¿ĞĞµÄµÚÒ»¸öÔªËØ±Ø¶¨ÊÇĞĞºÅ
+		//stream >> substr;//æ¯è¡Œçš„ç¬¬ä¸€ä¸ªå…ƒç´ å¿…å®šæ˜¯è¡Œå·
 		//substr.pop_back();
 		while (stream >> substr)
 		{
@@ -90,7 +92,7 @@ vector<Production> ProductionSet::makePordsFromFile(const string& file_name) con
 			{
 				equalFlag = true;
 				//cout << "::=" << endl;
-				continue;//¶ÔµÈºÅ²»×öÈÎºÎ´¦Àí
+				continue;//å¯¹ç­‰å·ä¸åšä»»ä½•å¤„ç†
 			}
 
 			if (!equalFlag)
@@ -118,7 +120,7 @@ vector<Production> ProductionSet::makePordsFromFile(const string& file_name) con
 
 
 		ret.push_back(Production(cur_prod_left, cur_prod_right, seqNum++));
-		equalFlag = false;//Ò»ĞĞÄÚÈİ½áÊø£¬½«±êÖ¾¹éÎ»
+		equalFlag = false;//ä¸€è¡Œå†…å®¹ç»“æŸï¼Œå°†æ ‡å¿—å½’ä½
 		line.clear();
 		substr.clear();
 		//cout <<"This line is over!\n\n\n\n"<< endl;
@@ -137,7 +139,7 @@ void ProductionSet::setTokenTerminalOrNot()
 
 		auto temp_ter = prod_iter->getProdTer();
 		auto temp_not = prod_iter->getProdNotTer();
-		//¶ÔÖÕ¼«·û¼¯ºÏÇó²¢£¬¶Ô·ÇÖÕ¼«·û¼¯ºÏÇó²¢
+		//å¯¹ç»ˆæç¬¦é›†åˆæ±‚å¹¶ï¼Œå¯¹éç»ˆæç¬¦é›†åˆæ±‚å¹¶
 		setUnion(m_notTerminal, temp_not);
 		setUnion(m_terminal, temp_ter);
 	}
@@ -146,7 +148,7 @@ void ProductionSet::setTokenTerminalOrNot()
 
 void ProductionSet::setTokenFirstSet()
 {
-	//first¼¯ºÏ³õÊ¼»¯
+	//firsté›†åˆåˆå§‹åŒ–
 	for (auto ter_iter = m_terminal.begin(); \
 		ter_iter != m_terminal.end(); ter_iter++) {
 		set<SNL_TOKEN_TYPE> temp = { *ter_iter };
@@ -157,9 +159,9 @@ void ProductionSet::setTokenFirstSet()
 
 		m_first_sets[*not_iter] = set<SNL_TOKEN_TYPE>();
 	}
-	//½øÒ»²½Çó·ÇÖÕ¼«·ûµÄfirst¼¯ºÏ
+	//è¿›ä¸€æ­¥æ±‚éç»ˆæç¬¦çš„firsté›†åˆ
 
-	//ÈÔÔÚÀ©´ó£¬±êÖ¾Î»
+	//ä»åœ¨æ‰©å¤§ï¼Œæ ‡å¿—ä½
 	bool  expanded = true;
 	while (expanded) {
 		expanded = false;
@@ -168,9 +170,9 @@ void ProductionSet::setTokenFirstSet()
 			notTer_iter != m_notTerminal.end();
 			notTer_iter++) {
 
-			//µ±Ç°·ÇÖÕ¼«·ûFirst¼¯ºÏ
+			//å½“å‰éç»ˆæç¬¦Firsté›†åˆ
 			set<SNL_TOKEN_TYPE>& cur_not_ter_first_set = m_first_sets.find(*notTer_iter)->second;
-			//¶ÔËùÓĞ²úÉúÊ½±éÀú
+			//å¯¹æ‰€æœ‰äº§ç”Ÿå¼éå†
 			for (auto prod_iter = m_productions.begin(); \
 				prod_iter !=  m_productions.end();prod_iter++) {
 				if (prod_iter->getProducitonLeft() == *notTer_iter) {
@@ -181,17 +183,17 @@ void ProductionSet::setTokenFirstSet()
 
 					
 					for (size_t i = 0; i < prod_r_len; i++) {
-						//Èç¹ûµÚÒ»¸öÊÇÖÕ¼«·û,Ö±½ÓÍË³ö
+						//å¦‚æœç¬¬ä¸€ä¸ªæ˜¯ç»ˆæç¬¦,ç›´æ¥é€€å‡º
 						if (getTokenType(prod_right[i]) == 2) {
 							cur_not_ter_first_set.insert(prod_right[i]);
 							break;
 						}
-						//Èç¹ûµÚÒ»¸öÊÇ¿Õ°×·û,¼ÌĞø²éÏÂÒ»¸ö×Ö·û
+						//å¦‚æœç¬¬ä¸€ä¸ªæ˜¯ç©ºç™½ç¬¦,ç»§ç»­æŸ¥ä¸‹ä¸€ä¸ªå­—ç¬¦
 						else if (getTokenType(prod_right[i]) == 1) {
 							cur_not_ter_first_set.insert(prod_right[i]);
 							continue;
 						}
-						//Èç¹ûµÚÒ»¸öÊÇ·ÇÖÕ¼«·û,¶şÕßÈ¡½»¼¯
+						//å¦‚æœç¬¬ä¸€ä¸ªæ˜¯éç»ˆæç¬¦,äºŒè€…å–äº¤é›†
 						else if (getTokenType(prod_right[i]) == 3) {
 							set<SNL_TOKEN_TYPE> r_first_set = m_first_sets.find(prod_right[i])->second;
 							setUnion(cur_not_ter_first_set, setRemoveBlank(r_first_set));
@@ -204,7 +206,7 @@ void ProductionSet::setTokenFirstSet()
 							
 						}
 					}
-					//Ö»ÒªÓĞÒ»¸ö·ÇÖÕ¼«·ûFirst¼¯À©´ó,Ôò¼ÌĞøÑ­»·
+					//åªè¦æœ‰ä¸€ä¸ªéç»ˆæç¬¦Firsté›†æ‰©å¤§,åˆ™ç»§ç»­å¾ªç¯
 					if (m_first_sets[*notTer_iter].size() != before) {
 						expanded = true;
 					}
@@ -227,7 +229,7 @@ inline void ProductionSet::setUnion(set<SNL_TOKEN_TYPE>& dst, const set<SNL_TOKE
 }
 
 template <typename T>
-static string ProductionSet::get_token_str(const T& tok_vec) 
+ string ProductionSet::get_token_str(const T& tok_vec)
 {
 	string ret = "";
 	for (auto i = tok_vec.begin(); i != tok_vec.end(); i++) {
@@ -237,7 +239,7 @@ static string ProductionSet::get_token_str(const T& tok_vec)
 	return ret;
 }
 
-ostream& operator <<(ostream& os, const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets)
+ostream& operator <<(ostream& os, const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets) 
 {
 	os << "----------------------\n";
 	for (auto iter = sets.begin(); iter != sets.end(); iter++) {
@@ -275,7 +277,7 @@ stringstream ProductionSet::getAllSetMapToStr() const
 }
 
 
-ostream& operator <<(ostream& os, const map<int, set<SNL_TOKEN_TYPE>>& predict_set)
+ostream& operator <<(ostream& os, const map<int, set<SNL_TOKEN_TYPE>>& predict_set)  
 {
 
 	os << "----------------------\n";
@@ -289,7 +291,7 @@ ostream& operator <<(ostream& os, const map<int, set<SNL_TOKEN_TYPE>>& predict_s
 }
 
 
-ostream& operator <<(ostream& os, const vector<vector<int>>& LL1_Analyse_Map) {
+ostream& operator <<(ostream& os, const vector<vector<int>>& LL1_Analyse_Map)   {
 	const size_t size = LL1_Analyse_Map.size();
 	for (size_t i = 0; i < size; i++) {
 		for (size_t j = 0; j < size; j++) {
@@ -323,7 +325,7 @@ set<SNL_TOKEN_TYPE> ProductionSet::setRemoveBlank(const set<SNL_TOKEN_TYPE>& src
 }
 
 
-//·ÇÖÕ¼«·ûÊÇ·ñÄÜÍÆ³ö¿Õ
+//éç»ˆæç¬¦æ˜¯å¦èƒ½æ¨å‡ºç©º
 bool ProductionSet::isNotTerDeriBlank(SNL_TOKEN_TYPE not_ter)
 {
 	auto iter = m_first_sets.find(not_ter);
@@ -331,7 +333,7 @@ bool ProductionSet::isNotTerDeriBlank(SNL_TOKEN_TYPE not_ter)
 		return false;
 	}
 
-	//¼¯ºÏÀïÄÜÕÒµ½,ËµÃ÷ÄÜÍÆ³ö¿Õ
+	//é›†åˆé‡Œèƒ½æ‰¾åˆ°,è¯´æ˜èƒ½æ¨å‡ºç©º
 	return iter->second.find(TOKEN_BLANK) != iter->second.end();
 }
 
@@ -344,10 +346,10 @@ int ProductionSet::getTokenType(SNL_TOKEN_TYPE tok)
 	auto ter_iter = m_terminal.find(tok);
 	auto not_iter = m_notTerminal.find(tok);
 	if (ter_iter != m_terminal.end()) {
-		return 2; //ÊÇÖÕ¼«·û
+		return 2; //æ˜¯ç»ˆæç¬¦
 	}
 	if (not_iter != m_notTerminal.end()) {
-		return 3;	//ÊÇ·ÇÖÕ¼«·û
+		return 3;	//æ˜¯éç»ˆæç¬¦
 	}
 
 	return 0;
@@ -364,7 +366,7 @@ void ProductionSet::setTokenFollowSet()
 		m_follow_sets[*not_iter] = set<SNL_TOKEN_TYPE>();
 	}
 
-	//ÕÒµ½¿ªÊ¼·û
+	//æ‰¾åˆ°å¼€å§‹ç¬¦
 	SNL_TOKEN_TYPE begin = m_productions[0].getProducitonLeft();
 	m_follow_sets[begin].insert(TOKEN_ENDFILE);
 
@@ -394,14 +396,14 @@ void ProductionSet::setTokenFollowSet()
 					set<SNL_TOKEN_TYPE> remove_blank = setRemoveBlank(after_fisrt_set);
 					setUnion(cur_not_follow, remove_blank);
 
-					//ÓÒ²à×Ö·ûÄÜÍÆ³ö¿Õ,²¢Èë×ó²à×Ö·ûµÄfollow
+					//å³ä¾§å­—ç¬¦èƒ½æ¨å‡ºç©º,å¹¶å…¥å·¦ä¾§å­—ç¬¦çš„follow
 					if (after_fisrt_set.find(TOKEN_BLANK)!=after_fisrt_set.end() ) {
 						//std::cout << prod_iter->getProducitonLeft() << std::endl;
 						setUnion(cur_not_follow, (m_follow_sets.find(prod_iter->getProducitonLeft()))->second);
 					}
 				}
 				else if (not_ter_in_right >= 1) {
-					for (int i = 0; i < cur_right.size(); i++) {
+					for (size_t i = 0; i < cur_right.size(); i++) {
 						vector<SNL_TOKEN_TYPE> after = vector<SNL_TOKEN_TYPE>();
 						getAfterTokenInRightProd(*not_iter, *prod_iter, after, now_prod_right_index);
 
@@ -409,7 +411,7 @@ void ProductionSet::setTokenFollowSet()
 						set<SNL_TOKEN_TYPE> remove_blank = setRemoveBlank(after_fisrt_set);
 						setUnion(cur_not_follow, remove_blank);
 
-						//ÓÒ²à×Ö·ûÄÜÍÆ³ö¿Õ,²¢Èë×ó²à×Ö·ûµÄfollow
+						//å³ä¾§å­—ç¬¦èƒ½æ¨å‡ºç©º,å¹¶å…¥å·¦ä¾§å­—ç¬¦çš„follow
 						if (after_fisrt_set.find(TOKEN_BLANK) != after_fisrt_set.end()) {
 							//std::cout << prod_iter->getProducitonLeft() << std::endl;
 							setUnion(cur_not_follow, (m_follow_sets.find(prod_iter->getProducitonLeft()))->second);
@@ -429,7 +431,7 @@ void ProductionSet::setTokenFollowSet()
 	return;
 }
 
-//µ±Ç°×Ö·ûµÄÏÂÒ»¸ö×Ö·ûÊÇÊ²Ã´
+//å½“å‰å­—ç¬¦çš„ä¸‹ä¸€ä¸ªå­—ç¬¦æ˜¯ä»€ä¹ˆ
 bool ProductionSet::getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, \
 											const Production& prod, \
 											vector<SNL_TOKEN_TYPE>& after_token,\
@@ -495,7 +497,7 @@ set<SNL_TOKEN_TYPE> ProductionSet::getOneProdPredict(const Production& prod)  {
 
 void ProductionSet::setAnalyseMap(){
 
-	//³õÊ¼»¯LL1 ·ÖÎö±í
+	//åˆå§‹åŒ–LL1 åˆ†æè¡¨
 	const size_t size = Token_Terminal_Map.size();
 	m_LL1_Analyse_Map = vector<vector<int>>(size, vector<int>(size));
 	for (size_t i = 0; i < size; i++) {
@@ -511,7 +513,7 @@ void ProductionSet::setAnalyseMap(){
 
 		SNL_TOKEN_TYPE left = prod_iter->getProducitonLeft();
 		int prod_id = prod_iter->get_id();
-		//ÕÒµ½µ±Ç°Predict¼¯
+		//æ‰¾åˆ°å½“å‰Predicté›†
 		set<SNL_TOKEN_TYPE>& cur_predict = m_predict_set.find(prod_iter->get_id())->second;
 		for (auto ter_iter = cur_predict.begin(); \
 			ter_iter != cur_predict.end(); ter_iter++) {
@@ -526,7 +528,7 @@ void ProductionSet::setAnalyseMap(){
 
 void ProductionSet::dfsBuildTree(Node*& parent)
 {
-	// ´«¹ıÀ´µÄ²ÎÊıparentÒ»¶¨ÊÇ·ÇÖÕ¼«·û
+	// ä¼ è¿‡æ¥çš„å‚æ•°parentä¸€å®šæ˜¯éç»ˆæç¬¦
 
 	if (Token_Terminal_Map.find(parent->curr)->second == true) {
 		std::cerr << "[error] dfsBuildTree invalid param" << std::endl;
@@ -536,17 +538,17 @@ void ProductionSet::dfsBuildTree(Node*& parent)
 		std::cerr << "[error] dfsBuildTree treeIndex" << std::endl;
 		exit(-1);
 	}
-	// ¹¹Ôì×Ó½Úµã
+	// æ„é€ å­èŠ‚ç‚¹
 	const auto& cur_right = vTree[treeIndex].getProductionRight();
 	for (auto iter = cur_right.begin(); iter != cur_right.end(); iter++) {
 		parent->children.emplace_back(new Node(*iter, parent, global_id++));
 	}
 
-	// ¹¹ÔìÍêÍÆµ¼Ê½ÏÂ±ê¾Í¼Ó¼Ó
+	// æ„é€ å®Œæ¨å¯¼å¼ä¸‹æ ‡å°±åŠ åŠ 
 	treeIndex++;
 	for (unsigned int i = 0; i < parent->children.size(); i++) {
 		if (Token_Terminal_Map.find(parent->children[i]->curr)->second) {
-			// ½«ID×ª»¯ÎªÊµ¼ÊÖµ
+			// å°†IDè½¬åŒ–ä¸ºå®é™…å€¼
 			if (parent->children[i]->curr == TOKEN_BLANK) {}
 			else {
 				//cout << tokenSymbols[global_token_index] <<"\t\ttokenlist"<< endl;
@@ -555,7 +557,7 @@ void ProductionSet::dfsBuildTree(Node*& parent)
 				parent->children[i]->curr_str = Token_Type_Name_Map.find(m_input_stream[global_token_index])->second;
 				global_token_index++;
 			}
-			continue;// ÖÕ¼«·ûÊÇÒ¶½Úµã
+			continue;// ç»ˆæç¬¦æ˜¯å¶èŠ‚ç‚¹
 		}
 		dfsBuildTree(parent->children[i]);
 	}
@@ -564,17 +566,17 @@ void ProductionSet::dfsBuildTree(Node*& parent)
 
 int ProductionSet::grammarAnalysis()
 {
-		// Àı ·ÖÎöÕ» #E   ÊäÈëÁ÷ i+i*i#
-		std::list<SNL_TOKEN_TYPE> s;//ÒòÎªÕ»²»ÄÜ±éÀúÊä³öËùÒÔÓÃlistÁ´±í´úÌæ
+		// ä¾‹ åˆ†ææ ˆ #E   è¾“å…¥æµ i+i*i#
+		std::list<SNL_TOKEN_TYPE> s;//å› ä¸ºæ ˆä¸èƒ½éå†è¾“å‡ºæ‰€ä»¥ç”¨listé“¾è¡¨ä»£æ›¿
 		s.emplace_back(TOKEN_ENDFILE); // #
-		s.emplace_back(m_productions.front().getProducitonLeft()); // ÎÄ·¨¿ªÊ¼·û
+		s.emplace_back(m_productions.front().getProducitonLeft()); // æ–‡æ³•å¼€å§‹ç¬¦
 		m_input_stream.emplace_back(TOKEN_SHARP);
-		int i = 0;//ÊäÈëÁ÷Ë÷Òı
+		int i = 0;//è¾“å…¥æµç´¢å¼•
 		while (!s.empty()) {
-			SNL_TOKEN_TYPE t = s.back();//Õ»¶¥ÔªËØ
-			SNL_TOKEN_TYPE r = m_input_stream[static_cast<unsigned int>(i)];//ÊäÈëÁ÷µ±Ç°É¨Ãè·ûºÅ
+			SNL_TOKEN_TYPE t = s.back();//æ ˆé¡¶å…ƒç´ 
+			SNL_TOKEN_TYPE r = m_input_stream[static_cast<unsigned int>(i)];//è¾“å…¥æµå½“å‰æ‰«æç¬¦å·
 			if (!Token_Terminal_Map.find(t)->second) {
-				//·ÇÖÕ¼«·û Ñ°ÕÒ t->É¶ µÄPredict¼¯ ÖĞÓĞÊäÈëÁ÷µ±Ç°Ë÷Òı·ûºÅ
+				//éç»ˆæç¬¦ å¯»æ‰¾ t->å•¥ çš„Predicté›† ä¸­æœ‰è¾“å…¥æµå½“å‰ç´¢å¼•ç¬¦å·
 				bool notFound = true;
 				for (map<int, set<SNL_TOKEN_TYPE>>::iterator a = m_predict_set.begin(); a != m_predict_set.end();a++) {
 					const Production& cur_prod = m_productions[a->first - 1];
@@ -587,14 +589,14 @@ int ProductionSet::grammarAnalysis()
 						f = a->second.find(r);
 					}
 					if (f == a->second.end())continue;
-					// ÕÒµ½ÁË t->a->secondµÄPredict¼¯ÖĞÓĞ r
+					// æ‰¾åˆ°äº† t->a->secondçš„Predicté›†ä¸­æœ‰ r
 
-					// »æÖÆÓï·¨Ê÷²¿·Ö
+					// ç»˜åˆ¶è¯­æ³•æ ‘éƒ¨åˆ†
 					vTree.emplace_back(cur_prod);
 
 					notFound = false;
-					s.pop_back();//ÏÈµ¯Õ»
-					// È»ºóÍÆµ¼Ê½µ¹×ÅÈëÕ»
+					s.pop_back();//å…ˆå¼¹æ ˆ
+					// ç„¶åæ¨å¯¼å¼å€’ç€å…¥æ ˆ
 					const vector<SNL_TOKEN_TYPE>& cur_right = cur_prod.getProductionRight();
 					for (auto it = cur_right.rbegin(); \
 						it != cur_right.rend(); \
@@ -606,7 +608,7 @@ int ProductionSet::grammarAnalysis()
 				if (notFound) {
 					system("pause");
 					return 0;
-					// ³ö´í
+					// å‡ºé”™
 					/*errMsg = "[Grammatical error] line " +
 						to_string(tokenSymbols[static_cast<unsigned int>(i)].line) + " Current parsing \'" +
 						r.v + "\'";
@@ -616,14 +618,14 @@ int ProductionSet::grammarAnalysis()
 					//exit(-1);
 				}
 				else {
-					continue;// ¼ÌĞø
+					continue;// ç»§ç»­
 				}
 			}
 			else {
 				if (Token_Type_Name_Map.find(t)->second == "ID") {
-					// ·Ç¹Ø¼ü×ÖµÄ±êÊ¶·û
+					// éå…³é”®å­—çš„æ ‡è¯†ç¬¦
 					if (Token_Type_Name_Map.find(r)->second == "ID") {
-						// Æ¥ÅäÁË!!!
+						// åŒ¹é…äº†!!!
 						s.pop_back();
 						i++;
 						continue;
@@ -635,7 +637,7 @@ int ProductionSet::grammarAnalysis()
 							to_string(tokenSymbols[static_cast<unsigned int>(i)].line) +
 							" Current parsing \'" + r.v + "\'";
 						return E_GRAMMAR;*/
-						// ³ö´í
+						// å‡ºé”™
 						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
 						//	<< endl;
 						//cerr << "at line " << tokenSymbols[i].line << endl;
@@ -643,14 +645,14 @@ int ProductionSet::grammarAnalysis()
 					}
 				}
 				else if (t == TOKEN_BLANK) {
-					// ¿Õ´®£¬Ö±½Óµ¯Õ»¼ÌĞø
+					// ç©ºä¸²ï¼Œç›´æ¥å¼¹æ ˆç»§ç»­
 					s.pop_back();
 					continue;
 				}
 				else if (Token_Type_Name_Map.find(t)->second == "INTC") {
-					// ÎŞ·ûºÅÕûÊı
+					// æ— ç¬¦å·æ•´æ•°
 					if (Token_Type_Name_Map.find(r)->second == "INTC") {
-						// Æ¥ÅäÁË!!!
+						// åŒ¹é…äº†!!!
 						s.pop_back();
 						i++;
 						continue;
@@ -662,7 +664,7 @@ int ProductionSet::grammarAnalysis()
 							to_string(tokenSymbols[static_cast<unsigned int>(i)].line) +
 							" Current parsing \'" + r.v + "\'";
 						return E_GRAMMAR;*/
-						// ³ö´í
+						// å‡ºé”™
 						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
 						//	<< endl;
 						//cerr << "at line " << tokenSymbols[i].line << endl;
@@ -671,11 +673,11 @@ int ProductionSet::grammarAnalysis()
 
 				}
 				else {
-					// µ¥¶ÀµÄ
+					// å•ç‹¬çš„
 					if (t == r) {
-						// Æ¥ÅäÁË!!!
+						// åŒ¹é…äº†!!!
 						if (t == TOKEN_ENDFILE) {
-							// Íê³ÉÁË!!!
+							// å®Œæˆäº†!!!
 							break;
 						}
 						s.pop_back();
@@ -685,7 +687,7 @@ int ProductionSet::grammarAnalysis()
 					else {
 						system("pause");
 						return 0;
-						//// ³ö´í
+						//// å‡ºé”™
 						//errMsg = "[Grammatical error] line " +
 						//	to_string(tokenSymbols[static_cast<unsigned int>(i)].line) +
 						//	" Current parsing \'" + r.v + "\'";
@@ -716,9 +718,6 @@ void ProductionSet::setInputStrem(const vector<SNL_TOKEN_TYPE>& input_stream)
 
 string ProductionSet::getTree()
 {
-	
-
-
 		int global_id = 1;
 
 		Node* root = new Node(vTree[0].getProducitonLeft(), nullptr, global_id++);
@@ -733,7 +732,7 @@ string ProductionSet::getTree()
 			dfsBuildTree(root->children[i]);
 		}
 
-		std::stringstream ss;//°ÑDOT Language±íÊ¾µÄÓï·¨Ê÷µÄ×Ö·û´®·Åµ½ÕâÀï±ß
+		std::stringstream ss;//æŠŠDOT Languageè¡¨ç¤ºçš„è¯­æ³•æ ‘çš„å­—ç¬¦ä¸²æ”¾åˆ°è¿™é‡Œè¾¹
 
 		ss.clear();
 		ss << "digraph GrammarTree {" << std::endl;
@@ -743,11 +742,11 @@ string ProductionSet::getTree()
 			Node* c = q.front();
 			q.pop();
 
-			// ¸Ã½ÚµãµÄÑùÊ½ºÍÄÚÈİ
+			// è¯¥èŠ‚ç‚¹çš„æ ·å¼å’Œå†…å®¹
 			if (Token_Terminal_Map.find(c->curr)->second) {
 				if (c->curr == TOKEN_BLANK) {
 					ss << "\"" << c->id << "\" [shape=square; style=filled; fillcolor=cornsilk; label=\""
-						<< "¦Å" << "\"];" << std::endl;
+						<< "Îµ" << "\"];" << std::endl;
 				}
 				else if (Token_Type_Name_Map.find(c->curr)->second == "ID") {
 					ss << "\"" << c->id << "\" [shape=square; style=filled; fillcolor=lightpink; label=\""
@@ -764,11 +763,11 @@ string ProductionSet::getTree()
 			}
 
 			if (c->children.size() == 0) {
-				// Ò¶×Ó½áµã
+				// å¶å­ç»“ç‚¹
 				continue;
 			}
 
-			// ¸úÆäËû½ÚµãµÄ¹ØÏµ
+			// è·Ÿå…¶ä»–èŠ‚ç‚¹çš„å…³ç³»
 			string children = "";
 			for (unsigned int i = 0; i < c->children.size(); i++) {
 				children += "\"" + std::to_string(c->children[i]->id) + "\"; "; // "id; "
@@ -776,7 +775,7 @@ string ProductionSet::getTree()
 			ss << "\"" << c->id << "\" -> {" << children << "}" << std::endl;
 			ss << "{rank=same; " << children << "}" << std::endl;
 
-			// ÈëÕ»
+			// å…¥æ ˆ
 			for (Node* nd : c->children) {
 				q.push(nd);
 			}
@@ -784,3 +783,22 @@ string ProductionSet::getTree()
 		ss << "}" << std::endl;
 		return ss.str();
 }
+
+
+map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> ProductionSet::get_First_Sets() const {
+    return m_first_sets;
+}
+map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> ProductionSet::get_Follow_Sets()const{
+    return m_follow_sets;
+}
+map<int, set<SNL_TOKEN_TYPE>> ProductionSet::get_Predict_Sets()const{
+    return m_predict_set;
+}
+set<SNL_TOKEN_TYPE> ProductionSet::get_All_Terminals()const{
+   return m_terminal;
+}
+set<SNL_TOKEN_TYPE> ProductionSet::get_All_Not_Terminals()const{
+    return m_notTerminal;
+}
+
+

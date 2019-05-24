@@ -1,4 +1,4 @@
-#ifndef _SNL_LL1_H
+ï»¿#ifndef _SNL_LL1_H
 #define _SNL_LL1_H
 
 
@@ -35,23 +35,23 @@ struct Node {
 
 class ProductionSet {
 private:
-	//ËùÓĞ²úÉúÊ½
+	//æ‰€æœ‰äº§ç”Ÿå¼
 	vector<Production> m_productions;
 	//Follow Set
 	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_follow_sets;
 	//First Set
 	map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> m_first_sets;
-	//Predict ¼¯ºÏ£¬²úÉúÊ½±êºÅ->Token_type ¼¯ºÏ
+	//Predict é›†åˆï¼Œäº§ç”Ÿå¼æ ‡å·->Token_type é›†åˆ
 	map<int, set<SNL_TOKEN_TYPE>> m_predict_set;
-	//SNL ·ÖÎö±í
+	//SNL åˆ†æè¡¨
 	vector<vector<int>> m_LL1_Analyse_Map;
-	//ÖÕ¼«·û¼¯ºÏ
+	//ç»ˆæç¬¦é›†åˆ
 	set<SNL_TOKEN_TYPE> m_terminal;
-	//·ÇÖÕ¼«·û¼¯ºÏ
+	//éç»ˆæç¬¦é›†åˆ
 	set<SNL_TOKEN_TYPE> m_notTerminal;
-	//ÊäÈëÁ÷
+	//è¾“å…¥æµ
 	vector<SNL_TOKEN_TYPE> m_input_stream;
-	//²úÉúÊ½Ë³Ğò
+	//äº§ç”Ÿå¼é¡ºåº
 	vector<Production> vTree;
 
 public:
@@ -60,33 +60,39 @@ public:
 	vector<Production> makePordsFromFile(const string& file_name)const;
 	void setInputStrem(const vector<SNL_TOKEN_TYPE>& input_stream);
 	
-	//ÖÕ¼«·û¡¢·ÇÖÕ¼«·û
+	//ç»ˆæç¬¦ã€éç»ˆæç¬¦
 	void setTokenTerminalOrNot();
-	//First ¼¯ºÏÉú³É
+	//First é›†åˆç”Ÿæˆ
 	void setTokenFirstSet();
-	//Follow ¼¯ºÏÉú³É
+	//Follow é›†åˆç”Ÿæˆ
 	void setTokenFollowSet();
-	//Predict ¼¯ºÏÉú³É
+	//Predict é›†åˆç”Ÿæˆ
 	void setPredictSet();
-	//SNL_ ·ÖÎö±í
+	//SNL_ åˆ†æè¡¨
 	void  setAnalyseMap();
+
+    map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> get_First_Sets()const;
+    map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> get_Follow_Sets()const;
+    map<int, set<SNL_TOKEN_TYPE>> get_Predict_Sets()const;
+    set<SNL_TOKEN_TYPE> get_All_Terminals()const;
+    set<SNL_TOKEN_TYPE> get_All_Not_Terminals()const;
 
 	int treeIndex = 0;
 	int global_id = 0;
-	unsigned int global_token_index;//ÓÃÓÚ½«ID×ª»¯Îª±äÁ¿ÃûºóÕßº¯ÊıÃûµÈ
+	unsigned int global_token_index;//ç”¨äºå°†IDè½¬åŒ–ä¸ºå˜é‡ååè€…å‡½æ•°åç­‰
 
 	string getTree();
 	void dfsBuildTree(Node*& parent);
 	int grammarAnalysis();
 	
 
-	//¹¹Ôì¼¯ºÏÊ±ÓÃµ½µÄº¯Êı
+	//æ„é€ é›†åˆæ—¶ç”¨åˆ°çš„å‡½æ•°
 	set<SNL_TOKEN_TYPE> setRemoveBlank(const set<SNL_TOKEN_TYPE>& src) const;
 	void setUnion(set<SNL_TOKEN_TYPE>& dst, const set<SNL_TOKEN_TYPE>& src);
 	bool isNotTerDeriBlank(SNL_TOKEN_TYPE not_ter);
 	int getTokenType(SNL_TOKEN_TYPE tok);
-	//ÕÒ¸ÃÖÕ¼«·ûÊÇ·ñÔÚÓÒ²à±í´ïÊ½³öÏÖ,³öÏÖÔò·µ»Øtrue,·ñÔò·µ»Øfalse;
-	//Èç¹û³öÏÖ,Í¬Ê±·µ»Ø½ô½Ó×Å×Ö·ûµÄFirst¼¯
+	//æ‰¾è¯¥ç»ˆæç¬¦æ˜¯å¦åœ¨å³ä¾§è¡¨è¾¾å¼å‡ºç°,å‡ºç°åˆ™è¿”å›true,å¦åˆ™è¿”å›false;
+	//å¦‚æœå‡ºç°,åŒæ—¶è¿”å›ç´§æ¥ç€å­—ç¬¦çš„Firsté›†
 	bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, vector<SNL_TOKEN_TYPE>& after_token,int prod_inx=0);
 
 	set<SNL_TOKEN_TYPE> getTokenVecFirst(const vector<SNL_TOKEN_TYPE>& tok_vec);
@@ -94,22 +100,28 @@ public:
 
 
 
-	//***************´òÓ¡Ïà¹Ø****************
-	//´ÓÈİÆ÷ÖĞµÃµ½Token String
+	//***************æ‰“å°ç›¸å…³****************
+	//ä»å®¹å™¨ä¸­å¾—åˆ°Token String
 	template <typename T>
 	static string get_token_str(const T& tok_vec);
-	
 	stringstream getAllSetMapToStr() const;
 
-	friend ostream& operator <<(ostream& os, const vector<vector<int>>& LL1_Analyse_Map);
-	friend ostream& operator <<(ostream& os, const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets);
-	friend ostream& operator <<(ostream& os, const map<int, set<SNL_TOKEN_TYPE>>& predict_set);
+
+
+
+	
 };
 
 
 
+ostream& operator <<(ostream& os, const vector<vector<int>>& LL1_Analyse_Map) ;
+ostream& operator <<(ostream& os, const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>& sets) ;
+ostream& operator <<(ostream& os, const map<int, set<SNL_TOKEN_TYPE>>& predict_set) ;
+
 
 #endif // !_SNL__H
+
+
 
 
 

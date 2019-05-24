@@ -1,4 +1,4 @@
-#pragma once
+ï»¿
 #ifndef _SNL_Lexer_H
 #define _SNL_Lexer_H
 
@@ -24,9 +24,9 @@ extern map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map;
  struct Token
  {
 	 SNL_TOKEN_TYPE type;
-	 const char* start;		//µ¥´ÊÆğÊ¼µØÖ·
-	 uint32_t length;		//µ¥´Ê³¤¶È
-	 uint32_t lineNo;		//µ¥´ÊĞĞºÅ
+	 const char* start;		//å•è¯èµ·å§‹åœ°å€
+	 uint32_t length;		//å•è¯é•¿åº¦
+	 uint32_t lineNo;		//å•è¯è¡Œå·
  };
 
  class Lexer
@@ -39,9 +39,9 @@ extern map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map;
 	 char curChar;
 	 Token curToken;
 	 Token preToken;
-	 //TokenĞòÁĞ
+	 //Tokenåºåˆ—
 	 vector<SNL_TOKEN_TYPE> m_Token_Vec;
-	 //TokenĞòÁĞ¶ÔÓ¦ÄÚÈİ
+	 //Tokenåºåˆ—å¯¹åº”å†…å®¹
 	 vector<string> m_Token_Contant_Vec;
 
  public:

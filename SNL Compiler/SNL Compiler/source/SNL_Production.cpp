@@ -1,4 +1,4 @@
-#include"SNL_Production.h"
+ï»¿#include"SNL_Production.h"
 #include"SNL_LL1.h"
 #include<iostream>
 
@@ -13,9 +13,9 @@ size_t Production::get_id() {
 
 
 
-Production::Production(SNL_TOKEN_TYPE left, vector<SNL_TOKEN_TYPE> right, int id, int idx)
+Production::Production(SNL_TOKEN_TYPE left, vector<SNL_TOKEN_TYPE> right, size_t id, size_t idx)
 {
-	//ÏÈÑéÖ¤²úÉúÊ½ÊÇ·ñÕıÈ·
+	//å…ˆéªŒè¯äº§ç”Ÿå¼æ˜¯å¦æ­£ç¡®
 	if (Token_Terminal_Map.find(left) == Token_Terminal_Map.end()) {
 		std::cerr << "this Token  cannot identified" << std::endl;
 		return;

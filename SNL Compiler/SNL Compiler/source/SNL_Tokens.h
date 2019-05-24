@@ -1,4 +1,4 @@
-#ifndef _SNL_Tokens_H
+ï»¿#ifndef _SNL_Tokens_H
 #define _SNL_Tokens_H
 
 #include<map>
@@ -6,28 +6,28 @@
 
  enum SNL_TOKEN_TYPE
 {
-	//*************************ÖÕ¼«·û**********************************
-	//¿Õ°×·û
+	//*************************ç»ˆæç¬¦**********************************
+	//ç©ºç™½ç¬¦
 	TOKEN_BLANK,TOKEN_SHARP,
-	/* ²¾¼Çµ¥´Ê·ûºÅ */
+	/* ç°¿è®°å•è¯ç¬¦å· */
 	TOKEN_ENDFILE, TOKEN_ERROR,
-	/* ±£Áô×Ö */
+	/* ä¿ç•™å­— */
 	TOKEN_PROGRAM, TOKEN_PROCEDURE, TOKEN_TYPE, TOKEN_VAR, TOKEN_IF,
 	TOKEN_THEN, TOKEN_ELSE, TOKEN_FI, TOKEN_WHILE, TOKEN_DO,
 	TOKEN_ENDWH, TOKEN_BEGIN, TOKEN_END, TOKEN_READ, TOKEN_WRITE,
 	TOKEN_ARRAY, TOKEN_OF, TOKEN_RECORD, TOKEN_RETURN,
 
 	TOKEN_INTEGER, TOKEN_CHAR,
-	/* ¶à×Ö·ûµ¥´Ê·ûºÅ */
+	/* å¤šå­—ç¬¦å•è¯ç¬¦å· */
 	TOKEN_ID, TOKEN_INTC, TOKEN_CHARC,
 
-	/*ÌØÊâ·ûºÅ */
+	/*ç‰¹æ®Šç¬¦å· */
 	TOKEN_ASSIGN, TOKEN_EQ, TOKEN_LESS, TOKEN_ADD, TOKEN_SUB,
 	TOKEN_MUL, TOKEN_DIV, TOKEN_LPAREN, TOKEN_RPAREN, TOKEN_DOT,
 	TOKEN_COLON, TOKEN_SEMI, TOKEN_COMMA, TOKEN_LMIDPAREN, TOKEN_RMIDPAREN,
 	TOKEN_UNDERANGE,
 
-	//Ôö¼Ó·ûºÅ
+	//å¢åŠ ç¬¦å·
 	TOKEN_MOD,
 	TOKEN_BIT_AND, TOKEN_BIT_OR, TOKEN_BIT_NOT,
 	TOKEN_BIT_SHIFT_RIGHT, TOKEN_BIT_SHIFT_LEFT,
@@ -36,71 +36,71 @@
 	TOKEN_LESS_EQUAL, TOKEN_QUESTION, TOKEN_STRING,
 
 
-	//*************************·ÇÖÕ¼«·û********************************
-	//×Ü³ÌĞò
+	//*************************éç»ˆæç¬¦********************************
+	//æ€»ç¨‹åº
 	Token_Program,
-	//³ÌĞòÍ· 
+	//ç¨‹åºå¤´ 
 	Token_ProgramHead, Token_ProgramName,
-	//³ÌĞòÉùÃ÷
+	//ç¨‹åºå£°æ˜
 	Token_DeclarePart,
 
-	//ÀàĞÍÉùÃ÷
+	//ç±»å‹å£°æ˜
 	Token_TypeDec, Token_TypeDeclaration,
 	Token_TypeDecList, Token_TypeDecMore, Token_TypeId,
-	//ÀàĞÍ
+	//ç±»å‹
 	Token_TypeName, Token_BaseType, Token_StructureType,
 	Token_ArrayType, Token_Low, Token_Top, Token_RecType,
 	Token_FieldDecList, Token_FieldDecMore, Token_IdList, Token_IdMore,
 
-	//±äÁ¿ÉùÃ÷
+	//å˜é‡å£°æ˜
 	Token_VarDec, Token_VarDeclaration, Token_VarDecList, Token_VarDecMore,
 	Token_VarIdList, Token_VarIdMore,
 
-	//¹ı³ÌÉùÃ÷
+	//è¿‡ç¨‹å£°æ˜
 	Token_ProcDec, Token_ProcDeclaration,
 	Token_ProcDecMore, Token_ProcName,
-	//²ÎÊıÉùÃ÷
+	//å‚æ•°å£°æ˜
 	Token_ParamList, Token_ParamDecList,
 	Token_ParamMore, Token_Param, Token_FormList, Token_FidMore,
-	//¹ı³ÌÖĞµÄÉùÃ÷²¿·Ö
+	//è¿‡ç¨‹ä¸­çš„å£°æ˜éƒ¨åˆ†
 	Token_ProcDecPart,
-	//¹ı³ÌÌå
+	//è¿‡ç¨‹ä½“
 	Token_ProcBody,
-	//Ö÷³ÌĞòÌå
+	//ä¸»ç¨‹åºä½“
 	Token_ProgramBody,
 
-	//Óï¾äĞòÁĞ
+	//è¯­å¥åºåˆ—
 	Token_StmList,
 	Token_StmMore,
-	//Óï¾ä
+	//è¯­å¥
 	Token_Stm, Token_AssCall,
-	//¸³ÖµÓï¾ä
+	//èµ‹å€¼è¯­å¥
 	Token_AssignmentRest,
-	//Ìõ¼şÓï¾ä
+	//æ¡ä»¶è¯­å¥
 	Token_ConditionalStm,
 	//Token_StmL, 
-	//Ñ­»·Óï¾ä
+	//å¾ªç¯è¯­å¥
 	Token_LoopStm,
-	//ÊäÈëÓï¾ä
+	//è¾“å…¥è¯­å¥
 	Token_InputStm,
 	Token_InVar,
-	//Êä³öÓï¾ä
+	//è¾“å‡ºè¯­å¥
 	Token_OutputStm,
 
-	//·µ»ØÓï¾ä
+	//è¿”å›è¯­å¥
 	Token_ReturnStm,
-	//¹ı³Ìµ÷ÓÃÓï¾ä
+	//è¿‡ç¨‹è°ƒç”¨è¯­å¥
 	Token_CallStmRest,
 	Token_ActParamList, Token_ActParamMore,
-	//Ìõ¼ş±í´ïÊ½
+	//æ¡ä»¶è¡¨è¾¾å¼
 	Token_RelExp, Token_OtherExp, Token_SimpleExp,
-	//ËãÊõ±í´ïÊ½
+	//ç®—æœ¯è¡¨è¾¾å¼
 	Token_Exp, Token_OtherTerm,
 
-	//Ïî
+	//é¡¹
 	Token_Term, Token_OtherFactor,
 
-	//Òò×Ó
+	//å› å­
 	Token_Factor, Token_Variable, Token_VariMore, Token_FieldVar,
 	Token_FieldVarMore, Token_CmpOp, Token_AddOp, Token_MultOp,
 
@@ -109,7 +109,7 @@
 
 const std::map<std::string, SNL_TOKEN_TYPE> Token_Name_Type_Map =
 {
-	//********************************ÖÕ¼«·û********************************
+	//********************************ç»ˆæç¬¦********************************
 	{"?",TOKEN_BLANK},
 	{"#",TOKEN_SHARP},
 	{ "EOF",TOKEN_ENDFILE},
@@ -154,7 +154,7 @@ const std::map<std::string, SNL_TOKEN_TYPE> Token_Name_Type_Map =
 	{ "[", TOKEN_LMIDPAREN},
 	{ "]", TOKEN_RMIDPAREN},
 	{ "..", TOKEN_UNDERANGE},
-	//Ìí¼ÓToken
+	//æ·»åŠ Token
 	{"MOD",TOKEN_MOD},
 	{"BIT_AND",TOKEN_BIT_AND},
 	{"BIT_OR",TOKEN_BIT_OR},
@@ -170,7 +170,7 @@ const std::map<std::string, SNL_TOKEN_TYPE> Token_Name_Type_Map =
 	{"LESS_EQUAL",TOKEN_LESS_EQUAL},
 	{"QUESTION",TOKEN_QUESTION},
 	{"STRING",TOKEN_STRING},
-	//********************************·ÇÖÕ¼«·û******************************
+	//********************************éç»ˆæç¬¦******************************
 	{ "Program",Token_Program },
 	{ "ProgramHead", Token_ProgramHead },
 	{ "ProgramName", Token_ProgramName },

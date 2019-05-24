@@ -1,4 +1,4 @@
-#include "Utils.h"
+ï»¿#include "Utils.h"
 #include "SNL_Lexer.h"
 #include "SNL_LL1.h"
 #include <cstdarg>
@@ -7,7 +7,7 @@
 
 
 
-//Í¨ÓÃ±¨´íº¯Êý
+//é€šç”¨æŠ¥é”™å‡½æ•°
 void errorReport(void* ptr,
 	ErrorType errorType, const char* fmt, ...) {
 	char buffer[DEFAULT_BUfFER_SIZE] = { '\0' };

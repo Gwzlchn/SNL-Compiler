@@ -1,4 +1,4 @@
-#pragma once
+ï»¿
 #include"SNL_Tokens.h"
 
 #include<vector>
@@ -12,15 +12,15 @@ private:
 
 	SNL_TOKEN_TYPE m_left = TOKEN_BLANK;
 	std::vector<SNL_TOKEN_TYPE> m_right = { TOKEN_BLANK };
-	size_t m_id = -1;
-	size_t m_look_ahead_idx = -1;	//µ±Ç°Õ¹Íû·û·Ö½ç£¬¼´Ğ¡Ô²µã£»
+    size_t m_id = 0xFF;
+    size_t m_look_ahead_idx =  0xFF;	//å½“å‰å±•æœ›ç¬¦åˆ†ç•Œï¼Œå³å°åœ†ç‚¹ï¼›
 
 public:
-	//²»ÓÃÄ¬ÈÏ¹¹Ôìº¯Êı£¬ÒÔÀàÄÚÖ±½Ó¶¨Òå´úÌæ
-	Production(SNL_TOKEN_TYPE left, std::vector<SNL_TOKEN_TYPE> right, int id, int idx = 0);
+	//ä¸ç”¨é»˜è®¤æ„é€ å‡½æ•°ï¼Œä»¥ç±»å†…ç›´æ¥å®šä¹‰ä»£æ›¿
+    Production(SNL_TOKEN_TYPE left, std::vector<SNL_TOKEN_TYPE> right, size_t id, size_t idx = 0 );
 	bool operator < (const Production& prod) const;
 	size_t get_id();
-	//×ó²àÊÇ·ñÎªÖÕ¼«·û
+	//å·¦ä¾§æ˜¯å¦ä¸ºç»ˆæç¬¦
 	bool isLeftTerminal();
 	SNL_TOKEN_TYPE getProducitonLeft()const;
 	std::vector<SNL_TOKEN_TYPE> getProductionRight() const;

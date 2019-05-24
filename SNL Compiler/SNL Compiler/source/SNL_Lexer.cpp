@@ -1,4 +1,4 @@
-
+ï»¿
 #define _CRT_SECURE_NO_WARNINGS
 #include"SNL_Lexer.h"
 #include <algorithm>
@@ -86,7 +86,7 @@ map<SNL_TOKEN_TYPE, string> Token_Type_Name_Map = reserveMap<SNL_TOKEN_TYPE, str
 
 const char* Lexer::readFile(const char* path) {
 	
-	//¶ÁÎÄ¼şifstream,Ğ´ÎÄ¼şofstream£¬¿É¶Á¿ÉĞ´fstream
+	//è¯»æ–‡ä»¶ifstream,å†™æ–‡ä»¶ofstreamï¼Œå¯è¯»å¯å†™fstream
 	std::ifstream file(path);
 	if (!file.is_open()) {
 		IO_ERROR("Could`t open file \"%s\".\n", path);
@@ -157,7 +157,7 @@ const stringstream  Lexer::printToken_And_Content() const
 }
 
 
- //ÅĞ¶Ïµ±Ç°µ¥´ÊÊÇ·ñÎª¹Ø¼ü×Ö£¬ÊÇ·µ»ØÏàÓ¦token£¬·ñÔòÊÇÆÕÍ¨±êÊ¶·û
+ //åˆ¤æ–­å½“å‰å•è¯æ˜¯å¦ä¸ºå…³é”®å­—ï¼Œæ˜¯è¿”å›ç›¸åº”tokenï¼Œå¦åˆ™æ˜¯æ™®é€šæ ‡è¯†ç¬¦
  SNL_TOKEN_TYPE  Lexer::idOrKeyword(const char* start, uint32_t length) {
 	 if (start == NULL) {
 		 return TOKEN_ERROR;
@@ -179,13 +179,13 @@ const stringstream  Lexer::printToken_And_Content() const
 	 return TOKEN_ID;
  }
 
- //ÏòÇ°¿´Ò»¸ö×Ö·û
+ //å‘å‰çœ‹ä¸€ä¸ªå­—ç¬¦
  char Lexer::lookAheadChar()
  {
 	 return *this->nextCharPtr;
  }
 
- //Ö¸ÕëÒÆ¶¯£¬Ö¸ÏòÏÂÒ»¸ö×Ö·û
+ //æŒ‡é’ˆç§»åŠ¨ï¼ŒæŒ‡å‘ä¸‹ä¸€ä¸ªå­—ç¬¦
  void Lexer::getNextChar()
  {
 	 if (this->nextCharPtr != NULL) {
@@ -195,7 +195,7 @@ const stringstream  Lexer::printToken_And_Content() const
 	 
  }
 
- //ÏÂÒ»¸ö×Ö·ûÊÇ·ñÓëÔ¤ÆÚÆ¥Åä
+ //ä¸‹ä¸€ä¸ªå­—ç¬¦æ˜¯å¦ä¸é¢„æœŸåŒ¹é…
  bool Lexer::matchNextChar(char expectedChar)
  {
 	 if (this->lookAheadChar() == expectedChar) {
@@ -205,7 +205,7 @@ const stringstream  Lexer::printToken_And_Content() const
 	 return false;
  }
 
- //Ìø¹ıÁ¬Ğø¿Õ°×
+ //è·³è¿‡è¿ç»­ç©ºç™½
 void Lexer::skipBlanks() {
 	if (!(this->curChar)) {
 		return;
@@ -233,7 +233,7 @@ void Lexer::skipAline() {
 
 
 
-//½âÎö±êÊ¶·û£º±äÁ¿Ãû&º¯ÊıÃû
+//è§£ææ ‡è¯†ç¬¦ï¼šå˜é‡å&å‡½æ•°å
 void Lexer::parserId(SNL_TOKEN_TYPE type) {
 	if ((this->curChar)) {
 
@@ -257,7 +257,7 @@ void Lexer::parserId(SNL_TOKEN_TYPE type) {
 
 
 
-//½âÎö×Ö·û´®,Ôİ²»Ö§³Ö×ªÒå×Ö·û
+//è§£æå­—ç¬¦ä¸²,æš‚ä¸æ”¯æŒè½¬ä¹‰å­—ç¬¦
 void Lexer::parseString() {
 
 	while (true) {
@@ -286,7 +286,7 @@ void Lexer::parseNum() {
 }
 
 
-//Ìø¹ı×¢ÊÍ£º¿é×¢ÊÍ&µ¥ĞĞ×¢ÊÍ
+//è·³è¿‡æ³¨é‡Šï¼šå—æ³¨é‡Š&å•è¡Œæ³¨é‡Š
 void Lexer::skipComment() {
 	//char nextChar = this->lookAheadChar();
 
@@ -295,7 +295,7 @@ void Lexer::skipComment() {
 	//	int a = 1;
 	//	this->getNextChar();
 	//	
-	////¿é×¢ÊÍ,like {* .. *}
+	////å—æ³¨é‡Š,like {* .. *}
 	//	while (nextChar != '*' && nextChar != '\0') {
 	//		this->getNextChar();
 	//		if (this->curChar == '\n') {
@@ -311,14 +311,14 @@ void Lexer::skipComment() {
 	//	}
 
 	//}
-	//else {	// µ¥ĞĞ×¢ÊÍ,like {...}
+	//else {	// å•è¡Œæ³¨é‡Š,like {...}
 	//	this->skipAline();
 	//}
 	this->skipBlanks();
 }
 
-//Èôµ±Ç°tokenÎªexpectedÔò¶ÁÈëÏÂÒ»¸ötoken²¢·µ»Øtrue,
-//·ñÔò²»¶ÁÈëtokenÇÒ·µ»Øfalse
+//è‹¥å½“å‰tokenä¸ºexpectedåˆ™è¯»å…¥ä¸‹ä¸€ä¸ªtokenå¹¶è¿”å›true,
+//å¦åˆ™ä¸è¯»å…¥tokenä¸”è¿”å›false
 bool Lexer::matchToken(SNL_TOKEN_TYPE expected) {
 	if (this->curToken.type == expected) {
 		this->getNextToken();
@@ -327,7 +327,7 @@ bool Lexer::matchToken(SNL_TOKEN_TYPE expected) {
 	return false;
 }
 
-//¶ÏÑÔµ±Ç°tokenÎªexpected²¢¶ÁÈëÏÂÒ»token,·ñÔò±¨´íerrMsg
+//æ–­è¨€å½“å‰tokenä¸ºexpectedå¹¶è¯»å…¥ä¸‹ä¸€token,å¦åˆ™æŠ¥é”™errMsg
 void Lexer::consumeCurToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
 	if (this->curToken.type != expected) {
 		COMPILE_ERROR(this, errMsg);
@@ -335,7 +335,7 @@ void Lexer::consumeCurToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
 	this->getNextToken();
 }
 
-//¶ÏÑÔÏÂÒ»¸ötokenÎªexpected,·ñÔò±¨´íerrMsg
+//æ–­è¨€ä¸‹ä¸€ä¸ªtokenä¸ºexpected,å¦åˆ™æŠ¥é”™errMsg
 void Lexer::consumeNextToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
 	this->getNextToken();
 	if (this->curToken.type != expected) {
@@ -344,14 +344,14 @@ void Lexer::consumeNextToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
 }
 
 
-//»ñµÃÏÂÒ»¸ötoken
+//è·å¾—ä¸‹ä¸€ä¸ªtoken
 void Lexer::getNextToken() {
 	this->preToken = this->curToken;
 	this->skipBlanks();
 
-	//ÆğÊ¼ÉèÖÃ
+	//èµ·å§‹è®¾ç½®
 	Token& currentToken = this->curToken;
-	//µÃµ½ÒıÓÃ
+	//å¾—åˆ°å¼•ç”¨
 	SNL_TOKEN_TYPE& curTokenType = currentToken.type;
 	curTokenType = TOKEN_ENDFILE;
 	currentToken.length = 0;
@@ -498,7 +498,7 @@ void Lexer::getNextToken() {
 			break;
 
 		default:
-			//´¦Àí±äÁ¿ÃûºÍÊı×Ö
+			//å¤„ç†å˜é‡åå’Œæ•°å­—
 			if (isalpha(static_cast<unsigned char>(this->curChar)) || this->curChar == '_') {
 				this->parserId(TOKEN_ERROR);
 			}
@@ -511,7 +511,7 @@ void Lexer::getNextToken() {
 			return;
 		}
 
-		// case break ºóµÄ³ö¿Ú
+		// case break åçš„å‡ºå£
 		currentToken.length = (uint32_t)(this->nextCharPtr - this->curToken.start);
 		this->getNextChar();
 		return;
