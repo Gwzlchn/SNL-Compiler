@@ -106,7 +106,7 @@ public:
 	//***************打印相关****************
 	//从容器中得到Token String
 	template <typename T>
-	static string get_token_str(const T& tok_vec);
+    static string get_token_vec_str(const T& tok_vec);
 	stringstream getAllSetMapToStr() const;
 
 

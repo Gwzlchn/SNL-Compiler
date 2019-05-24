@@ -206,7 +206,7 @@ inline void ProductionSet::setUnion(set<SNL_TOKEN_TYPE>& dst, const set<SNL_TOKE
 }
 
 template <typename T>
- string ProductionSet::get_token_str(const T& tok_vec)
+ string ProductionSet::get_token_vec_str(const T& tok_vec)
 {
 	string ret = "";
 	for (auto i = tok_vec.begin(); i != tok_vec.end(); i++) {
@@ -222,7 +222,7 @@ ostream& operator <<(ostream& os, const map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>>
 	for (auto iter = sets.begin(); iter != sets.end(); iter++) {
         if (!is_Token_Terminal(iter->first)) {
             os <<get_Token_Str(iter->first) << "\t\t\t";
-			os << ProductionSet::get_token_str<set<SNL_TOKEN_TYPE>>(iter->second) << std::endl;
+            os << ProductionSet::get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second) << std::endl;
 		}
 	}
 	return os;
@@ -241,10 +241,10 @@ stringstream ProductionSet::getAllSetMapToStr() const
 		if (m_terminal.find(first_iter->first) == m_terminal.end()) {
 			ss << i <<".1\t";
             ss << get_Token_Str(first_iter->first)<< "\t\t\t";
-			ss << get_token_str<set<SNL_TOKEN_TYPE>>(first_iter->second) << std::endl;
+            ss << get_token_vec_str<set<SNL_TOKEN_TYPE>>(first_iter->second) << std::endl;
 			ss << i << ".2\t";
             ss << get_Token_Str(follow_iter->first) << "\t\t\t";
-			ss  << get_token_str<set<SNL_TOKEN_TYPE>>(follow_iter->second) << std::endl;
+            ss  << get_token_vec_str<set<SNL_TOKEN_TYPE>>(follow_iter->second) << std::endl;
 			i++;
 		} 
 		first_iter++;
@@ -261,7 +261,7 @@ ostream& operator <<(ostream& os, const map<int, set<SNL_TOKEN_TYPE>>& predict_s
 	for (auto iter = predict_set.begin(); iter != predict_set.end(); iter++) {
 
 		os << iter->first << "\t";
-		os << ProductionSet::get_token_str<set<SNL_TOKEN_TYPE>>(iter->second) << std::endl;
+        os << ProductionSet::get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second) << std::endl;
 
 	}
 	return os;
