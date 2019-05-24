@@ -80,8 +80,8 @@ public:
     set<SNL_TOKEN_TYPE> get_All_Not_Terminals()const;
     string get_errMsg() const;
 
-	int treeIndex = 0;
-	int global_id = 0;
+    size_t treeIndex = 0;
+    size_t global_id = 0;
 	unsigned int global_token_index;//用于将ID转化为变量名后者函数名等
 
 	string getTree();
@@ -96,7 +96,7 @@ public:
 	int getTokenType(SNL_TOKEN_TYPE tok);
 	//找该终极符是否在右侧表达式出现,出现则返回true,否则返回false;
 	//如果出现,同时返回紧接着字符的First集
-	bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, vector<SNL_TOKEN_TYPE>& after_token,int prod_inx=0);
+    bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, vector<SNL_TOKEN_TYPE>& after_token,size_t prod_inx=0);
 
 	set<SNL_TOKEN_TYPE> getTokenVecFirst(const vector<SNL_TOKEN_TYPE>& tok_vec);
 	set<SNL_TOKEN_TYPE> getOneProdPredict(const Production& prod);

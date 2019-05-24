@@ -101,7 +101,7 @@ void MainWindow::on_pushButton_3_clicked()
     for (auto iter = sets.begin(); iter != sets.end(); iter++) {
         if (m_terminal.find(iter->first) == m_terminal.end()) {
             SetMapTable->setItem(i,0,new QTableWidgetItem(QString::fromStdString(Token_Type_Name_Map.find(iter->first)->second)));
-            SetMapTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_str<set<SNL_TOKEN_TYPE>>(iter->second))));
+            SetMapTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
             i++;
         }
     }
@@ -126,7 +126,7 @@ void MainWindow::on_pushButton_7_clicked()
     for (auto iter = sets.begin(); iter != sets.end(); iter++) {
         if (m_terminal.find(iter->first) == m_terminal.end()) {
             SetMapTable->setItem(i,0,new QTableWidgetItem(QString::fromStdString(Token_Type_Name_Map.find(iter->first)->second)));
-            SetMapTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_str<set<SNL_TOKEN_TYPE>>(iter->second))));
+            SetMapTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
             i++;
         }
     }
@@ -142,7 +142,7 @@ void MainWindow::on_pushButton_4_clicked()
 
     for (auto iter = m_predict_set.begin(); iter != m_predict_set.end(); iter++) {
             ProductionSetTable->setItem(i,0,new QTableWidgetItem(iter->first));
-            ProductionSetTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_str<set<SNL_TOKEN_TYPE>>(iter->second))));
+            ProductionSetTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
             i++;
     }
     ProductionSetTable->show();

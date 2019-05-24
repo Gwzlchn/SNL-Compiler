@@ -35,7 +35,7 @@ ProductionSet::ProductionSet(string prods_file_name) {
 	//std::cout << getPredictMapToStr().str();
 	//std::cout << getLL1AnalyseMapToStr().str();
 
-	int a = 1;
+    //int a = 1;
 	//this->PrintLL1AnalyseMap();
 }
 
@@ -412,7 +412,7 @@ void ProductionSet::setTokenFollowSet()
 bool ProductionSet::getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, \
 											const Production& prod, \
 											vector<SNL_TOKEN_TYPE>& after_token,\
-											int prod_inx)
+                                            size_t prod_inx)
 {
 	vector<SNL_TOKEN_TYPE> right = prod.getProductionRight();
 	bool found = false;
@@ -483,13 +483,13 @@ void ProductionSet::setAnalyseMap(){
 			m_LL1_Analyse_Map[i][j] = 0;
 		}
 	}
-	size_t ter_size = m_terminal.size();
+//	size_t ter_size = m_terminal.size();
 
 	for (auto prod_iter = m_productions.begin(); \
 		prod_iter != m_productions.end(); prod_iter++) {
 
 		SNL_TOKEN_TYPE left = prod_iter->getProducitonLeft();
-		int prod_id = prod_iter->get_id();
+        size_t prod_id = prod_iter->get_id();
 		//找到当前Predict集
 		set<SNL_TOKEN_TYPE>& cur_predict = m_predict_set.find(prod_iter->get_id())->second;
 		for (auto ter_iter = cur_predict.begin(); \
