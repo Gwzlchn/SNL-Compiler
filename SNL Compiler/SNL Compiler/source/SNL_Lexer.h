@@ -1,4 +1,4 @@
-﻿
+
 #ifndef SNL_Lexer_H
 #define SNL_Lexer_H
 

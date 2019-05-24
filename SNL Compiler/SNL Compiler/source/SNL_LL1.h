@@ -1,4 +1,4 @@
-﻿#ifndef SNL_LL1_H
+#ifndef SNL_LL1_H
 #define SNL_LL1_H
 
 
