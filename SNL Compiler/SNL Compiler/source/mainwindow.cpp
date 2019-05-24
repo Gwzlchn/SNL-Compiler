@@ -100,7 +100,7 @@ void MainWindow::on_pushButton_3_clicked()
     auto m_terminal=p->get_All_Terminals();
     for (auto iter = sets.begin(); iter != sets.end(); iter++) {
         if (m_terminal.find(iter->first) == m_terminal.end()) {
-            SetMapTable->setItem(i,0,new QTableWidgetItem(QString::fromStdString(Token_Type_Name_Map.find(iter->first)->second)));
+            SetMapTable->setItem(i,0,new QTableWidgetItem(QString::fromStdString(get_Token_Str(iter->first))));
             SetMapTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
             i++;
         }
@@ -125,7 +125,7 @@ void MainWindow::on_pushButton_7_clicked()
     auto m_terminal=p->get_All_Terminals();
     for (auto iter = sets.begin(); iter != sets.end(); iter++) {
         if (m_terminal.find(iter->first) == m_terminal.end()) {
-            SetMapTable->setItem(i,0,new QTableWidgetItem(QString::fromStdString(Token_Type_Name_Map.find(iter->first)->second)));
+            SetMapTable->setItem(i,0,new QTableWidgetItem(QString::fromStdString(get_Token_Str(iter->first))));
             SetMapTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
             i++;
         }
