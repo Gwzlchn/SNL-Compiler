@@ -1,4 +1,4 @@
-﻿#include "SNL_LL1.h"
+#include "SNL_LL1.h"
 #include "SNL_Lexer.h"
 #include "SNL_Tokens.h"
 
@@ -51,8 +51,8 @@ ProductionSet::ProductionSet(string prods_file_name) {
 	this->setPredictSet();
 	this->setAnalyseMap();
 
-	//std::cout << m_first_sets;
-	//std::cout << m_follow_sets;
+    std::cout << m_first_sets;
+   std::cout << m_follow_sets;
 	//std::cout << getSetMapToStr(m_first_sets).str();
 	//std::cout << getSetMapToStr(m_follow_sets).str();
 	//std::cout << getAllSetMapToStr().str();
@@ -71,11 +71,12 @@ vector<Production> ProductionSet::makePordsFromFile(const string& file_name) con
 	if (!infile)
 	{
 		std::cerr << "文件打开失败！" << std::endl;
+        exit(-1);
 	}
 	string line;//从文件中读取一行产生式
 	string substr;//承载分割后的字符串
 	bool equalFlag = false;//标志是否已读到"::="这个符号
-	int seqNum = 1;//当前行号，也即产生式的编号
+    size_t seqNum = 1;//当前行号，也即产生式的编号
 
 
 	while (getline(infile, line))
@@ -579,7 +580,7 @@ int ProductionSet::grammarAnalysis()
 				//非终极符 寻找 t->啥 的Predict集 中有输入流当前索引符号
 				bool notFound = true;
 				for (map<int, set<SNL_TOKEN_TYPE>>::iterator a = m_predict_set.begin(); a != m_predict_set.end();a++) {
-					const Production& cur_prod = m_productions[a->first - 1];
+                    const Production& cur_prod = m_productions[size_t(a->first - 1)];
 					if (cur_prod.getProducitonLeft() != t)continue;
 					set<SNL_TOKEN_TYPE>::iterator f;
 					if (Token_Type_Name_Map.find(r)->second == "ID") {
@@ -606,13 +607,11 @@ int ProductionSet::grammarAnalysis()
 					break;
 				}
 				if (notFound) {
-					system("pause");
-					return 0;
 					// 出错
-					/*errMsg = "[Grammatical error] line " +
-						to_string(tokenSymbols[static_cast<unsigned int>(i)].line) + " Current parsing \'" +
-						r.v + "\'";
-					return E_GRAMMAR;*/
+                    analyse_err =  " Current parsing \'" +\
+                            Token_Type_Name_Map.find(r)->second + "\' and " + \
+                            Token_Type_Name_Map.find(t)->second +  "\n";
+                    return -1;
 					//cerr << "[error] " << __LINE__ << " " << t << " can not predict " << r << endl;
 					//cerr << "at line " << tokenSymbols[i].line << endl;
 					//exit(-1);
@@ -631,12 +630,10 @@ int ProductionSet::grammarAnalysis()
 						continue;
 					}
 					else {
-						system("pause");
-						return 0;
-						/*errMsg = "[Grammatical error] line " +
-							to_string(tokenSymbols[static_cast<unsigned int>(i)].line) +
-							" Current parsing \'" + r.v + "\'";
-						return E_GRAMMAR;*/
+                        analyse_err =  " Current parsing \'" +\
+                                Token_Type_Name_Map.find(r)->second + "\' and " + \
+                                Token_Type_Name_Map.find(t)->second +  "\n";
+                        return -1;
 						// 出错
 						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
 						//	<< endl;
@@ -658,12 +655,10 @@ int ProductionSet::grammarAnalysis()
 						continue;
 					}
 					else {
-						system("pause");
-						return 0;
-						/*errMsg = "[Grammatical error] line " +
-							to_string(tokenSymbols[static_cast<unsigned int>(i)].line) +
-							" Current parsing \'" + r.v + "\'";
-						return E_GRAMMAR;*/
+                        analyse_err =  " Current parsing \'" +\
+                                Token_Type_Name_Map.find(r)->second + "\' and " + \
+                                Token_Type_Name_Map.find(t)->second +  "\n";
+                        return -1;
 						// 出错
 						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
 						//	<< endl;
@@ -685,13 +680,11 @@ int ProductionSet::grammarAnalysis()
 						continue;
 					}
 					else {
-						system("pause");
-						return 0;
-						//// 出错
-						//errMsg = "[Grammatical error] line " +
-						//	to_string(tokenSymbols[static_cast<unsigned int>(i)].line) +
-						//	" Current parsing \'" + r.v + "\'";
-						//return E_GRAMMAR;
+
+                        analyse_err =  " Current parsing \'" +\
+                                Token_Type_Name_Map.find(r)->second + "\' and " + \
+                                Token_Type_Name_Map.find(t)->second +  "\n";
+                        return -1;
 						//cerr << "[error] " << __LINE__ << " Top of stack is " << t << " but head of queue is " << r
 						//	<< endl;
 						//cerr << "at line " << tokenSymbols[i].line << endl;
@@ -746,7 +739,7 @@ string ProductionSet::getTree()
 			if (Token_Terminal_Map.find(c->curr)->second) {
 				if (c->curr == TOKEN_BLANK) {
 					ss << "\"" << c->id << "\" [shape=square; style=filled; fillcolor=cornsilk; label=\""
-						<< "ε" << "\"];" << std::endl;
+                        << "BLANK" << "\"];" << std::endl;
 				}
 				else if (Token_Type_Name_Map.find(c->curr)->second == "ID") {
 					ss << "\"" << c->id << "\" [shape=square; style=filled; fillcolor=lightpink; label=\""
@@ -801,4 +794,6 @@ set<SNL_TOKEN_TYPE> ProductionSet::get_All_Not_Terminals()const{
     return m_notTerminal;
 }
 
-
+string ProductionSet::get_errMsg() const{
+    return analyse_err;
+}

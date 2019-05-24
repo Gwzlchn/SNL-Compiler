@@ -1,4 +1,5 @@
-﻿
+﻿#ifndef SNL_PRODUCTION_H
+#define SNL_PRODUCTION_H
 #include"SNL_Tokens.h"
 
 #include<vector>
@@ -28,3 +29,4 @@ public:
 	std::set<SNL_TOKEN_TYPE> getProdNotTer();
 };
 
+#endif //SNL_PRODUCTION_H

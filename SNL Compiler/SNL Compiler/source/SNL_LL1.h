@@ -1,5 +1,5 @@
-﻿#ifndef _SNL_LL1_H
-#define _SNL_LL1_H
+﻿#ifndef SNL_LL1_H
+#define SNL_LL1_H
 
 
 #include"SNL_Tokens.h"
@@ -54,6 +54,8 @@ private:
 	//产生式顺序
 	vector<Production> vTree;
 
+    string analyse_err = "";
+
 public:
 
 	ProductionSet(string prods_file_name);
@@ -76,6 +78,7 @@ public:
     map<int, set<SNL_TOKEN_TYPE>> get_Predict_Sets()const;
     set<SNL_TOKEN_TYPE> get_All_Terminals()const;
     set<SNL_TOKEN_TYPE> get_All_Not_Terminals()const;
+    string get_errMsg() const;
 
 	int treeIndex = 0;
 	int global_id = 0;

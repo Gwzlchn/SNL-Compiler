@@ -25,7 +25,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++14
 
 SOURCES += \
-        source/SNL_Compiler.cpp \
         source/SNL_LL1.cpp \
         source/SNL_Lexer.cpp \
         source/SNL_Production.cpp \

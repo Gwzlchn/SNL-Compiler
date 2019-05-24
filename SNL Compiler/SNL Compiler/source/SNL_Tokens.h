@@ -1,5 +1,5 @@
-﻿#ifndef _SNL_Tokens_H
-#define _SNL_Tokens_H
+﻿#ifndef SNL_Tokens_H
+#define SNL_Tokens_H
 
 #include<map>
 #include<string>

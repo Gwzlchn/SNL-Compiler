@@ -1,6 +1,6 @@
 ﻿
-#ifndef _SNL_Lexer_H
-#define _SNL_Lexer_H
+#ifndef SNL_Lexer_H
+#define SNL_Lexer_H
 
 #include"Utils.h"
 #include"SNL_Tokens.h"
