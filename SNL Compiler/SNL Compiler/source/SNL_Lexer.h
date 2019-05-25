@@ -69,6 +69,7 @@ using std::string;
 	 void consumeCurToken(SNL_TOKEN_TYPE expected, const char* errMsg);
 	 void consumeNextToken(SNL_TOKEN_TYPE expected, const char* errMsg);
 	 vector<SNL_TOKEN_TYPE> getTokenVec();	
+     vector<string> getTokenContantVec();
 	 const stringstream printToken_And_Content() const ;
  };
 

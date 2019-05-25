@@ -125,7 +125,10 @@ vector<SNL_TOKEN_TYPE> Lexer::getTokenVec()
 	return this->m_Token_Vec;
 }
 
-
+vector<string> Lexer::getTokenContantVec()
+{
+    return this->m_Token_Contant_Vec;
+}
 
 
 const stringstream  Lexer::printToken_And_Content() const

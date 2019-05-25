@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="TokenList">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -30,7 +30,7 @@
      <string>TokenList</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="FollowTable">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -46,7 +46,7 @@
      <string>FollowTable</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_4">
+   <widget class="QPushButton" name="PredicctTable">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -78,7 +78,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="InputToken">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -91,7 +91,7 @@
      <string>InputToken</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_5">
+   <widget class="QPushButton" name="save">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -104,7 +104,7 @@
      <string>Save</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_6">
+   <widget class="QPushButton" name="InputProductionset">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -117,7 +117,7 @@
      <string>InputProductionSet</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_7">
+   <widget class="QPushButton" name="FirstTable">
     <property name="geometry">
      <rect>
       <x>290</x>

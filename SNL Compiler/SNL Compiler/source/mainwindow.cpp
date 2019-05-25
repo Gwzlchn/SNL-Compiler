@@ -24,7 +24,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_InputToken_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, "打开文件", ".", "Txt(*.txt);;c files(*.c);; cpp files(*.cpp)");
         if(filename.isEmpty() == false)
@@ -47,7 +47,7 @@ void MainWindow::on_pushButton_clicked()
         }
 }
 
-void MainWindow::on_pushButton_5_clicked()
+void MainWindow::on_save_clicked()
 {
     QString filename = QFileDialog::getSaveFileName(this, "保存文件", ".", "Txt(*.txt);;c files(*.c);;c++ files(*.cpp)");
         if(filename.isEmpty() == false)
@@ -63,7 +63,7 @@ void MainWindow::on_pushButton_5_clicked()
         }
 }
 
-void MainWindow::on_pushButton_6_clicked()
+void MainWindow::on_InputProductionset_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, "打开文件", ".", "Txt(*.txt);;c files(*.c);; cpp files(*.cpp)");
         if(filename.isEmpty() == false)
@@ -91,59 +91,78 @@ void MainWindow::on_pushButton_6_clicked()
         std::cout<<p->getTree();
 }
 
-void MainWindow::on_pushButton_3_clicked()
-{
-    map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> sets = p->get_Follow_Sets();
-    QTableWidget* SetMapTable = new QTableWidget(sets.size(),2);
-    SetMapTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
-    int i=0;
-    auto m_terminal=p->get_All_Terminals();
-    for (auto iter = sets.begin(); iter != sets.end(); iter++) {
-        if (m_terminal.find(iter->first) == m_terminal.end()) {
-            SetMapTable->setItem(i,0,new QTableWidgetItem(QString::fromStdString(get_Token_Str(iter->first))));
-            SetMapTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
-            i++;
-        }
-    }
-    SetMapTable->show();
-}
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_TokenList_clicked()
 {
-    lex->RunFile();
-     QTableWidget* TokenTable = new QTableWidget(1,1);
-     TokenTable->setItem(0,0,new QTableWidgetItem(QString::fromStdString(lex->printToken_And_Content().str())));
+     lex->RunFile();
+     QTableWidget* TokenTable = new QTableWidget(0,2);
+
+     vector<SNL_TOKEN_TYPE>m_Token_Vec = lex->getTokenVec();
+     vector<string>m_Token_Contant_Vec = lex->getTokenContantVec();
+     auto token_iter = m_Token_Vec.begin();
+     auto token_contain_iter = m_Token_Contant_Vec.begin();
+     while (token_iter != m_Token_Vec.end() || token_contain_iter != m_Token_Contant_Vec.end()) {
+         int row = TokenTable->rowCount();
+         TokenTable->insertRow(row);
+         TokenTable->setItem(row,0,new QTableWidgetItem(QString::fromStdString(get_Token_Str(*token_iter))));
+         TokenTable->setItem(row,1,new QTableWidgetItem(QString::fromStdString(*token_contain_iter)));
+
+         if (token_iter != m_Token_Vec.end()) {
+             token_iter++;
+         }
+         if (token_contain_iter != m_Token_Contant_Vec.end()) {
+             token_contain_iter++;
+         }
+     }
      TokenTable->show();
 }
 
-void MainWindow::on_pushButton_7_clicked()
+void MainWindow::on_FirstTable_clicked()
 {
     map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> sets = p->get_First_Sets();
-    QTableWidget* SetMapTable = new QTableWidget(sets.size(),2);
-    SetMapTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
-    int i=0;
+    QTableWidget* FirstTable = new QTableWidget(0,2);
+    FirstTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
     auto m_terminal=p->get_All_Terminals();
     for (auto iter = sets.begin(); iter != sets.end(); iter++) {
         if (m_terminal.find(iter->first) == m_terminal.end()) {
-            SetMapTable->setItem(i,0,new QTableWidgetItem(QString::fromStdString(get_Token_Str(iter->first))));
-            SetMapTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
-            i++;
+            int row = FirstTable->rowCount();
+            FirstTable->insertRow(row);
+            FirstTable->setItem(row,0,new QTableWidgetItem(QString::fromStdString(get_Token_Str(iter->first))));
+            FirstTable->setItem(row,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
         }
     }
-    SetMapTable->show();
+    FirstTable->show();
 }
 
-void MainWindow::on_pushButton_4_clicked()
+void MainWindow::on_FollowTable_clicked()
+{
+    map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> sets = p->get_Follow_Sets();
+    QTableWidget* FollowTable = new QTableWidget(0,2);
+    FollowTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
+    auto m_terminal=p->get_All_Terminals();
+    for (auto iter = sets.begin(); iter != sets.end(); iter++) {
+        if (m_terminal.find(iter->first) == m_terminal.end()) {
+            int row = FollowTable->rowCount();
+            FollowTable->insertRow(row);
+            FollowTable->setItem(row,0,new QTableWidgetItem(QString::fromStdString(get_Token_Str(iter->first))));
+            FollowTable->setItem(row,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
+        }
+    }
+    FollowTable->show();
+}
+
+void MainWindow::on_PredicctTable_clicked()
 {
     map<int, set<SNL_TOKEN_TYPE>> m_predict_set = p->get_Predict_Sets();
-    QTableWidget* ProductionSetTable = new QTableWidget(m_predict_set.size(),2);
-    ProductionSetTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
-    int i=0;
+    QTableWidget* PredictTable = new QTableWidget(0,2);
+    PredictTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
 
     for (auto iter = m_predict_set.begin(); iter != m_predict_set.end(); iter++) {
-            ProductionSetTable->setItem(i,0,new QTableWidgetItem(iter->first));
-            ProductionSetTable->setItem(i,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
-            i++;
+        int row = PredictTable->rowCount();
+        PredictTable->insertRow(row);
+        PredictTable->setItem(row,0,new QTableWidgetItem(QString::number(iter->first)));
+        PredictTable->setItem(row,1,new QTableWidgetItem(QString::fromStdString(p->get_token_vec_str<set<SNL_TOKEN_TYPE>>(iter->second))));
     }
-    ProductionSetTable->show();
+    PredictTable->show();
 }
+

@@ -38,7 +38,6 @@ HEADERS += \
         source/SNL_Lexer.h \
         source/SNL_Production.h \
         source/SNL_Tokens.h \
-        source/TokenName.h \
         source/Utils.h \
         source/mainwindow.h \
         source/mainwindow.h \

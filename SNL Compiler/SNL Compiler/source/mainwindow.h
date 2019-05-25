@@ -16,19 +16,19 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_InputToken_clicked();
 
-    void on_pushButton_5_clicked();
+    void on_save_clicked();
 
-    void on_pushButton_6_clicked();
+    void on_InputProductionset_clicked();
 
-    void on_pushButton_3_clicked();
+    void on_FollowTable_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_TokenList_clicked();
 
-    void on_pushButton_7_clicked();
+    void on_FirstTable_clicked();
 
-    void on_pushButton_4_clicked();
+    void on_PredicctTable_clicked();
 
 private:
     Ui::MainWindow *ui;
