@@ -95,7 +95,7 @@ void MainWindow::on_InputProductionset_clicked()
 void MainWindow::on_TokenList_clicked()
 {
      lex->RunFile();
-     QTableWidget* TokenTable = new QTableWidget(0,2);
+     QTableWidget* TokenTable = new QTableWidget(1,2);
 
      vector<SNL_TOKEN_TYPE>m_Token_Vec = lex->getTokenVec();
      vector<string>m_Token_Contant_Vec = lex->getTokenContantVec();
@@ -120,7 +120,7 @@ void MainWindow::on_TokenList_clicked()
 void MainWindow::on_FirstTable_clicked()
 {
     map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> sets = p->get_First_Sets();
-    QTableWidget* FirstTable = new QTableWidget(0,2);
+    QTableWidget* FirstTable = new QTableWidget(1,2);
     FirstTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
     auto m_terminal=p->get_All_Terminals();
     for (auto iter = sets.begin(); iter != sets.end(); iter++) {
@@ -137,7 +137,7 @@ void MainWindow::on_FirstTable_clicked()
 void MainWindow::on_FollowTable_clicked()
 {
     map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> sets = p->get_Follow_Sets();
-    QTableWidget* FollowTable = new QTableWidget(0,2);
+    QTableWidget* FollowTable = new QTableWidget(1,2);
     FollowTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
     auto m_terminal=p->get_All_Terminals();
     for (auto iter = sets.begin(); iter != sets.end(); iter++) {
@@ -154,7 +154,7 @@ void MainWindow::on_FollowTable_clicked()
 void MainWindow::on_PredicctTable_clicked()
 {
     map<int, set<SNL_TOKEN_TYPE>> m_predict_set = p->get_Predict_Sets();
-    QTableWidget* PredictTable = new QTableWidget(0,2);
+    QTableWidget* PredictTable = new QTableWidget(1,2);
     PredictTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
 
     for (auto iter = m_predict_set.begin(); iter != m_predict_set.end(); iter++) {
