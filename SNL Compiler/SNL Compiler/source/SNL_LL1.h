@@ -84,10 +84,12 @@ public:
     size_t global_id = 0;
 	unsigned int global_token_index;//用于将ID转化为变量名后者函数名等
 
-	string getTree();
+
 	void dfsBuildTree(Node*& parent);
 	int grammarAnalysis();
-	
+    bool buildTree();
+    string getTreeToStr() const;
+    string getTreeToDOTLanguage() const;
 
 	//构造集合时用到的函数
 	set<SNL_TOKEN_TYPE> setRemoveBlank(const set<SNL_TOKEN_TYPE>& src) const;

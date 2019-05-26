@@ -29,6 +29,7 @@ ProductionSet::ProductionSet(string prods_file_name) {
 
     std::cout << m_first_sets;
    std::cout << m_follow_sets;
+   m_root = NULL;
 	//std::cout << getSetMapToStr(m_first_sets).str();
 	//std::cout << getSetMapToStr(m_follow_sets).str();
 	//std::cout << getAllSetMapToStr().str();
@@ -683,30 +684,40 @@ void ProductionSet::setInputStrem(const vector<SNL_TOKEN_TYPE>& input_stream)
 
 
 
+bool ProductionSet::buildTree(){
+    int global_id = 1;
+
+    m_root = new Node(vTree[0].getProducitonLeft(), nullptr, global_id++);
+    vector<SNL_TOKEN_TYPE> cur_right = vTree[0].getProductionRight();
+    for (auto iter = cur_right.begin(); iter != cur_right.end();iter++) {
+        m_root->children.emplace_back(new Node(*iter, m_root, global_id++));
+    }
+    treeIndex = 1;
+    global_token_index = 0;
+    for (unsigned int i = 0; i < m_root->children.size(); i++) {
+        if (is_Token_Terminal(m_root->children[i]->curr))continue;
+        dfsBuildTree(m_root->children[i]);
+    }
 
 
-string ProductionSet::getTree()
+}
+
+
+
+string ProductionSet::getTreeToStr() const {
+
+}
+
+
+string ProductionSet::getTreeToDOTLanguage() const
 {
-		int global_id = 1;
-
-		Node* root = new Node(vTree[0].getProducitonLeft(), nullptr, global_id++);
-		vector<SNL_TOKEN_TYPE> cur_right = vTree[0].getProductionRight();
-		for (auto iter = cur_right.begin(); iter != cur_right.end();iter++) {
-			root->children.emplace_back(new Node(*iter, root, global_id++));
-		}
-		treeIndex = 1;
-		global_token_index = 0;
-		for (unsigned int i = 0; i < root->children.size(); i++) {
-            if (is_Token_Terminal(root->children[i]->curr))continue;
-			dfsBuildTree(root->children[i]);
-		}
 
 		std::stringstream ss;//把DOT Language表示的语法树的字符串放到这里边
 
 		ss.clear();
 		ss << "digraph GrammarTree {" << std::endl;
 		std::queue<Node*> q;
-		q.push(root);
+        q.push(m_root);
 		while (!q.empty()) {
 			Node* c = q.front();
 			q.pop();
@@ -752,6 +763,17 @@ string ProductionSet::getTree()
 		ss << "}" << std::endl;
 		return ss.str();
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> ProductionSet::get_First_Sets() const {
