@@ -59,11 +59,11 @@ void MainWindow::on_GrammarTree_clicked()
 
     };
     p->buildTree();
-    string stdString = p->getTreeToStr();
+    string stdString = p->getTreeToDOTLanguage();
     QByteArray byteArray(stdString.c_str(), stdString.length());
     ui->textBrowser->setText(byteArray);
 
-    stdString = p->getTreeToDOTLanguage();
+    stdString = p->getTreeToStr();
     QByteArray byteArrayGT(stdString.c_str(), stdString.length());
     QWidget *Win = new QWidget();
     QLabel *GT=new QLabel(Win);
