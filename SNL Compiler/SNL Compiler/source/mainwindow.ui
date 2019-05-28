@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1002</width>
-    <height>847</height>
+    <height>697</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,8 +20,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>720</y>
+      <x>30</x>
+      <y>590</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -36,8 +36,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>800</x>
-      <y>720</y>
+      <x>810</x>
+      <y>590</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -52,8 +52,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>720</y>
+      <x>260</x>
+      <y>590</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -70,8 +70,8 @@
      <rect>
       <x>20</x>
       <y>60</y>
-      <width>921</width>
-      <height>621</height>
+      <width>931</width>
+      <height>501</height>
      </rect>
     </property>
     <property name="readOnly">
@@ -120,8 +120,8 @@
    <widget class="QPushButton" name="FirstTable">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>720</y>
+      <x>530</x>
+      <y>590</y>
       <width>131</width>
       <height>41</height>
      </rect>
