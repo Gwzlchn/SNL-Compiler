@@ -9,6 +9,7 @@
 #include <QTableWidget>
 #include <QMessageBox>
 #include <QLabel>
+#include <QScrollArea>
 using namespace std;
 
 ProductionSet* p=NULL;
@@ -171,15 +172,15 @@ void MainWindow::on_PredicctTable_clicked()
 void MainWindow::on_GrammarTree_clicked()
 {
     if(p==NULL&lex==NULL){
-        QMessageBox::warning(NULL, "warning", "Token and productionset missing", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        QMessageBox::warning(NULL, "warning", "Token and productionset are missing", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
         return;
     }
     if(p==NULL){
-        QMessageBox::warning(NULL, "warning", "Token missing", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        QMessageBox::warning(NULL, "warning", "Productionset missing", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
         return;
     }
     if(lex==NULL){
-        QMessageBox::warning(NULL, "warning", "Productionset missing", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        QMessageBox::warning(NULL, "warning", "Token missing", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
         return;
     }
     vector<SNL_TOKEN_TYPE> in = lex->getTokenVec();
@@ -196,9 +197,13 @@ void MainWindow::on_GrammarTree_clicked()
 
     stdString = p->getTreeToStr();
     QByteArray byteArrayGT(stdString.c_str(), stdString.length());
-    QWidget *Win = new QWidget();
-    QLabel *GT=new QLabel(Win);
-    GT->setText(byteArrayGT);
-    GT->adjustSize();
-    Win->show();
+    QTabWidget *tabwidget = new QTabWidget;
+    QScrollArea *scrollArea = new QScrollArea;
+    QLabel *widget = new QLabel;
+    widget->setText(byteArrayGT);
+    widget->adjustSize();
+    scrollArea->setWidget(widget);
+    tabwidget->addTab(scrollArea,"GrammarTree");
+    tabwidget->show();
+
 }
