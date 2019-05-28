@@ -8,9 +8,7 @@
 #include<map>
 #include<string>
 #include<vector>
-#include<sys/stat.h>
-#include<cstring>
-#include<sstream>
+
 
 using std::stringstream;
 using std::vector;
@@ -47,7 +45,9 @@ using std::string;
  public:
 	 Lexer(const char* file);
 	const char* readFile(const char* path);
-	 void RunFile();
+
+    string lex_err_msg = "";
+     bool RunFile();
 	 const char* getFileName();
 
 	 uint32_t getCurrentLineNo();
@@ -63,7 +63,7 @@ using std::string;
 	 void skipAline();
 	 void skipComment();
 	 
-	 void getNextToken();
+     bool getNextToken();
 
 	 bool matchToken( SNL_TOKEN_TYPE expected);
 	 void consumeCurToken(SNL_TOKEN_TYPE expected, const char* errMsg);

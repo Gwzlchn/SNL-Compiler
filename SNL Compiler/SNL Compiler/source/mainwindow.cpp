@@ -83,12 +83,12 @@ void MainWindow::on_InputProductionset_clicked()
             file.close();//文件读取完毕后关闭文件。
         }
         vector<SNL_TOKEN_TYPE> in = lex->getTokenVec();
-        p->setInputStrem(in);
+        p->setInputStrem(lex->getTokenVec(),lex->getTokenContantVec());
         if(p->grammarAnalysis() == -1){
             std::cout<<p->get_errMsg();
 
         };
-        std::cout<<p->getTree();
+        std::cout<<p->getTreeToDOTLanguage();
 }
 
 

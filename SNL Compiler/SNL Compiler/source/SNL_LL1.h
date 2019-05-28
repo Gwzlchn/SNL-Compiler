@@ -50,17 +50,21 @@ private:
 	//非终极符集合
 	set<SNL_TOKEN_TYPE> m_notTerminal;
 	//输入流
-	vector<SNL_TOKEN_TYPE> m_input_stream;
+    vector<SNL_TOKEN_TYPE> m_input_token_stream;
+    vector<string> m_input_token_contains_stream;
 	//产生式顺序
 	vector<Production> vTree;
 
     string analyse_err = "";
 
+    Node* m_root;
 public:
 
 	ProductionSet(string prods_file_name);
-	vector<Production> makePordsFromFile(const string& file_name)const;
-	void setInputStrem(const vector<SNL_TOKEN_TYPE>& input_stream);
+    string make_prods_file_err_msg;
+    bool makePordsFromFile(const string& file_name,vector<Production>& to_set_prods) const;
+    void setInputStrem(const vector<SNL_TOKEN_TYPE>& input_tkn_stream,\
+                       const vector<string> input_tkn_contrain_stream);
 	
 	//终极符、非终极符
 	void setTokenTerminalOrNot();
@@ -80,16 +84,13 @@ public:
     set<SNL_TOKEN_TYPE> get_All_Not_Terminals()const;
     string get_errMsg() const;
 
-    size_t treeIndex = 0;
-    size_t global_id = 0;
-	unsigned int global_token_index;//用于将ID转化为变量名后者函数名等
 
 
-	void dfsBuildTree(Node*& parent);
-	int grammarAnalysis();
+
+    void dfsBuildTree(Node*& parent,size_t& treeIndex,size_t& global_id,size_t& global_token_id);
+    bool grammarAnalysis();
     bool buildTree();
-    string getTreeToStr() const;
-    string getTreeToDOTLanguage() const;
+
 
 	//构造集合时用到的函数
 	set<SNL_TOKEN_TYPE> setRemoveBlank(const set<SNL_TOKEN_TYPE>& src) const;
@@ -100,8 +101,8 @@ public:
 	//如果出现,同时返回紧接着字符的First集
     bool getAfterTokenInRightProd(const SNL_TOKEN_TYPE& to_find, const Production& prod, vector<SNL_TOKEN_TYPE>& after_token,size_t prod_inx=0);
 
-	set<SNL_TOKEN_TYPE> getTokenVecFirst(const vector<SNL_TOKEN_TYPE>& tok_vec);
-	set<SNL_TOKEN_TYPE> getOneProdPredict(const Production& prod);
+    set<SNL_TOKEN_TYPE> getTokenVecFirst(const vector<SNL_TOKEN_TYPE>& tok_vec);
+    set<SNL_TOKEN_TYPE> getOneProdPredict(const Production& prod);
 
 
 
@@ -109,9 +110,11 @@ public:
 	//从容器中得到Token String
 	template <typename T>
     static string get_token_vec_str(const T& tok_vec);
-	stringstream getAllSetMapToStr() const;
+    stringstream getAllSetMapToStr() const;
 
-
+    string getTreeToStr() const;
+    string getTreeToStrSub(string lftstr,string append,Node* node) const;
+    string getTreeToDOTLanguage() const;
 
 
 	

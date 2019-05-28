@@ -1,10 +1,12 @@
 
-#define _CRT_SECURE_NO_WARNINGS
+
 #include"SNL_Lexer.h"
 #include <algorithm>
 #include <sstream>
 #include <iostream>     // std::streambuf, std::cout
 #include <fstream>  
+#include<sys/stat.h>
+#include<cstring>
 
 
 
@@ -62,8 +64,8 @@
  Lexer::Lexer(const char* file) {
 	 
 	 this->file = file;
-	 this->sourceCode = this->readFile(file);
-	 this->curChar = *this->sourceCode;
+    this->sourceCode = this->readFile(file);
+     this->curChar = *this->sourceCode;
 	 this->nextCharPtr = this->sourceCode + 1;
 
 	 this->curToken.lineNo = 1;
@@ -79,7 +81,7 @@ const char* Lexer::readFile(const char* path) {
 	
 	//读文件ifstream,写文件ofstream，可读可写fstream
 	std::ifstream file(path);
-	if (!file.is_open()) {
+    if (!file.is_open()) {
 		IO_ERROR("Could`t open file \"%s\".\n", path);
 	}
 	std::stringstream buffer;
@@ -87,22 +89,24 @@ const char* Lexer::readFile(const char* path) {
 		 
 	std::string s = buffer.str() + '\0';
 		 
-	char* str = (char*)malloc(s.size() + 1);
-	strcpy(str, s.c_str());
-	return str;
+    char* str = (char*)malloc(s.size() + 1);
+    strcpy(str, s.c_str());
+    return str;
 
 }
 
 
 
 
-void Lexer::RunFile() {
-
+bool Lexer::RunFile() {
 	 while (this->curToken.type != TOKEN_ENDFILE) {
-		 this->getNextToken();
-		 string cur_str(this->curToken.start, this->curToken.length);
-		 this->m_Token_Contant_Vec.push_back(cur_str);
-		 this->m_Token_Vec.push_back(this->curToken.type);
+         if(this->getNextToken()){
+             string cur_str(this->curToken.start, this->curToken.length);
+             this->m_Token_Contant_Vec.push_back(cur_str);
+             this->m_Token_Vec.push_back(this->curToken.type);
+         }else{
+             return false;
+         }
 	 }
  }
 
@@ -339,7 +343,7 @@ void Lexer::consumeNextToken(SNL_TOKEN_TYPE expected, const char* errMsg) {
 
 
 //获得下一个token
-void Lexer::getNextToken() {
+bool Lexer::getNextToken() {
 	this->preToken = this->curToken;
 	this->skipBlanks();
 
@@ -500,15 +504,17 @@ void Lexer::getNextToken() {
 				this->parseNum();
 			}
 			else {
-				LEX_ERROR(this, "unsupport char: \'%c\', quit.", this->curChar);
+                lex_err_msg = "unsupport char:  " + std::string(1,this->curChar) +"  quit.";
+
+                return false;
 			}
-			return;
+            return true;
 		}
 
 		// case break 后的出口
 		currentToken.length = (uint32_t)(this->nextCharPtr - this->curToken.start);
 		this->getNextChar();
-		return;
+        return true;
 
 	}
 }
