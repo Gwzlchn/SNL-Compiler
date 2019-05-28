@@ -7,6 +7,7 @@
 #include"SNL_Lexer.h"
 #include <iostream>
 #include <QTableWidget>
+#include <QLabel>
 using namespace std;
 
 ProductionSet* p;
@@ -27,40 +28,48 @@ MainWindow::~MainWindow()
 void MainWindow::on_InputToken_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, "打开文件", ".", "Txt(*.txt);;c files(*.c);; cpp files(*.cpp)");
-        if(filename.isEmpty() == false)
+    if(filename.isEmpty() == false)
+    {
+        QFile file(filename);
+        QByteArray ba = filename.toLatin1();
+        const char *c = ba.data();
+        lex = new Lexer(c);
+        bool isok = file.open(QIODevice::ReadOnly);//以只读的方式打开文件
+        if(isok == true)
         {
-            QFile file(filename);
-            QByteArray ba = filename.toLatin1();
-            const char *c = ba.data();
-            lex = new Lexer(c);
-            bool isok = file.open(QIODevice::ReadOnly);//以只读的方式打开文件
-            if(isok == true)
+            QByteArray array;
+            while(file.atEnd() == false)
             {
-                QByteArray array;
-                while(file.atEnd() == false)
-                {
-                    array += file.readLine();//将文件中的读取的内容保存在字节数组中。
-                }
-                ui->textBrowser->setText(array);
+                array += file.readLine();//将文件中的读取的内容保存在字节数组中。
             }
-            file.close();//文件读取完毕后关闭文件。
+            ui->textBrowser->setText(array);
         }
+        file.close();//文件读取完毕后关闭文件。
+    }
+    lex->RunFile();
 }
 
-void MainWindow::on_save_clicked()
+void MainWindow::on_GrammarTree_clicked()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "保存文件", ".", "Txt(*.txt);;c files(*.c);;c++ files(*.cpp)");
-        if(filename.isEmpty() == false)
-        {
-            QFile file(filename);
-            bool isok = file.open(QIODevice::WriteOnly);
-            if(isok == true)
-            {
-                QString str = ui->textBrowser->toPlainText();
-                file.write(str.toUtf8());
-            }
-            file.close();
-        }
+    vector<SNL_TOKEN_TYPE> in = lex->getTokenVec();
+    vector<string> in_str = lex->getTokenContantVec();
+    p->setInputStrem(in,in_str);
+    if(p->grammarAnalysis() == -1){
+        std::cout<<p->get_errMsg();
+
+    };
+    p->buildTree();
+    string stdString = p->getTreeToStr();
+    QByteArray byteArray(stdString.c_str(), stdString.length());
+    ui->textBrowser->setText(byteArray);
+
+    stdString = p->getTreeToDOTLanguage();
+    QByteArray byteArrayGT(stdString.c_str(), stdString.length());
+    QWidget *Win = new QWidget();
+    QLabel *GT=new QLabel(Win);
+    GT->setText(byteArrayGT);
+    GT->adjustSize();
+    Win->show();
 }
 
 void MainWindow::on_InputProductionset_clicked()
@@ -82,20 +91,12 @@ void MainWindow::on_InputProductionset_clicked()
             }
             file.close();//文件读取完毕后关闭文件。
         }
-        vector<SNL_TOKEN_TYPE> in = lex->getTokenVec();
-        p->setInputStrem(lex->getTokenVec(),lex->getTokenContantVec());
-        if(p->grammarAnalysis() == -1){
-            std::cout<<p->get_errMsg();
-
-        };
-        std::cout<<p->getTreeToDOTLanguage();
 }
 
 
 void MainWindow::on_TokenList_clicked()
 {
-     lex->RunFile();
-     QTableWidget* TokenTable = new QTableWidget(1,2);
+     QTableWidget* TokenTable = new QTableWidget(0,2);
 
      vector<SNL_TOKEN_TYPE>m_Token_Vec = lex->getTokenVec();
      vector<string>m_Token_Contant_Vec = lex->getTokenContantVec();
@@ -120,7 +121,7 @@ void MainWindow::on_TokenList_clicked()
 void MainWindow::on_FirstTable_clicked()
 {
     map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> sets = p->get_First_Sets();
-    QTableWidget* FirstTable = new QTableWidget(1,2);
+    QTableWidget* FirstTable = new QTableWidget(0,2);
     FirstTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
     auto m_terminal=p->get_All_Terminals();
     for (auto iter = sets.begin(); iter != sets.end(); iter++) {
@@ -137,7 +138,7 @@ void MainWindow::on_FirstTable_clicked()
 void MainWindow::on_FollowTable_clicked()
 {
     map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> sets = p->get_Follow_Sets();
-    QTableWidget* FollowTable = new QTableWidget(1,2);
+    QTableWidget* FollowTable = new QTableWidget(0,2);
     FollowTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
     auto m_terminal=p->get_All_Terminals();
     for (auto iter = sets.begin(); iter != sets.end(); iter++) {
@@ -154,7 +155,7 @@ void MainWindow::on_FollowTable_clicked()
 void MainWindow::on_PredicctTable_clicked()
 {
     map<int, set<SNL_TOKEN_TYPE>> m_predict_set = p->get_Predict_Sets();
-    QTableWidget* PredictTable = new QTableWidget(1,2);
+    QTableWidget* PredictTable = new QTableWidget(0,2);
     PredictTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
 
     for (auto iter = m_predict_set.begin(); iter != m_predict_set.end(); iter++) {

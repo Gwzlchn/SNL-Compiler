@@ -75,7 +75,7 @@
      </rect>
     </property>
     <property name="readOnly">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="InputToken">
@@ -91,7 +91,7 @@
      <string>InputToken</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="save">
+   <widget class="QPushButton" name="GrammarTree">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -101,7 +101,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Save</string>
+     <string>GrammarTree</string>
     </property>
    </widget>
    <widget class="QPushButton" name="InputProductionset">

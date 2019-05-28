@@ -18,7 +18,7 @@ public:
 private slots:
     void on_InputToken_clicked();
 
-    void on_save_clicked();
+    void on_GrammarTree_clicked();
 
     void on_InputProductionset_clicked();
 
