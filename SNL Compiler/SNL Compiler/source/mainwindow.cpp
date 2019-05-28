@@ -186,9 +186,9 @@ void MainWindow::on_GrammarTree_clicked()
     vector<SNL_TOKEN_TYPE> in = lex->getTokenVec();
     vector<string> in_str = lex->getTokenContantVec();
     p->setInputStrem(in,in_str);
-    if(p->grammarAnalysis() == -1){
-        std::cout<<p->get_errMsg();
-
+    if(!p->grammarAnalysis()){
+        QMessageBox::warning(NULL, "warning", QString::fromStdString(p->get_errMsg()), QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        return;
     };
     p->buildTree();
 
