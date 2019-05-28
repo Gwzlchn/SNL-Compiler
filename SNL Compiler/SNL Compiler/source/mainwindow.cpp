@@ -46,8 +46,9 @@ void MainWindow::on_InputToken_clicked()
             ui->textBrowser->setText(array);
         }
         file.close();//文件读取完毕后关闭文件。
+
     }
-    lex->RunFile();
+
 }
 
 void MainWindow::on_InputProductionset_clicked()
@@ -76,6 +77,11 @@ void MainWindow::on_TokenList_clicked()
 {
     if(lex==NULL){
         QMessageBox::warning(NULL, "warning", "Input token first", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        return;
+    }
+    bool flag = lex->RunFile();
+    if(!flag){
+        QMessageBox::warning(NULL, "ERROR", "LEX ERROR" + QString::fromStdString(lex->lex_err_msg) , QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
         return;
     }
      QTableWidget* TokenTable = new QTableWidget(0,2);

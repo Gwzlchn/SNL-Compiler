@@ -100,14 +100,15 @@ const char* Lexer::readFile(const char* path) {
 
 bool Lexer::RunFile() {
 	 while (this->curToken.type != TOKEN_ENDFILE) {
-         if(this->getNextToken()){
+         if(!this->getNextToken() && this->curToken.type!= TOKEN_ENDFILE){
+            return false;
+         }else{
              string cur_str(this->curToken.start, this->curToken.length);
              this->m_Token_Contant_Vec.push_back(cur_str);
              this->m_Token_Vec.push_back(this->curToken.type);
-         }else{
-             return false;
          }
 	 }
+     return true;
  }
 
 
