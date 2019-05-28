@@ -185,17 +185,14 @@ void MainWindow::on_GrammarTree_clicked()
 
     };
     p->buildTree();
-    string stdString = p->getTreeToDOTLanguage();
-    QByteArray byteArray(stdString.c_str(), stdString.length());
-    ui->textBrowser->setText(byteArray);
 
-    stdString = p->getTreeToStr();
-    QByteArray byteArrayGT(stdString.c_str(), stdString.length());
+    ui->textBrowser->setText(QString::fromStdString(p->getTreeToDOTLanguage()));
+
     QTabWidget *tabwidget = new QTabWidget;
     QScrollArea *scrollArea = new QScrollArea;
     QLabel *widget = new QLabel;
-    widget->setText(byteArrayGT);
-    widget->adjustSize();
+    widget->setText(QString::fromStdString(p->getTreeToStr()));
+    //widget->adjustSize();
     scrollArea->setWidget(widget);
     tabwidget->addTab(scrollArea,"GrammarTree");
     tabwidget->show();
