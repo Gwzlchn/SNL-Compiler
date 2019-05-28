@@ -7,11 +7,12 @@
 #include"SNL_Lexer.h"
 #include <iostream>
 #include <QTableWidget>
+#include <QMessageBox>
 #include <QLabel>
 using namespace std;
 
-ProductionSet* p;
-Lexer* lex;
+ProductionSet* p=NULL;
+Lexer* lex=NULL;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -49,29 +50,6 @@ void MainWindow::on_InputToken_clicked()
     lex->RunFile();
 }
 
-void MainWindow::on_GrammarTree_clicked()
-{
-    vector<SNL_TOKEN_TYPE> in = lex->getTokenVec();
-    vector<string> in_str = lex->getTokenContantVec();
-    p->setInputStrem(in,in_str);
-    if(p->grammarAnalysis() == -1){
-        std::cout<<p->get_errMsg();
-
-    };
-    p->buildTree();
-    string stdString = p->getTreeToDOTLanguage();
-    QByteArray byteArray(stdString.c_str(), stdString.length());
-    ui->textBrowser->setText(byteArray);
-
-    stdString = p->getTreeToStr();
-    QByteArray byteArrayGT(stdString.c_str(), stdString.length());
-    QWidget *Win = new QWidget();
-    QLabel *GT=new QLabel(Win);
-    GT->setText(byteArrayGT);
-    GT->adjustSize();
-    Win->show();
-}
-
 void MainWindow::on_InputProductionset_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, "打开文件", ".", "Txt(*.txt);;c files(*.c);; cpp files(*.cpp)");
@@ -96,6 +74,10 @@ void MainWindow::on_InputProductionset_clicked()
 
 void MainWindow::on_TokenList_clicked()
 {
+    if(lex==NULL){
+        QMessageBox::warning(NULL, "warning", "Input token first", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        return;
+    }
      QTableWidget* TokenTable = new QTableWidget(0,2);
 
      vector<SNL_TOKEN_TYPE>m_Token_Vec = lex->getTokenVec();
@@ -120,6 +102,10 @@ void MainWindow::on_TokenList_clicked()
 
 void MainWindow::on_FirstTable_clicked()
 {
+    if(p==NULL){
+        QMessageBox::warning(NULL, "warning", "haven't input productionset", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        return;
+    }
     map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> sets = p->get_First_Sets();
     QTableWidget* FirstTable = new QTableWidget(0,2);
     FirstTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
@@ -137,6 +123,10 @@ void MainWindow::on_FirstTable_clicked()
 
 void MainWindow::on_FollowTable_clicked()
 {
+    if(p==NULL){
+        QMessageBox::warning(NULL, "warning", "haven't input productionset", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        return;
+    }
     map<SNL_TOKEN_TYPE, set<SNL_TOKEN_TYPE>> sets = p->get_Follow_Sets();
     QTableWidget* FollowTable = new QTableWidget(0,2);
     FollowTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
@@ -154,6 +144,10 @@ void MainWindow::on_FollowTable_clicked()
 
 void MainWindow::on_PredicctTable_clicked()
 {
+    if(p==NULL){
+        QMessageBox::warning(NULL, "warning", "haven't input productionset", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        return;
+    }
     map<int, set<SNL_TOKEN_TYPE>> m_predict_set = p->get_Predict_Sets();
     QTableWidget* PredictTable = new QTableWidget(0,2);
     PredictTable->setHorizontalHeaderLabels(QStringList()<<"typename"<<"token");
@@ -167,3 +161,38 @@ void MainWindow::on_PredicctTable_clicked()
     PredictTable->show();
 }
 
+
+void MainWindow::on_GrammarTree_clicked()
+{
+    if(p==NULL&lex==NULL){
+        QMessageBox::warning(NULL, "warning", "Token and productionset missing", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        return;
+    }
+    if(p==NULL){
+        QMessageBox::warning(NULL, "warning", "Token missing", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        return;
+    }
+    if(lex==NULL){
+        QMessageBox::warning(NULL, "warning", "Productionset missing", QMessageBox::Retry | QMessageBox::Cancel,QMessageBox::Retry);
+        return;
+    }
+    vector<SNL_TOKEN_TYPE> in = lex->getTokenVec();
+    vector<string> in_str = lex->getTokenContantVec();
+    p->setInputStrem(in,in_str);
+    if(p->grammarAnalysis() == -1){
+        std::cout<<p->get_errMsg();
+
+    };
+    p->buildTree();
+    string stdString = p->getTreeToDOTLanguage();
+    QByteArray byteArray(stdString.c_str(), stdString.length());
+    ui->textBrowser->setText(byteArray);
+
+    stdString = p->getTreeToStr();
+    QByteArray byteArrayGT(stdString.c_str(), stdString.length());
+    QWidget *Win = new QWidget();
+    QLabel *GT=new QLabel(Win);
+    GT->setText(byteArrayGT);
+    GT->adjustSize();
+    Win->show();
+}
